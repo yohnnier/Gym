@@ -266,6 +266,21 @@ main { padding: 18px 16px; max-width: 640px; margin: 0 auto; }
 .add { margin-top: 6px; padding-left: 0; }
 img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
 
+/* grafica de progreso */
+.headline { margin: 12px 0 4px; font-size: 14px; font-weight: 600; }
+.chart-box { margin: 4px -4px 0; }
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.chart-base { stroke: var(--line); stroke-width: 1; }
+.chart-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart-dot { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+.chart-dot.last { fill: var(--accent); }
+.chart-hit { fill: transparent; cursor: pointer; }
+.chart-pt:hover .chart-dot { r: 6; }
+.chart-val { font-size: 11px; font-weight: 600; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart-val.last { fill: var(--text); font-size: 12px; font-weight: 700; }
+.chart-date { font-size: 10px; fill: var(--muted); }
+.chart-table { margin-top: 6px; }
+
 /* hoja inferior con imagen grande */
 .sheet { position: fixed; inset: 0; z-index: 30; }
 .sheet.hidden { display: none; }

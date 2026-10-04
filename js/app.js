@@ -744,8 +744,59 @@
     return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, addRow);
   }
 
+  // ---------- grafica de progreso (una linea por ejercicio) ----------
+  // Frase que resume que paso, para no tener que interpretar la grafica
+  function progressHeadline(rows, unit) {
+    const first = rows[0], last = rows[rows.length - 1];
+    if (rows.length === 1) return 'Primera sesión: ' + fmt(last.weight) + ' ' + unit + ' × ' + last.reps + '. La línea aparece desde tu próxima sesión.';
+    const diff = last.weight - first.weight;
+    const days = Math.round((isoToDate(last.date) - isoToDate(first.date)) / DAY);
+    const span = days < 14 ? days + ' días' : Math.round(days / 7) + ' semanas';
+    if (diff > 0) return '↑ Subiste ' + fmt(diff) + ' ' + unit + ' en ' + span + ' (de ' + fmt(first.weight) + ' a ' + fmt(last.weight) + ').';
+    if (diff < 0) return '↓ Bajaste ' + fmt(-diff) + ' ' + unit + ' en ' + span + '. Es normal tras una descarga o un día flojo.';
+    let same = 1;
+    for (let i = rows.length - 2; i >= 0 && rows[i].weight === last.weight; i--) same++;
+    if (last.reps > rows[rows.length - 2].reps) return '→ Mismo peso, pero ' + (last.reps - rows[rows.length - 2].reps) + ' repetición(es) más que la vez anterior. Vas bien.';
+    return '→ Llevas ' + same + ' sesiones con ' + fmt(last.weight) + ' ' + unit + '. Intenta sumar una repetición.';
+  }
+
+  function progressChart(rows, unit) {
+    const W = 320, H = 150, L = 14, R = 14, T = 26, B = 24;
+    const n = rows.length;
+    const ws = rows.map((x) => x.weight);
+    let lo = Math.min.apply(null, ws), hi = Math.max.apply(null, ws);
+    if (lo === hi) { lo -= 5; hi += 5; }
+    const pad = (hi - lo) * 0.15;
+    lo = Math.max(0, lo - pad); hi += pad;
+    const x = (i) => n === 1 ? W / 2 : L + (W - L - R) * i / (n - 1);
+    const y = (v) => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+    const maxI = ws.indexOf(Math.max.apply(null, ws));
+    const labelIdx = (i) => n <= 6 || i === 0 || i === n - 1 || i === maxI;
+    const dateIdx = (i) => n <= 5 || i === 0 || i === n - 1;
+    const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="Peso por sesión en ' + esc(unit) + '">';
+    svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" class="chart-base"/>';
+    if (n > 1) svg += '<polyline class="chart-line" points="' + rows.map((r, i) => x(i).toFixed(1) + ',' + y(r.weight).toFixed(1)).join(' ') + '"/>';
+    rows.forEach((r, i) => {
+      const cx = x(i).toFixed(1), cy = y(r.weight).toFixed(1);
+      svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="12" class="chart-hit"/>' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="4.5" class="chart-dot' + (i === n - 1 ? ' last' : '') + '"/>' +
+        '<title>' + fmtDate(r.date) + ': ' + esc(fmt(r.weight) + ' ' + unit + ' × ' + r.reps + ' reps') + '</title></g>';
+      if (labelIdx(i)) svg += '<text x="' + cx + '" y="' + (+cy - 10) + '" class="chart-val' + (i === n - 1 ? ' last' : '') + '" text-anchor="middle">' + esc(fmt(r.weight)) + '</text>';
+      if (dateIdx(i)) {
+        const p = r.date.split('-');
+        const anchor = n === 1 ? 'middle' : i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle';
+        svg += '<text x="' + cx + '" y="' + (H - 6) + '" class="chart-date" text-anchor="' + anchor + '">' + p[2] + '/' + p[1] + '</text>';
+      }
+    });
+    svg += '</svg>';
+    const box = h('div', { class: 'chart-box' });
+    box.innerHTML = svg;
+    return box;
+  }
+
   function renderProg(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Mejor serie de cada sesión por ejercicio.')));
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.')));
     const sessions = sortedSessions().reverse(); // de la mas antigua a la mas reciente
     let any = false;
     ROUTINES.forEach((r) => {
@@ -772,10 +823,14 @@
         cards.push(h('section', { class: 'card' },
           h('div', { class: 'row' },
             h('img', { class: 'mini', src: imgSrc(ex, 0), alt: '', loading: 'lazy' }),
-            h('div', {}, h('div', { class: 'ex-name' }, ex.name), h('div', { class: 'muted small' }, ex.unit))),
-          h('table', { class: 'sets' },
-            h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso × reps'), h('th', { class: 'num' }, 'Volumen'), h('th', { class: 'num' }, 'Δ peso'))),
-            tbody)));
+            h('div', {}, h('div', { class: 'ex-name' }, ex.name), h('div', { class: 'muted small' }, 'Peso en ' + ex.unit + ' · ' + rows.length + (rows.length === 1 ? ' sesión' : ' sesiones')))),
+          h('p', { class: 'headline' }, progressHeadline(rows, ex.unit)),
+          rows.length > 1 ? progressChart(rows, ex.unit) : null,
+          h('details', { class: 'chart-table' },
+            h('summary', { class: 'muted small' }, 'Ver detalle en tabla'),
+            h('table', { class: 'sets' },
+              h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso × reps'), h('th', { class: 'num' }, 'Volumen'), h('th', { class: 'num' }, 'Δ peso'))),
+              tbody))));
       });
       if (cards.length) { any = true; root.append(h('div', { class: 'section-title' }, r.name)); cards.forEach((c) => root.append(c)); }
     });
