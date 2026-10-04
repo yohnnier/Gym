@@ -262,7 +262,7 @@
 
   // ---------- volumen semanal ----------
   // Series directas por musculo en los ultimos 7 dias. Referencia para hipertrofia: 10–20 por semana.
-  const VOL_MIN = 10, VOL_MAX = 20, VOL_SCALE = 26;
+  const VOL_MIN = 10, VOL_MAX = 20;
   function weeklyVolume() {
     const out = {};
     Object.keys(MUSCLES).forEach((k) => { out[k] = 0; });
@@ -272,20 +272,30 @@
     });
     return out;
   }
+  // Mensaje en palabras simples para cada musculo
   function volStatus(n) {
-    return n < VOL_MIN ? { cls: 'low', icon: '○', text: 'Bajo' }
-      : n > VOL_MAX ? { cls: 'high', icon: '▲', text: 'Alto' }
-      : { cls: 'ok', icon: '✓', text: 'En rango' };
+    const left = VOL_MIN - n;
+    if (n === 0) return { cls: 'low', text: 'Sin series esta semana. Meta: ' + VOL_MIN + '.' };
+    if (left > 0) return { cls: 'low', text: 'Te ' + (left === 1 ? 'falta 1 serie' : 'faltan ' + left + ' series') + ' para la meta.' };
+    if (n > VOL_MAX) return { cls: 'high', text: 'Más de ' + VOL_MAX + ': es suficiente, prioriza recuperar.' };
+    return { cls: 'ok', text: '¡Meta cumplida!' };
   }
   function volumeMeter(key, n) {
     const st = volStatus(n);
-    const pct = (v) => Math.min(100, 100 * v / VOL_SCALE) + '%';
-    return h('div', { class: 'vol-row', title: MUSCLES[key] + ': ' + n + ' series en 7 días (' + st.text + ')' },
-      h('span', { class: 'vol-name' }, MUSCLES[key]),
-      h('span', { class: 'vol-track', 'aria-hidden': 'true' },
-        h('span', { class: 'vol-band', style: 'left:' + pct(VOL_MIN) + ';width:calc(' + pct(VOL_MAX) + ' - ' + pct(VOL_MIN) + ')' }),
-        n ? h('span', { class: 'vol-fill ' + st.cls, style: 'width:' + pct(n) }) : null),
-      h('span', { class: 'vol-val' }, h('b', {}, n), ' ', h('span', { class: 'vol-st ' + st.cls }, st.icon + ' ' + st.text)));
+    const pct = Math.min(100, 100 * n / VOL_MIN);
+    return h('div', { class: 'goal ' + st.cls },
+      h('div', { class: 'goal-top' },
+        h('span', { class: 'goal-name' }, MUSCLES[key]),
+        h('span', { class: 'goal-num' }, h('b', {}, n), ' de ' + VOL_MIN + ' series')),
+      h('div', { class: 'goal-bar', role: 'progressbar', 'aria-label': MUSCLES[key], 'aria-valuenow': n, 'aria-valuemin': 0, 'aria-valuemax': VOL_MIN },
+        h('i', { style: 'width:' + pct + '%' })),
+      h('div', { class: 'goal-msg' }, (st.cls === 'ok' ? '✓ ' : st.cls === 'high' ? '! ' : '') + st.text));
+  }
+  function volumeIntro(list, vol) {
+    const done = list.filter((k) => vol[k] >= VOL_MIN).length;
+    return h('div', { class: 'goal-intro' },
+      h('div', { class: 'goal-score' }, h('b', {}, done), ' de ' + list.length + ' músculos cumplen la meta'),
+      h('p', { class: 'muted small' }, 'Para ganar músculo, cada uno necesita al menos ' + VOL_MIN + ' series por semana. Aquí se cuentan las que hiciste en los últimos 7 días, incluido hoy.'));
   }
 
   // ---------- acciones ----------
@@ -599,14 +609,11 @@
     root.append(days);
 
     const vol = weeklyVolume();
-    const volCard = h('section', { class: 'card vol' },
-      h('div', { class: 'row between' },
-        h('strong', {}, 'Volumen semanal'),
-        h('span', { class: 'muted small' }, 'Series en 7 días')),
-      h('p', { class: 'muted small', style: 'margin:4px 0 10px' }, 'La franja marca 10–20 series por músculo, el rango más usado para hipertrofia.'));
     // Lumbar y trapecio no estan en el plan: solo se muestran si tienen series
-    Object.keys(MUSCLES).filter((k) => vol[k] || (k !== 'lumbar' && k !== 'trapecio')).forEach((k) => volCard.append(volumeMeter(k, vol[k])));
-    root.append(h('div', { class: 'section-title' }, 'Tu semana'));
+    const shown = Object.keys(MUSCLES).filter((k) => vol[k] || (k !== 'lumbar' && k !== 'trapecio'));
+    const volCard = h('section', { class: 'card vol' }, volumeIntro(shown, vol));
+    shown.forEach((k) => volCard.append(volumeMeter(k, vol[k])));
+    root.append(h('div', { class: 'section-title' }, 'Meta de la semana'));
     root.append(volCard);
 
 
@@ -639,11 +646,13 @@
     const vol = weeklyVolume();
     const muscles = [];
     r.exercises.forEach((e) => { if (muscles.indexOf(e.muscle) === -1) muscles.push(e.muscle); });
+    const doneM = muscles.filter((m) => vol[m] >= VOL_MIN).length;
     root.append(h('details', { class: 'card vol compact' },
-      h('summary', {}, h('strong', {}, 'Volumen esta semana'), h('span', { class: 'muted small' },
-        muscles.map((m) => MUSCLES[m] + ' ' + vol[m]).join(' · '))),
-      h('div', { style: 'margin-top:10px' }, muscles.map((m) => volumeMeter(m, vol[m]))),
-      h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Referencia: 10–20 series por músculo a la semana. Incluye lo que registres hoy.')));
+      h('summary', {},
+        h('strong', {}, 'Meta de la semana: ' + doneM + ' de ' + muscles.length + ' músculos'),
+        h('span', { class: 'muted small' }, 'Toca para ver cuántas series le faltan a cada uno')),
+      h('div', { style: 'margin-top:12px' }, muscles.map((m) => volumeMeter(m, vol[m]))),
+      h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Meta: al menos ' + VOL_MIN + ' series por músculo en 7 días. Lo que registres hoy se suma al momento.')));
 
     r.exercises.forEach((ex, i) => root.append(exerciseCard(ex, i, r)));
   }

@@ -217,18 +217,23 @@ main { padding: 18px 16px; max-width: 640px; margin: 0 auto; }
 .sugg.deload strong { color: var(--warm); }
 .sugg.deload .sugg-ico { background: var(--warm); color: #2a1300; }
 
-/* volumen semanal */
-.vol-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) 104px; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; }
-.vol-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.vol-track { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); }
-.vol-band { position: absolute; top: -3px; bottom: -3px; border-radius: 4px; background: var(--accent-soft); outline: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent); }
-.vol-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--muted); }
-.vol-fill.ok { background: var(--accent); }
-.vol-fill.high { background: var(--warm); }
-.vol-val { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.vol-val b { display: inline-block; min-width: 18px; text-align: right; }
-.vol-st { color: var(--muted); font-size: 12px; }
-.vol-st.ok { color: var(--text); }
+/* meta semanal de series por musculo */
+.goal-intro { margin-bottom: 6px; }
+.goal-score { font-size: 17px; }
+.goal-score b { font-size: 22px; color: var(--accent); }
+.goal-intro p { margin: 4px 0 4px; }
+.goal { padding: 10px 0; border-top: 1px solid var(--line); }
+.goal-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.goal-name { font-weight: 600; }
+.goal-num { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.goal-num b { color: var(--text); font-size: 15px; }
+.goal-bar { height: 10px; margin: 6px 0 5px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+.goal-bar i { display: block; height: 100%; border-radius: 5px; background: var(--muted); transition: width .3s ease; }
+.goal.ok .goal-bar i { background: var(--accent); }
+.goal.high .goal-bar i { background: var(--warm); }
+.goal-msg { font-size: 12px; color: var(--muted); }
+.goal.ok .goal-msg { color: var(--accent); font-weight: 600; }
+.goal.high .goal-msg { color: var(--warm); font-weight: 600; }
 .vol.compact summary { list-style: none; display: flex; flex-direction: column; gap: 2px; }
 .vol.compact summary::-webkit-details-marker { display: none; }
 .vol.compact { margin-bottom: 14px; }

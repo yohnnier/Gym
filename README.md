@@ -5,7 +5,7 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 ## Funciones
 
 - **Plan de 3 días** (empuje / tirón + abdomen / piernas), con tres tarjetas en el inicio, editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día según el último que hiciste.
-- **Inicio**: saludo, resumen, el plan de 3 días, **volumen semanal** por músculo (referencia 10–20 series) . Los grupos musculares sueltos están en la pestaña Rutinas.
+- **Inicio**: saludo, resumen, el plan de 3 días, **meta de la semana**: cuántas series lleva cada músculo de las 10 recomendadas y cuántas le faltan . Los grupos musculares sueltos están en la pestaña Rutinas.
 - **Página por grupo** (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): cada ejercicio muestra su imagen, tu **último registro** y, al lado, las filas para registrar **hoy**. La fecha se guarda sola.
 - **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
   - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango. Si el salto supera el 15 % del peso (p. ej. mancuernas ligeras), primero pide 3 repeticiones más.
