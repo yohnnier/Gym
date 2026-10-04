@@ -286,7 +286,7 @@ const PLAN = {
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }
+        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }, { id: 'press-frances', sets: 2 }
       ]
     },
     {
@@ -294,15 +294,15 @@ const PLAN = {
       exercises: [
         { id: 'jalon-pecho', sets: 4 }, { id: 'remo-maquina' }, { id: 'remo-mancuerna' },
         { id: 'face-pull' }, { id: 'pajaros' },
-        { id: 'curl-inclinado', sets: 4 }, { id: 'curl-martillo', sets: 4 },
+        { id: 'curl-inclinado', sets: 4 }, { id: 'curl-martillo', sets: 4 }, { id: 'curl-predicador', sets: 2 },
         { id: 'crunch-polea' }
       ]
     },
     {
       id: 'dia-piernas', name: 'Día 3 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
-        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust' },
-        { id: 'extension-cuadriceps' }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
+        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
       ]
     }
   ]
