@@ -1,0 +1,15 @@
+{
+  "name": "Rutinas de gimnasio",
+  "short_name": "Rutinas",
+  "description": "Registro de series, progresión y descanso para tu rutina de piernas.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
