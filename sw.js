@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v9';
+const CACHE = 'rutinas-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -29,7 +29,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    fetch(e.request)
+    // no-cache: revalida con el servidor y evita servir una copia vieja de la cache HTTP del navegador
+    fetch(e.request, { cache: 'no-cache' })
       .then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(e.request, copy));
