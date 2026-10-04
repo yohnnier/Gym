@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v17';
+const CACHE = 'rutinas-v18';
 const ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,8 @@ self.addEventListener('activate', (e) => {
 // Red primero para recibir actualizaciones; si no hay conexion, usa la cache.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  // Solo archivos de la propia app: las llamadas a GitHub (con la llave) no se guardan en cache
+  if (new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
     // no-cache: revalida con el servidor y evita servir una copia vieja de la cache HTTP del navegador
     fetch(e.request, { cache: 'no-cache' })

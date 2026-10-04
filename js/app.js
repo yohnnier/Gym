@@ -91,13 +91,20 @@
         const sessions = s.sessions;
         // Version anterior: una sesion "en curso" separada. Se guarda como sesion normal.
         if (s.current && s.current.entries && s.current.entries.length) sessions.push(s.current);
-        return { sessions: sessions };
+        return { sessions: sessions, deleted: Array.isArray(s.deleted) ? s.deleted : [] };
       }
     } catch (e) { /* sin datos */ }
-    return { sessions: [] };
+    return { sessions: [], deleted: [] };
   }
-  function save() {
+  // changed = true cuando cambian los registros: se programa el guardado en la nube
+  function save(changed) {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* almacenamiento no disponible */ }
+    if (changed) scheduleSync();
+  }
+  function touch(s) { s.updatedAt = Date.now(); }
+  function forget(s) {
+    state.sessions = state.sessions.filter((x) => x.id !== s.id);
+    if (state.deleted.indexOf(s.id) === -1) state.deleted.push(s.id);
   }
   function loadImages() {
     try { return JSON.parse(localStorage.getItem(IMG_KEY)) || {}; } catch (e) { return {}; }
@@ -106,13 +113,21 @@
     try { localStorage.setItem(IMG_KEY, JSON.stringify(customImg)); return true; } catch (e) { return false; }
   }
 
-  // Historial del repositorio (data/sessions.json), solo lectura; se une al guardado en este dispositivo.
-  function allSessions() {
-    const ids = {};
-    repoSessions.forEach((x) => { ids[x.id] = true; });
-    return repoSessions.concat(state.sessions.filter((x) => !ids[x.id]));
+  // Une dos listas de sesiones por id: gana la copia modificada mas recientemente (en empate, la primera lista).
+  function mergeSessions(base, local, deleted) {
+    const del = {};
+    (deleted || []).forEach((id) => { del[id] = true; });
+    const map = new Map();
+    base.forEach((x) => { if (!del[x.id]) map.set(x.id, x); });
+    local.forEach((x) => {
+      if (del[x.id]) return;
+      const b = map.get(x.id);
+      if (!b || (x.updatedAt || 0) > (b.updatedAt || 0)) map.set(x.id, x);
+    });
+    return Array.from(map.values());
   }
-  const isRepo = (s) => repoSessions.indexOf(s) !== -1;
+  // Historial del repositorio (data/sessions.json) unido con lo guardado en este dispositivo.
+  function allSessions() { return mergeSessions(repoSessions, state.sessions, state.deleted); }
   function sortedSessions() {
     return allSessions().sort((a, b) =>
       a.date === b.date ? (b.createdAt || 0) - (a.createdAt || 0) : (a.date < b.date ? 1 : -1));
@@ -121,9 +136,9 @@
   // Sesion de hoy para un grupo (solo en este dispositivo). Se crea al registrar la primera serie.
   function todaySession(routineId, create) {
     const today = todayISO();
-    let s = state.sessions.find((x) => x.date === today && (x.routineId || 'piernas') === routineId);
+    let s = state.sessions.find((x) => x.date === today && x.source === 'app' && (x.routineId || 'piernas') === routineId);
     if (!s && create) {
-      s = { id: uid(), date: today, createdAt: Date.now(), routineId: routineId, entries: [] };
+      s = { id: uid(), date: today, createdAt: Date.now(), routineId: routineId, source: 'app', entries: [] };
       state.sessions.push(s);
     }
     return s || null;
@@ -139,7 +154,7 @@
     const out = [];
     const sessions = sortedSessions();
     for (let i = 0; i < sessions.length && out.length < n; i++) {
-      if (!isRepo(sessions[i]) && sessions[i].date >= today) continue;
+      if (sessions[i].source === 'app' && sessions[i].date >= today) continue;
       const sets = sessions[i].entries.filter((x) => x.exerciseId === exId);
       if (sets.length) out.push({ session: sessions[i], sets: sets });
     }
@@ -312,8 +327,9 @@
     const s = todaySession(routineId, true);
     s.entries.push(entry);
     renumber(s.entries);
+    touch(s);
     delete drafts[ex.id][row];
-    save();
+    save(true);
     startTimer(ex.rest);
     if (entry.weight != null && before != null && entry.weight > before) toast('¡Nuevo récord en ' + ex.name + '! 🎉');
     else if (entry.reps < ex.repMin) toast('Está bien quedarse corto: ajusta el peso y sigue.');
@@ -326,8 +342,9 @@
     if (!s) return;
     s.entries = s.entries.filter((x) => x !== entry);
     renumber(s.entries);
-    if (!s.entries.length) state.sessions = state.sessions.filter((x) => x !== s);
-    save(); render();
+    touch(s);
+    if (!s.entries.length) forget(s);
+    save(true); render();
   }
 
   // ---------- imagenes ----------
@@ -478,6 +495,189 @@
     sheet.classList.remove('hidden');
   }
 
+  // ---------- guardado en la nube (GitHub) ----------
+  // La app guarda las sesiones en data/sessions.json del repositorio, con una llave de acceso
+  // (token de GitHub con permiso solo para este repositorio) guardada en este dispositivo.
+  const GH = { owner: 'yohnnier', repo: 'Gym', branch: 'main', path: 'data/sessions.json' };
+  const GH_API = 'https://api.github.com/repos/' + GH.owner + '/' + GH.repo;
+  const TOKEN_KEY = 'rutinas.gh.v1';
+  let ghToken = null;
+  try { ghToken = localStorage.getItem(TOKEN_KEY) || null; } catch (e) { /* sin almacenamiento */ }
+  const sync = { status: ghToken ? 'idle' : 'off', at: 0, error: '', running: false, again: false, timer: null };
+
+  function b64enc(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function b64dec(b64) {
+    const bin = atob(b64.replace(/\s/g, ''));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function ghError(status) {
+    const e = new Error(
+      status === 401 ? 'la llave no es válida o ya venció'
+        : status === 403 || status === 404 ? 'la llave no tiene permiso para guardar en el repositorio Gym'
+        : status === 0 ? 'sin conexión a internet'
+        : 'GitHub respondió con un error (' + status + ')');
+    e.status = status;
+    return e;
+  }
+  function ghHeaders(token) {
+    return { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  }
+  async function ghFetch(url, opts) {
+    try { return await fetch(url, opts); } catch (e) { throw ghError(0); }
+  }
+  async function ghRead(token) {
+    const r = await ghFetch(GH_API + '/contents/' + GH.path + '?ref=' + GH.branch + '&t=' + Date.now(), { headers: ghHeaders(token), cache: 'no-store' });
+    if (r.status === 404) {
+      // ¿No existe el archivo o la llave no ve el repositorio?
+      const repo = await ghFetch(GH_API, { headers: ghHeaders(token), cache: 'no-store' });
+      if (repo.ok) return { list: [], sha: null };
+      throw ghError(repo.status);
+    }
+    if (!r.ok) throw ghError(r.status);
+    const j = await r.json();
+    const list = JSON.parse(b64dec(j.content || '') || '[]');
+    return { list: Array.isArray(list) ? list : [], sha: j.sha };
+  }
+  async function ghWrite(token, list, sha, message) {
+    const body = { message: message, content: b64enc(JSON.stringify(list, null, 1) + '\n'), branch: GH.branch };
+    if (sha) body.sha = sha;
+    const r = await ghFetch(GH_API + '/contents/' + GH.path, { method: 'PUT', headers: ghHeaders(token), body: JSON.stringify(body) });
+    if (r.status === 409 || r.status === 422) { const e = ghError(r.status); e.conflict = true; throw e; }
+    if (!r.ok) throw ghError(r.status);
+  }
+  function fileOrder(list) {
+    return list.slice().sort((a, b) => (a.date === b.date ? (a.createdAt || 0) - (b.createdAt || 0) : (a.date < b.date ? -1 : 1)));
+  }
+
+  function setSync(status, error) {
+    sync.status = status;
+    if (error != null) sync.error = error;
+    document.querySelectorAll('.sync-status').forEach((el) => { el.replaceWith(syncBadge()); });
+  }
+  function syncText() {
+    switch (sync.status) {
+      case 'off': return { cls: 'off', text: 'Guardado solo en este dispositivo. Actívalo en Rutinas → Guardado en la nube.' };
+      case 'pending': return { cls: 'wait', text: '☁ Cambios pendientes de guardar…' };
+      case 'saving': return { cls: 'wait', text: '☁ Guardando en la nube…' };
+      case 'ok': return { cls: 'ok', text: '☁ Guardado en la nube · ' + new Date(sync.at).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) };
+      case 'error': return { cls: 'err', text: '⚠ No se pudo guardar en la nube: ' + sync.error + '. Tus datos siguen en este dispositivo y se reintentará.' };
+      default: return { cls: 'wait', text: '☁ Conectado a la nube' };
+    }
+  }
+  function syncBadge() {
+    const t = syncText();
+    return h('div', { class: 'sync-status ' + t.cls, role: 'status' }, t.text);
+  }
+
+  function scheduleSync(delay) {
+    if (!ghToken) return;
+    if (sync.status !== 'saving') setSync('pending');
+    clearTimeout(sync.timer);
+    sync.timer = setTimeout(runSync, delay == null ? 6000 : delay);
+  }
+
+  async function runSync() {
+    if (!ghToken) return;
+    if (sync.running) { sync.again = true; return; }
+    sync.running = true;
+    clearTimeout(sync.timer);
+    setSync('saving');
+    try {
+      for (let attempt = 0; ; attempt++) {
+        const remote = await ghRead(ghToken);
+        const merged = mergeSessions(remote.list, state.sessions, state.deleted);
+        const before = JSON.stringify(fileOrder(remote.list));
+        const after = fileOrder(merged);
+        if (JSON.stringify(after) !== before) {
+          const latest = merged.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+          const msg = latest ? 'Registro desde la app: ' + routineOf(latest).name + ' ' + latest.date : 'Registro desde la app';
+          try { await ghWrite(ghToken, after, remote.sha, msg); }
+          catch (e) { if (e.conflict && attempt < 2) continue; throw e; }
+        }
+        const remoteChanged = JSON.stringify(fileOrder(repoSessions)) !== JSON.stringify(after);
+        state.sessions = merged;
+        repoSessions = merged;
+        save(false);
+        sync.at = Date.now();
+        setSync('ok', '');
+        // Redibujar solo si llegaron datos nuevos y no estas escribiendo en un campo
+        if (remoteChanged && !(document.activeElement && document.activeElement.tagName === 'INPUT')) render();
+        break;
+      }
+    } catch (e) {
+      setSync('error', e.message);
+      if (e.status === 0 || !e.status || e.status >= 500) sync.timer = setTimeout(runSync, 60000);
+    } finally {
+      sync.running = false;
+      if (sync.again) { sync.again = false; scheduleSync(1000); }
+    }
+  }
+
+  async function connectGitHub(token, done) {
+    token = token.trim();
+    if (!token) { toast('Pega la llave de acceso.'); return; }
+    try {
+      await ghRead(token);
+    } catch (e) { done(e.message); return; }
+    ghToken = token;
+    try { localStorage.setItem(TOKEN_KEY, token); } catch (e) { /* sin almacenamiento */ }
+    toast('Conectado. Guardando tus registros en la nube…');
+    done(null);
+    await runSync();
+    render();
+  }
+  function disconnectGitHub() {
+    if (!confirm('¿Desconectar? Tus registros quedan guardados en la nube y en este dispositivo, pero los nuevos solo se guardarán aquí.')) return;
+    ghToken = null;
+    try { localStorage.removeItem(TOKEN_KEY); } catch (e) { /* sin almacenamiento */ }
+    clearTimeout(sync.timer);
+    setSync('off', '');
+    render();
+  }
+
+  function cloudCard() {
+    const card = h('section', { class: 'card cloud' });
+    if (ghToken) {
+      card.append(
+        h('strong', {}, '☁ Conectado a GitHub'),
+        h('p', { class: 'muted small' }, 'Cada serie que registras se guarda sola en tu repositorio (' + GH.owner + '/' + GH.repo + '). Puedes abrir la app en otro dispositivo y conectarlo con la misma llave.'),
+        syncBadge(),
+        h('div', { class: 'row wrap', style: 'margin-top:10px' },
+          h('button', { class: 'btn', type: 'button', onclick: () => runSync() }, 'Guardar ahora'),
+          h('button', { class: 'btn ghost', type: 'button', onclick: disconnectGitHub }, 'Desconectar')));
+      return card;
+    }
+    const input = h('input', { type: 'password', autocomplete: 'off', placeholder: 'github_pat_…', 'aria-label': 'Llave de acceso de GitHub' });
+    const msg = h('p', { class: 'small', style: 'margin:8px 0 0' });
+    const btn = h('button', { class: 'btn primary', type: 'button', onclick: () => {
+      btn.disabled = true; msg.textContent = 'Comprobando…'; msg.className = 'small muted';
+      connectGitHub(input.value, (err) => {
+        btn.disabled = false;
+        if (err) { msg.textContent = 'No se pudo conectar: ' + err + '.'; msg.className = 'small err-text'; }
+      });
+    } }, 'Conectar');
+    card.append(
+      h('strong', {}, 'Guarda tus registros en la nube'),
+      h('p', { class: 'muted small' }, 'Ahora tus registros están solo en este dispositivo. Conecta tu repositorio de GitHub para guardarlos solos, verlos en todos tus dispositivos y no perderlos nunca.'),
+      h('ol', { class: 'steps small' },
+        h('li', {}, 'Abre ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'github.com/settings/personal-access-tokens/new'), '.'),
+        h('li', {}, 'Nombre: "Rutinas". Caducidad: la que prefieras (por ejemplo, 1 año).'),
+        h('li', {}, 'En "Repository access" elige "Only select repositories" y marca ', h('b', {}, 'Gym'), '.'),
+        h('li', {}, 'En "Permissions" → "Repository permissions" → ', h('b', {}, 'Contents'), ': "Read and write".'),
+        h('li', {}, 'Pulsa "Generate token", copia la llave y pégala aquí.')),
+      h('div', { class: 'row' }, input, btn),
+      msg,
+      h('p', { class: 'muted small' }, 'La llave se guarda solo en este dispositivo y solo sirve para el repositorio Gym. No la compartas con nadie, ni en el chat. Las fotos que cambies no se suben, solo los registros.'));
+    return card;
+  }
+
   // ---------- exportar / importar ----------
   function download(name, text, type) {
     const a = document.createElement('a');
@@ -507,8 +707,8 @@
         const data = JSON.parse(String(reader.result));
         if (!data || !Array.isArray(data.sessions)) throw new Error('formato');
         if (!confirm('Esto reemplaza tus datos actuales. ¿Continuar?')) return;
-        state = { sessions: data.sessions };
-        save(); render();
+        state = { sessions: data.sessions, deleted: Array.isArray(data.deleted) ? data.deleted : [] };
+        save(true); render();
       } catch (e) {
         alert('El archivo no es una exportación válida de esta app.');
       }
@@ -641,7 +841,8 @@
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
         ? done + ' de ' + total + ' series' + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
-        : total + ' series planificadas · la fecha se guarda sola')));
+        : total + ' series planificadas · la fecha se guarda sola'),
+      syncBadge()));
 
     const vol = weeklyVolume();
     const muscles = [];
@@ -714,7 +915,7 @@
           const row = h('div', { class: 'rpe' });
           [6, 7, 8, 9, 10].forEach((v) => row.append(h('button', {
             type: 'button', title: RPE_TEXT[v],
-            onclick: () => { entry.rpe = v; save(); toast(RPE_TEXT[v] + '. Anotado.'); render(); }
+            onclick: () => { entry.rpe = v; const ts = todaySession(r.id, false); if (ts) touch(ts); save(true); toast(RPE_TEXT[v] + '. Anotado.'); render(); }
           }, String(v))));
           chips.append(row);
           table.append(chips);
@@ -864,12 +1065,12 @@
       });
       inner.append(h('div', { class: 'row wrap', style: 'margin-top:10px' },
         h('button', { class: 'btn small', type: 'button', onclick: () => download('rutina-' + routineOf(s).id + '-' + s.date + '.md', sessionToMd(s), 'text/markdown') }, 'Exportar .md'),
-        isRepo(s) ? h('span', { class: 'muted small' }, 'Registro del repositorio') : h('button', {
+        h('button', {
           class: 'btn small danger', type: 'button',
           onclick: () => {
-            if (!confirm('¿Eliminar esta sesión?')) return;
-            state.sessions = state.sessions.filter((x) => x !== s);
-            save(); render();
+            if (!confirm(ghToken ? '¿Eliminar esta sesión? También se borrará de la nube.' : '¿Eliminar esta sesión de este dispositivo?')) return;
+            forget(s);
+            save(true); render();
           }
         }, 'Eliminar')));
       root.append(h('details', { class: 'sess' },
@@ -926,21 +1127,23 @@
     const fileInput = h('input', { type: 'file', accept: 'application/json', style: 'display:none' });
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) importData(fileInput.files[0]); });
 
-    root.append(h('div', { class: 'section-title' }, 'Datos'));
+    root.append(h('div', { class: 'section-title' }, 'Guardado en la nube'));
+    root.append(cloudCard());
+    root.append(h('div', { class: 'section-title' }, 'Copia de seguridad'));
     root.append(h('section', { class: 'card' },
-      h('p', { class: 'muted small', style: 'margin-top:0' }, 'Lo que registras en la app se guarda en este dispositivo. Exporta una copia de vez en cuando.'),
+      h('p', { class: 'muted small', style: 'margin-top:0' }, 'Descarga o carga un archivo con tus registros. Útil como respaldo extra.'),
       h('div', { class: 'row wrap' },
         h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(state, null, 2), 'application/json') }, 'Exportar datos'),
         h('button', { class: 'btn', type: 'button', onclick: () => fileInput.click() }, 'Importar datos'),
         h('button', {
           class: 'btn danger', type: 'button',
           onclick: () => {
-            if (!confirm('Se borrarán todas las sesiones de este dispositivo. ¿Continuar?')) return;
-            state = { sessions: [] };
+            if (!confirm('Se borrarán las sesiones guardadas en este dispositivo.' + (ghToken ? ' La copia en la nube no se borra y volverá a cargarse.' : '') + ' ¿Continuar?')) return;
+            state = { sessions: [], deleted: state.deleted };
             stopTimer(false);
-            save(); render();
+            save(false); render();
           }
-        }, 'Borrar todo')),
+        }, 'Borrar de este dispositivo')),
       fileInput));
   }
 
@@ -964,19 +1167,26 @@
   save();
   render();
 
-  fetch('data/sessions.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : []))
-    .then((list) => {
-      if (!Array.isArray(list)) return;
-      repoSessions = list;
-      render();
-    })
-    .catch(() => { /* sin historial del repositorio */ });
+  if (ghToken) {
+    runSync();
+  } else {
+    fetch('data/sessions.json', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list) => {
+        if (!Array.isArray(list)) return;
+        repoSessions = list;
+        render();
+      })
+      .catch(() => { /* sin historial del repositorio */ });
+  }
+  // Guardar antes de salir de la app y al recuperar la conexion
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && sync.status === 'pending') runSync(); });
+  window.addEventListener('online', () => { if (ghToken && (sync.status === 'error' || sync.status === 'pending')) runSync(); });
 
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     navigator.serviceWorker.register('sw.js').catch(() => { /* sin offline */ });
   }
 
   // Expuesto para pruebas
-  window.__rutinas = { plan: plan, sessionToMd: sessionToMd, getState: () => state };
+  window.__rutinas = { mergeSessions: mergeSessions, plan: plan, sessionToMd: sessionToMd, getState: () => state };
 })();

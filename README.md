@@ -18,9 +18,16 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 - **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
 - **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.
 
-## Registrar desde el chat
+## Guardado en la nube (GitHub)
 
-El historial publicado está en `data/sessions.json`. La app lo une con lo que registres en el dispositivo.
+En **Rutinas → Guardado en la nube** se conecta la app al repositorio con una llave de acceso de GitHub (token *fine-grained* con permiso **Contents: Read and write** solo para este repositorio). Desde entonces cada serie registrada se guarda sola en `data/sessions.json`, se ve en todos los dispositivos conectados y no se pierde al borrar el navegador. La llave se guarda solo en el dispositivo.
+
+- Si dos dispositivos cambian la misma sesión, gana la modificación más reciente.
+- Las sesiones eliminadas en la app también se eliminan del repositorio.
+- Las fotos propias de las máquinas no se suben.
+- También se pueden añadir sesiones desde el chat: van al mismo archivo.
+
+Sin conexión a GitHub, la app sigue funcionando y guarda en el dispositivo.
 
 ## Probar en local
 
@@ -51,7 +58,7 @@ Edita `js/routine.js`: ejercicios, series, rangos de repeticiones, descansos, un
 
 ## Datos
 
-Los registros se guardan en el `localStorage` del navegador de cada dispositivo. No hay servidor ni cuentas. Exporta una copia desde la pestaña **Rutina → Datos** de vez en cuando, y úsala para pasar tus datos a otro dispositivo.
+Sin guardado en la nube, los registros quedan en el `localStorage` del navegador de cada dispositivo. Con el guardado en la nube activado, además se guardan en `data/sessions.json` del repositorio. También hay exportación e importación manual en JSON (Rutinas → Copia de seguridad).
 
 ## Estructura
 
