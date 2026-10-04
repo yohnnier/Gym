@@ -141,8 +141,8 @@ main { padding: 18px 16px; max-width: 640px; margin: 0 auto; }
 }
 .day:active { transform: scale(.99); }
 .day.next { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset, var(--shadow); }
-.day-cover { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; height: 120px; background: var(--line); }
-.day-cover img { width: 100%; height: 100%; object-fit: cover; display: block; min-width: 0; }
+.day-cover { position: relative; flex: none; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 100%; gap: 2px; height: 120px; overflow: hidden; background: var(--line); }
+.day-cover img { width: 100%; height: 100%; object-fit: cover; display: block; min-width: 0; min-height: 0; }
 .day-body { display: flex; align-items: center; gap: 12px; padding: 12px 14px 14px; }
 .day-n {
   flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
