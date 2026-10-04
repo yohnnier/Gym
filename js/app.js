@@ -521,7 +521,7 @@
     const e = new Error(
       status === 401 ? 'la llave no es válida o ya venció'
         : status === 403 || status === 404 ? 'la llave no tiene permiso para guardar en el repositorio Gym'
-        : status === 0 ? 'sin conexión a internet'
+        : status === 0 ? 'no hubo respuesta de GitHub (revisa tu conexión a internet)'
         : 'GitHub respondió con un error (' + status + ')');
     e.status = status;
     return e;
@@ -529,8 +529,13 @@
   function ghHeaders(token) {
     return { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
   }
+  // Con limite de 20 s para que nunca se quede esperando
   async function ghFetch(url, opts) {
-    try { return await fetch(url, opts); } catch (e) { throw ghError(0); }
+    const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const t = ctrl ? setTimeout(() => ctrl.abort(), 20000) : null;
+    try { return await fetch(url, Object.assign({}, opts, ctrl ? { signal: ctrl.signal } : {})); }
+    catch (e) { throw ghError(0); }
+    finally { clearTimeout(t); }
   }
   async function ghRead(token) {
     const r = await ghFetch(GH_API + '/contents/' + GH.path + '?ref=' + GH.branch + '&t=' + Date.now(), { headers: ghHeaders(token), cache: 'no-store' });
@@ -622,7 +627,7 @@
 
   async function connectGitHub(token, done) {
     token = token.trim();
-    if (!token) { toast('Pega la llave de acceso.'); return; }
+    if (!token) { done('primero pega la llave en el campo (empieza por github_pat_)'); return; }
     try {
       await ghRead(token);
     } catch (e) { done(e.message); return; }
