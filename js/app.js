@@ -1184,7 +1184,18 @@
   window.addEventListener('online', () => { if (ghToken && (sync.status === 'error' || sync.status === 'pending')) runSync(); });
 
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* sin offline */ });
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      // Buscar versiones nuevas al volver a la app
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => { /* sin offline */ });
+    // Cuando se publica una version nueva, ofrecer actualizar (sin recargar a la fuerza a mitad de una serie)
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || $('#update-bar')) return;
+      document.body.append(h('div', { class: 'update-bar', id: 'update-bar', role: 'status' },
+        h('span', {}, 'Hay una versión nueva de la app.'),
+        h('button', { class: 'btn primary small', type: 'button', onclick: () => location.reload() }, 'Actualizar')));
+    });
   }
 
   // Expuesto para pruebas
