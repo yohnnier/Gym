@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+  const VERSION = '21';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -1150,6 +1151,7 @@
           }
         }, 'Borrar de este dispositivo')),
       fileInput));
+    root.append(h('p', { class: 'muted small', style: 'text-align:center;margin-top:18px' }, 'Versión ' + VERSION));
   }
 
   // ---------- arranque ----------
