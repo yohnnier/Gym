@@ -4,7 +4,11 @@
 
   const KEY = 'rutinas.v1';
   const exById = {};
-  ROUTINE.exercises.forEach((e) => { exById[e.id] = e; });
+  ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
+  const routineById = {};
+  ROUTINES.forEach((r) => { routineById[r.id] = r; });
+  const routineOf = (s) => routineById[(s && s.routineId) || 'piernas'] || ROUTINES[0];
+  const curRoutine = () => routineOf(state.current);
 
   let state = load();
   let view = 'hoy';
@@ -102,9 +106,9 @@
   }
 
   // ---------- acciones ----------
-  function startSession() {
-    state.current = { id: uid(), date: todayISO(), createdAt: Date.now(), entries: [] };
-    openId = ROUTINE.exercises[0].id;
+  function startSession(routine) {
+    state.current = { id: uid(), date: todayISO(), createdAt: Date.now(), routineId: routine.id, entries: [] };
+    openId = routine.exercises[0].id;
     save(); render();
   }
 
@@ -149,7 +153,7 @@
 
     const done = state.current.entries.filter((x) => x.exerciseId === ex.id).length >= ex.sets;
     if (done) {
-      const next = ROUTINE.exercises.find((e) => state.current.entries.filter((x) => x.exerciseId === e.id).length < e.sets);
+      const next = curRoutine().exercises.find((e) => state.current.entries.filter((x) => x.exerciseId === e.id).length < e.sets);
       openId = next ? next.id : null;
     }
     render();
@@ -220,7 +224,7 @@
   }
 
   function sessionToMd(s) {
-    let md = '# ' + ROUTINE.name + ' — Registro ' + fmtDate(s.date) + '\n\n';
+    let md = '# ' + routineOf(s).name + ' — Registro ' + fmtDate(s.date) + '\n\n';
     md += '| Ejercicio | Serie | Peso | Repeticiones | Dificultad |\n|---|---|---|---|---|\n';
     s.entries.forEach((e) => {
       const ex = exById[e.exerciseId] || { name: e.exerciseId, unit: 'kg' };
@@ -265,19 +269,25 @@
     const cur = state.current;
     if (!cur) {
       root.append(h('section', { class: 'card' },
-        h('h2', {}, 'Rutina de ' + ROUTINE.name),
-        h('p', { class: 'muted' }, ROUTINE.exercises.length + ' ejercicios en máquina · hipertrofia con 0–2 repeticiones en reserva.'),
-        h('button', { class: 'btn primary big', type: 'button', onclick: startSession }, 'Iniciar sesión de hoy')));
-      const list = h('ul', { class: 'plain' });
-      ROUTINE.exercises.forEach((ex) => list.append(h('li', {}, h('strong', {}, ex.name), h('span', { class: 'muted' }, ' — ' + specText(ex)))));
-      root.append(h('section', { class: 'card' }, h('h2', {}, 'Ejercicios'), list));
+        h('h2', {}, 'Elige qué entrenar hoy'),
+        h('p', { class: 'muted' }, 'Hipertrofia con 0–2 repeticiones en reserva. Toca un grupo muscular para iniciar la sesión.')));
+      ROUTINES.forEach((r) => {
+        const list = h('ul', { class: 'plain' });
+        r.exercises.forEach((ex) => list.append(h('li', {}, h('strong', {}, ex.name), h('span', { class: 'muted' }, ' — ' + specText(ex)))));
+        root.append(h('section', { class: 'card' },
+          h('div', { class: 'row between' },
+            h('h2', {}, r.name),
+            h('span', { class: 'muted small' }, r.exercises.length + ' ejercicios')),
+          h('button', { class: 'btn primary big', type: 'button', onclick: () => startSession(r) }, 'Iniciar ' + r.name),
+          h('details', {}, h('summary', { class: 'muted small' }, 'Ver ejercicios'), list)));
+      });
       return;
     }
 
     root.append(h('div', { class: 'row between', style: 'margin-bottom:12px' },
-      h('strong', {}, 'Sesión ' + fmtDate(cur.date)),
+      h('strong', {}, curRoutine().name + ' · ' + fmtDate(cur.date)),
       h('button', { class: 'btn', type: 'button', onclick: finishSession }, 'Terminar sesión')));
-    ROUTINE.exercises.forEach((ex, i) => root.append(exerciseCard(ex, i)));
+    curRoutine().exercises.forEach((ex, i) => root.append(exerciseCard(ex, i)));
   }
 
   function exerciseCard(ex, idx) {
@@ -349,7 +359,7 @@
     }
     sessions.forEach((s) => {
       const n = s.entries.length;
-      const exIds = ROUTINE.exercises.map((e) => e.id).filter((id) => s.entries.some((x) => x.exerciseId === id));
+      const exIds = routineOf(s).exercises.map((e) => e.id).filter((id) => s.entries.some((x) => x.exerciseId === id));
       const inner = h('div', { class: 'inner' });
       exIds.forEach((id) => {
         const ex = exById[id];
@@ -358,7 +368,7 @@
         inner.append(h('div', { class: 'line' }, h('strong', {}, ex.name), h('span', { class: 'muted' }, ' · ' + ex.unit), h('div', {}, parts.join('  ·  '))));
       });
       inner.append(h('div', { class: 'row wrap', style: 'margin-top:10px' },
-        h('button', { class: 'btn small', type: 'button', onclick: () => download('rutina-' + s.date + '.md', sessionToMd(s), 'text/markdown') }, 'Exportar .md'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => download('rutina-' + routineOf(s).id + '-' + s.date + '.md', sessionToMd(s), 'text/markdown') }, 'Exportar .md'),
         h('button', {
           class: 'btn small danger', type: 'button',
           onclick: () => {
@@ -368,20 +378,20 @@
           }
         }, 'Eliminar')));
       root.append(h('details', { class: 'sess' },
-        h('summary', {}, h('strong', {}, fmtDate(s.date)), h('span', { class: 'muted small' }, exIds.length + ' ejercicios · ' + n + ' series')),
+        h('summary', {}, h('strong', {}, fmtDate(s.date) + ' · ' + routineOf(s).name), h('span', { class: 'muted small' }, exIds.length + ' ejercicios · ' + n + ' series')),
         inner));
     });
     root.append(h('p', { class: 'muted small' }, 'Formato de cada serie: peso×repeticiones (dificultad). ⚠ = técnica incompleta.'));
   }
 
   function renderRutina(root) {
-    ROUTINE.exercises.forEach((ex, i) => {
+    ROUTINES.forEach((r) => { root.append(h('h2', { class: 'grp' }, r.name)); r.exercises.forEach((ex, i) => {
       root.append(h('section', { class: 'card' },
         h('div', { class: 'ex-name' }, (i + 1) + '. ' + ex.name),
         h('div', { class: 'muted small' }, specText(ex) + ' · ' + ex.unit),
         ex.notes ? h('p', { class: 'note' }, ex.notes) : null,
         ex.provisional ? h('div', { class: 'flag' }, 'Rango provisorio: ajústalo en js/routine.js') : null));
-    });
+    }); });
 
     const fileInput = h('input', { type: 'file', accept: 'application/json', style: 'display:none' });
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) importData(fileInput.files[0]); });
@@ -415,7 +425,7 @@
   $('#t-skip').addEventListener('click', () => stopTimer(false));
 
   if (state.current) {
-    const next = ROUTINE.exercises.find((e) => state.current.entries.filter((x) => x.exerciseId === e.id).length < e.sets);
+    const next = curRoutine().exercises.find((e) => state.current.entries.filter((x) => x.exerciseId === e.id).length < e.sets);
     openId = next ? next.id : null;
   }
   render();

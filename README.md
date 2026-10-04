@@ -1,10 +1,10 @@
 # Rutinas
 
-Web app instalable (PWA) para registrar tu rutina de piernas en el gimnasio: peso, repeticiones y dificultad de cada serie, sugerencia de progresión y temporizador de descanso. No tiene dependencias ni paso de compilación.
+Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscular (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): peso, repeticiones y dificultad de cada serie, sugerencia de progresión y temporizador de descanso. No tiene dependencias ni paso de compilación.
 
 ## Funciones
 
-- **Rutina precargada** con los 8 ejercicios en máquina, sus rangos de repeticiones y descansos.
+- **Rutinas precargadas** por grupo muscular (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen), con rangos de repeticiones y descansos. Las de piernas son las originales; el resto son sugeridas y editables.
 - **Registro por serie**: peso, repeticiones y dificultad (1–10), con nota opcional y marca de "técnica incompleta".
 - **Sugerencia de progresión** (doble progresión, orientada a hipertrofia con 0–2 repeticiones en reserva):
   - Si no llegas al mínimo de repeticiones, baja el peso.

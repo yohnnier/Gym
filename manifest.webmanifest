@@ -1,7 +1,7 @@
 {
   "name": "Rutinas de gimnasio",
   "short_name": "Rutinas",
-  "description": "Registro de series, progresión y descanso para tu rutina de piernas.",
+  "description": "Registro de series, progresión y descanso para tus rutinas por grupo muscular.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
