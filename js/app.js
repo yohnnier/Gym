@@ -648,6 +648,14 @@
     r.exercises.forEach((ex, i) => root.append(exerciseCard(ex, i, r)));
   }
 
+  function musclesLine(ex) {
+    return h('div', { class: 'muscles' },
+      h('span', { class: 'chip' }, MUSCLES[ex.muscle] || ex.muscle),
+      ex.secondary && ex.secondary.length
+        ? h('span', { class: 'muted small' }, 'también ' + ex.secondary.map((m) => MUSCLES[m].toLowerCase()).join(', '))
+        : null);
+  }
+
   function exerciseCard(ex, idx, r) {
     const last = lastRecord(ex.id);
     const p = plan(ex);
@@ -661,6 +669,7 @@
         h('span', { class: 'thumb-edit', 'aria-hidden': 'true' }, '⤢')),
       h('div', { class: 'grow' },
         h('div', { class: 'ex-name' }, (idx + 1) + '. ' + ex.name),
+        musclesLine(ex),
         h('div', { class: 'muted small' }, specText(ex)),
         h('div', { class: 'last small' }, last
           ? h('span', {}, h('b', {}, 'Último (' + fmtDate(last.session.date) + '): '), last.sets.map(setStr).join(' · '))
@@ -836,6 +845,7 @@
             h('button', { class: 'thumb', type: 'button', 'aria-label': 'Ver imagen de ' + ex.name, onclick: () => openSheet(ex) }, h('img', { src: imgSrc(ex, 0), alt: '', loading: 'lazy' })),
             h('div', { class: 'grow' },
               h('div', { class: 'ex-name' }, (i + 1) + '. ' + ex.name),
+              musclesLine(ex),
               h('div', { class: 'muted small' }, specText(ex) + ' · ' + ex.unit),
               ex.notes ? h('p', { class: 'note' }, ex.notes) : null))));
       });
