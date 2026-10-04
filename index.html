@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f1115">
+  <meta name="theme-color" content="#0c0f14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Rutinas</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -13,8 +14,17 @@
 </head>
 <body>
   <header class="top">
-    <h1>Rutinas</h1>
-    <span class="muted small" id="sub">Hipertrofia · 0–2 en reserva</span>
+    <div class="top-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>
+        </span>
+        <div>
+          <h1>Rutinas</h1>
+          <div class="sub" id="sub"></div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main id="app"></main>
@@ -31,11 +41,13 @@
     </div>
   </div>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <nav class="tabs" aria-label="Secciones">
-    <button type="button" data-view="hoy">Hoy</button>
-    <button type="button" data-view="prog">Progreso</button>
-    <button type="button" data-view="hist">Historial</button>
-    <button type="button" data-view="rutina">Rutina</button>
+    <button type="button" data-view="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+    <button type="button" data-view="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progreso</button>
+    <button type="button" data-view="hist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Historial</button>
+    <button type="button" data-view="rutina"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Rutinas</button>
   </nav>
 
   <script src="js/routine.js"></script>

@@ -11,6 +11,8 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
   - Si te sobraban repeticiones (dificultad ≤ 7) o llegas al tope con dificultad ≤ 8, sube el peso.
   - En otro caso, mantiene el peso.
   - Al abrir un ejercicio, el punto de partida sale de tu última sesión.
+- **Inicio** con saludo, resumen semanal y mensual, rutina sugerida (el grupo que llevas más tiempo sin entrenar) y resumen al terminar cada sesión.
+- **Progreso** por ejercicio: mejor serie de cada sesión y cambio de peso.
 - **Temporizador de descanso** automático al registrar cada serie, con aviso sonoro y vibración.
 - **Historial** de sesiones, con exportación a Markdown.
 - **Copia de seguridad**: exportar e importar todos los datos en JSON.

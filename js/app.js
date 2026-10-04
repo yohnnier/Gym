@@ -13,6 +13,7 @@
   let state = load();
   let view = 'hoy';
   let openId = null;
+  let lastSummary = null;
 
   // ---------- utilidades ----------
   const $ = (s, r) => (r || document).querySelector(s);
@@ -46,6 +47,40 @@
     const n = parseFloat(s);
     return isNaN(n) ? null : n;
   }
+  const DAY = 86400000;
+  function isoToDate(iso) { const p = iso.split('-'); return new Date(+p[0], p[1] - 1, +p[2]); }
+  function daysSince(iso) { return Math.round((isoToDate(todayISO()) - isoToDate(iso)) / DAY); }
+  function agoText(iso) {
+    const d = daysSince(iso);
+    return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : 'hace ' + d + ' días';
+  }
+  function longDate(d) {
+    return d.toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  function greeting() {
+    const hr = new Date().getHours();
+    return hr < 12 ? 'Buenos días' : hr < 20 ? 'Buenas tardes' : 'Buenas noches';
+  }
+  const RPE_TEXT = {
+    1: 'Muy fácil', 2: 'Muy fácil', 3: 'Fácil', 4: 'Fácil', 5: 'Moderado',
+    6: 'Te quedaban 4 o más', 7: 'Te quedaban 3', 8: 'Te quedaban 2', 9: 'Te quedaba 1', 10: 'Al límite, no salía otra'
+  };
+  let toastHandle = null;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastHandle);
+    toastHandle = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  function bestWeight(exId, sessions) {
+    let best = null;
+    sessions.forEach((s) => s.entries.forEach((x) => {
+      if (x.exerciseId === exId && x.weight != null && !x.badTech && (best == null || x.weight > best)) best = x.weight;
+    }));
+    return best;
+  }
+
   function mmss(sec) { return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
 
   // ---------- estado ----------
@@ -128,9 +163,24 @@
       state.current = null;
     } else {
       if (!confirm('¿Terminar la sesión y guardarla en el historial?')) return;
+      const prev = allSessions();
+      const prs = [];
+      curRoutine().exercises.forEach((ex) => {
+        const now = bestWeight(ex.id, [cur]);
+        const before = bestWeight(ex.id, prev);
+        if (now != null && before != null && now > before) prs.push(ex.name);
+      });
+      lastSummary = {
+        routine: curRoutine().name,
+        sets: cur.entries.length,
+        exercises: new Set(cur.entries.map((x) => x.exerciseId)).size,
+        volume: Math.round(cur.entries.reduce((t, x) => t + (x.weight || 0) * x.reps, 0)),
+        prs: prs
+      };
       state.sessions.push(cur);
       state.current = null;
-      view = 'hist';
+      view = 'hoy';
+      $('#toast').classList.remove('show');
     }
     stopTimer(false);
     save(); render();
@@ -154,10 +204,15 @@
     const note = form.elements.note.value.trim();
     if (note) entry.note = note;
     if (form.elements.bad.checked) entry.badTech = true;
+    const before = bestWeight(ex.id, allSessions().concat([state.current]));
     state.current.entries.push(entry);
     renumber(state.current.entries);
     save();
     startTimer(ex.rest);
+    if (entry.weight != null && before != null && entry.weight > before && !entry.badTech) toast('¡Nuevo récord en ' + ex.name + '! 🎉');
+    else if (entry.rpe >= 10) toast('Serie al límite. Respira y recupera bien.');
+    else if (entry.reps < ex.repMin) toast('Está bien quedarse corto: ajusta el peso y sigue.');
+    else toast('Serie registrada. ¡Bien hecho!');
 
     const done = state.current.entries.filter((x) => x.exerciseId === ex.id).length >= ex.sets;
     if (done) {
@@ -263,6 +318,8 @@
   function render() {
     const root = $('#app');
     root.replaceChildren();
+    const sub = longDate(new Date());
+    $('#sub').textContent = sub.charAt(0).toUpperCase() + sub.slice(1);
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     if (view === 'hoy') renderHoy(root);
     else if (view === 'prog') renderProg(root);
@@ -276,27 +333,95 @@
 
   function renderHoy(root) {
     const cur = state.current;
-    if (!cur) {
-      root.append(h('section', { class: 'card' },
-        h('h2', {}, 'Elige qué entrenar hoy'),
-        h('p', { class: 'muted' }, 'Hipertrofia con 0–2 repeticiones en reserva. Toca un grupo muscular para iniciar la sesión.')));
-      ROUTINES.forEach((r) => {
-        const list = h('ul', { class: 'plain' });
-        r.exercises.forEach((ex) => list.append(h('li', {}, h('strong', {}, ex.name), h('span', { class: 'muted' }, ' — ' + specText(ex)))));
-        root.append(h('section', { class: 'card' },
-          h('div', { class: 'row between' },
-            h('h2', {}, r.name),
-            h('span', { class: 'muted small' }, r.exercises.length + ' ejercicios')),
-          h('button', { class: 'btn primary big', type: 'button', onclick: () => startSession(r) }, 'Iniciar ' + r.name),
-          h('details', {}, h('summary', { class: 'muted small' }, 'Ver ejercicios'), list)));
-      });
-      return;
+    if (!cur) { renderHome(root); return; }
+
+    const total = curRoutine().exercises.reduce((t, e) => t + e.sets, 0);
+    const done = Math.min(cur.entries.length, total);
+    const pct = Math.round(100 * done / total);
+    root.append(h('div', { class: 'session-head' },
+      h('div', { class: 'row between' },
+        h('span', { class: 'eyebrow' }, 'Sesión en curso · ' + fmtDate(cur.date)),
+        h('button', { class: 'btn small', type: 'button', onclick: finishSession }, 'Terminar')),
+      h('h2', {}, curRoutine().name),
+      h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
+      h('div', { class: 'progress-label' }, done + ' de ' + total + ' series' + (pct >= 100 ? ' · ¡Completaste la rutina!' : pct >= 50 ? ' · Ya pasaste la mitad' : ''))));
+    curRoutine().exercises.forEach((ex, i) => root.append(exerciseCard(ex, i)));
+  }
+
+  function renderHome(root) {
+    const sessions = sortedSessions();
+    const last = sessions[0];
+    const monthKey = todayISO().slice(0, 7);
+    const thisMonth = sessions.filter((x) => x.date.slice(0, 7) === monthKey).length;
+    const week = sessions.filter((x) => daysSince(x.date) < 7).length;
+    const sets = sessions.reduce((t, x) => t + x.entries.length, 0);
+
+    let msg;
+    if (!last) msg = 'Empecemos con calma. Elige un grupo muscular y registra tu primera sesión.';
+    else if (daysSince(last.date) === 0) msg = 'Ya entrenaste hoy. Recuperar también es parte del progreso.';
+    else if (daysSince(last.date) > 7) msg = 'Qué bueno verte de nuevo. Retoma con pesos cómodos y ve subiendo.';
+    else msg = 'Cada serie suma. Vamos por la sesión de hoy.';
+
+    root.append(h('section', { class: 'hero' },
+      h('h2', {}, greeting()),
+      h('p', {}, msg)));
+    root.append(h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', {}, week), h('span', {}, 'Sesiones en 7 días')),
+      h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
+      h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
+
+    if (lastSummary) {
+      const sm = lastSummary;
+      root.append(h('section', { class: 'card soft summary', style: 'margin-top:18px' },
+        h('span', { class: 'eyebrow' }, 'Sesión guardada'),
+        h('h2', {}, '¡Buen trabajo con ' + sm.routine + '!'),
+        h('div', { class: 'stats' },
+          h('div', { class: 'stat' }, h('b', {}, sm.exercises), h('span', {}, 'Ejercicios')),
+          h('div', { class: 'stat' }, h('b', {}, sm.sets), h('span', {}, 'Series')),
+          h('div', { class: 'stat' }, h('b', {}, fmt(sm.volume)), h('span', {}, 'Volumen (peso × reps)'))),
+        h('p', { class: 'small', style: 'margin:0' }, sm.prs.length
+          ? 'Nuevos récords: ' + sm.prs.join(', ') + '.'
+          : 'Constancia antes que intensidad: hoy sumaste otra sesión.'),
+        h('button', { class: 'btn ghost small', type: 'button', onclick: () => { lastSummary = null; render(); } }, 'Cerrar')));
     }
 
-    root.append(h('div', { class: 'row between', style: 'margin-bottom:12px' },
-      h('strong', {}, curRoutine().name + ' · ' + fmtDate(cur.date)),
-      h('button', { class: 'btn', type: 'button', onclick: finishSession }, 'Terminar sesión')));
-    curRoutine().exercises.forEach((ex, i) => root.append(exerciseCard(ex, i)));
+    // Sugerencia: el grupo que lleva mas tiempo sin entrenar
+    const lastDone = {};
+    sessions.forEach((x) => { const id = x.routineId || 'piernas'; if (!lastDone[id]) lastDone[id] = x.date; });
+    const next = ROUTINES.slice().sort((a, b) => {
+      const da = lastDone[a.id] ? daysSince(lastDone[a.id]) : 1e9;
+      const db = lastDone[b.id] ? daysSince(lastDone[b.id]) : 1e9;
+      return db - da;
+    })[0];
+
+    root.append(h('div', { class: 'section-title' }, 'Sugerido para hoy'));
+    root.append(h('section', { class: 'card' },
+      h('div', { class: 'next' },
+        h('div', { class: 'txt' },
+          h('strong', {}, next.name),
+          h('span', { class: 'muted small' }, (lastDone[next.id] ? 'Último: ' + agoText(lastDone[next.id]) : 'Aún sin registros') + ' · ' + next.exercises.length + ' ejercicios'))),
+      h('button', { class: 'btn primary big', type: 'button', style: 'margin-top:14px', onclick: () => startSession(next) }, 'Empezar ' + next.name)));
+
+    root.append(h('div', { class: 'section-title' }, 'O elige otro grupo'));
+    const grid = h('div', { class: 'groups' });
+    ROUTINES.forEach((r) => {
+      grid.append(h('button', { class: 'group', type: 'button', onclick: () => startSession(r), 'aria-label': 'Empezar ' + r.name },
+        h('span', { class: 'ico' }, r.name.charAt(0)),
+        h('div', {},
+          h('strong', {}, r.name),
+          h('div', {}, h('span', {}, lastDone[r.id] ? agoText(lastDone[r.id]) : r.exercises.length + ' ejercicios')))));
+    });
+    root.append(grid);
+
+    if (last) {
+      root.append(h('div', { class: 'section-title' }, 'Última sesión'));
+      root.append(h('section', { class: 'card' },
+        h('div', { class: 'row between' },
+          h('strong', {}, routineOf(last).name),
+          h('span', { class: 'muted small' }, fmtDate(last.date) + ' · ' + agoText(last.date))),
+        h('div', { class: 'muted small', style: 'margin-top:4px' }, new Set(last.entries.map((x) => x.exerciseId)).size + ' ejercicios · ' + last.entries.length + ' series'),
+        h('button', { class: 'btn small', type: 'button', style: 'margin-top:12px', onclick: () => { view = 'hist'; render(); } }, 'Ver detalle')));
+    }
   }
 
   function exerciseCard(ex, idx) {
@@ -343,15 +468,26 @@
       h('strong', {}, 'Serie ' + nextNum + (sugg.weight != null ? ': ' + fmt(sugg.weight) + ' ' + ex.unit : '') + ' · ' + ex.repMin + '–' + ex.repMax + ' reps'),
       h('div', {}, sugg.text)));
 
-    const rpeSel = h('select', { name: 'rpe' });
-    for (let i = 1; i <= 10; i++) rpeSel.append(h('option', { value: i, selected: i === 8 }, String(i)));
+    const rpeInput = h('input', { type: 'hidden', name: 'rpe', value: '8' });
+    const rpeHelp = h('div', { class: 'rpe-help' }, RPE_TEXT[8]);
+    const rpeGrid = h('div', { class: 'rpe', role: 'radiogroup', 'aria-label': 'Dificultad' });
+    [6, 7, 8, 9, 10].forEach((v) => {
+      rpeGrid.append(h('button', {
+        type: 'button', class: v === 8 ? 'on' : '', role: 'radio', 'aria-checked': v === 8 ? 'true' : 'false',
+        onclick: (ev) => {
+          rpeInput.value = String(v);
+          rpeHelp.textContent = RPE_TEXT[v];
+          rpeGrid.querySelectorAll('button').forEach((b) => { b.classList.toggle('on', b === ev.currentTarget); b.setAttribute('aria-checked', b === ev.currentTarget ? 'true' : 'false'); });
+        }
+      }, String(v)));
+    });
 
     const form = h('form', { class: 'set-form', autocomplete: 'off' },
       h('label', {}, 'Peso (' + ex.unit + ')', h('input', { name: 'weight', inputmode: 'decimal', value: sugg.weight != null ? fmt(sugg.weight) : '' })),
       h('label', {}, ex.perLeg ? 'Reps (por pierna)' : 'Repeticiones', h('input', { name: 'reps', inputmode: 'numeric', type: 'number', min: '1' })),
-      h('label', {}, 'Dificultad 1–10', rpeSel),
+      h('div', { class: 'full' }, h('label', {}, '¿Qué tan difícil fue?'), rpeGrid, rpeHelp, rpeInput),
       h('label', { class: 'full' }, 'Nota (opcional)', h('input', { name: 'note', type: 'text' })),
-      h('label', { class: 'full check' }, h('input', { name: 'bad', type: 'checkbox' }), 'Técnica o pausa incompleta'),
+      h('label', { class: 'full check' }, h('input', { name: 'bad', type: 'checkbox' }), 'La técnica o la pausa no salió completa'),
       h('button', { class: 'btn primary full', type: 'submit' }, 'Registrar serie ' + nextNum));
     form.addEventListener('submit', (ev) => { ev.preventDefault(); addEntry(ex, form); });
     body.append(form);
@@ -393,13 +529,13 @@
       });
       if (cards.length) { any = true; root.append(h('h2', { class: 'grp' }, r.name)); cards.forEach((c) => root.append(c)); }
     });
-    if (!any) root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Aún no hay registros para mostrar el progreso.')));
+    if (!any) root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Cuando registres algunas sesiones verás aquí cómo evolucionan tus pesos.')));
   }
 
   function renderHist(root) {
     const sessions = sortedSessions();
     if (!sessions.length) {
-      root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Aún no hay sesiones guardadas.')));
+      root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Aún no hay sesiones guardadas. Tu historial aparecerá aquí después de tu primer entrenamiento.')));
       return;
     }
     sessions.forEach((s) => {
