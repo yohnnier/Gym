@@ -748,7 +748,7 @@
   // Frase que resume que paso, para no tener que interpretar la grafica
   function progressHeadline(rows, unit) {
     const first = rows[0], last = rows[rows.length - 1];
-    if (rows.length === 1) return 'Primera sesión: ' + fmt(last.weight) + ' ' + unit + ' × ' + last.reps + '. La línea aparece desde tu próxima sesión.';
+    if (rows.length === 1) return 'Primera sesión: ' + fmt(last.weight) + ' ' + unit + ' × ' + last.reps + '. El punto punteado es tu próxima sesión: ahí verás si subes.';
     const diff = last.weight - first.weight;
     const days = Math.round((isoToDate(last.date) - isoToDate(first.date)) / DAY);
     const span = days < 14 ? days + ' días' : Math.round(days / 7) + ' semanas';
@@ -768,7 +768,7 @@
     if (lo === hi) { lo -= 5; hi += 5; }
     const pad = (hi - lo) * 0.15;
     lo = Math.max(0, lo - pad); hi += pad;
-    const x = (i) => n === 1 ? W / 2 : L + (W - L - R) * i / (n - 1);
+    const x = (i) => n === 1 ? L + 40 : L + (W - L - R) * i / (n - 1);
     const y = (v) => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
     const maxI = ws.indexOf(Math.max.apply(null, ws));
     const labelIdx = (i) => n <= 6 || i === 0 || i === n - 1 || i === maxI;
@@ -776,6 +776,14 @@
     const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
     let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="Peso por sesión en ' + esc(unit) + '">';
     svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" class="chart-base"/>';
+    if (n === 1) {
+      // Con una sola sesion: punto punteado donde ira la proxima
+      const gx = W - R - 40, gy = y(rows[0].weight);
+      svg += '<line x1="' + (x(0) + 8) + '" y1="' + gy + '" x2="' + (gx - 8) + '" y2="' + gy + '" class="chart-ghost-line"/>' +
+        '<circle cx="' + gx + '" cy="' + gy + '" r="4.5" class="chart-ghost"/>' +
+        '<text x="' + gx + '" y="' + (gy - 10) + '" class="chart-val" text-anchor="middle">?</text>' +
+        '<text x="' + gx + '" y="' + (H - 6) + '" class="chart-date" text-anchor="middle">Próxima</text>';
+    }
     if (n > 1) svg += '<polyline class="chart-line" points="' + rows.map((r, i) => x(i).toFixed(1) + ',' + y(r.weight).toFixed(1)).join(' ') + '"/>';
     rows.forEach((r, i) => {
       const cx = x(i).toFixed(1), cy = y(r.weight).toFixed(1);
@@ -825,7 +833,7 @@
             h('img', { class: 'mini', src: imgSrc(ex, 0), alt: '', loading: 'lazy' }),
             h('div', {}, h('div', { class: 'ex-name' }, ex.name), h('div', { class: 'muted small' }, 'Peso en ' + ex.unit + ' · ' + rows.length + (rows.length === 1 ? ' sesión' : ' sesiones')))),
           h('p', { class: 'headline' }, progressHeadline(rows, ex.unit)),
-          rows.length > 1 ? progressChart(rows, ex.unit) : null,
+          progressChart(rows, ex.unit),
           h('details', { class: 'chart-table' },
             h('summary', { class: 'muted small' }, 'Ver detalle en tabla'),
             h('table', { class: 'sets' },

@@ -280,6 +280,8 @@ img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; fl
 .chart-val.last { fill: var(--text); font-size: 12px; font-weight: 700; }
 .chart-date { font-size: 10px; fill: var(--muted); }
 .chart-table { margin-top: 6px; }
+.chart-ghost { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.chart-ghost-line { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .6; }
 
 /* hoja inferior con imagen grande */
 .sheet { position: fixed; inset: 0; z-index: 30; }
