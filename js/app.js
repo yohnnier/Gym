@@ -580,14 +580,21 @@
       const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
       const status = today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
         : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
+      // Portada: una imagen por cada grupo principal del dia
+      const covers = [];
+      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c.muscle === e.muscle)) covers.push(e); });
       days.append(h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
-        h('span', { class: 'day-n' }, i + 1),
-        h('span', { class: 'day-txt' },
-          h('strong', {}, d.name.replace(/^Día \d+ · /, '')),
-          h('span', {}, d.focus),
-          h('span', { class: 'day-st' }, status)),
-        today ? h('span', { class: 'pill live static' }, 'Hoy')
-          : d === nextDay ? h('span', { class: 'pill static' }, 'Siguiente') : null));
+        h('span', { class: 'day-cover' },
+          covers.map((e) => h('img', { src: imgSrc(e, 0), alt: '', loading: 'lazy' })),
+          today ? h('span', { class: 'pill live' }, 'Hoy')
+            : d === nextDay ? h('span', { class: 'pill' }, 'Siguiente') : null),
+        h('span', { class: 'day-body' },
+          h('span', { class: 'day-n' }, i + 1),
+          h('span', { class: 'day-txt' },
+            h('strong', {}, d.name.replace(/^Día \d+ · /, '')),
+            h('span', {}, d.focus),
+            h('span', { class: 'day-st' }, status)),
+          h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›'))));
     });
     root.append(days);
 
@@ -603,22 +610,6 @@
     root.append(volCard);
 
 
-    root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
-    const grid = h('div', { class: 'groups' });
-    ROUTINES.forEach((r) => {
-      const today = todaySession(r.id, false);
-      const status = today ? 'En curso hoy · ' + today.entries.length + ' series'
-        : lastDone[r.id] ? 'Último: ' + agoText(lastDone[r.id]) : 'Sin registros aún';
-      grid.append(h('button', { class: 'group', type: 'button', onclick: () => go('#/g/' + r.id) },
-        h('span', { class: 'cover' },
-          h('img', { src: imgSrc(r.exercises[0], 0), alt: '', loading: 'lazy' }),
-          today ? h('span', { class: 'pill live' }, 'Hoy') : null),
-        h('span', { class: 'group-txt' },
-          h('strong', {}, r.name),
-          h('span', {}, r.exercises.length + ' ejercicios'),
-          h('span', {}, status))));
-    });
-    root.append(grid);
   }
 
   function elapsedText(s) {
@@ -807,6 +798,25 @@
     root.append(h('p', { class: 'muted small' }, 'Formato de cada serie: peso×repeticiones (dificultad). ⚠ = técnica incompleta.'));
   }
 
+  function groupsGrid() {
+    const lastDone = lastDoneByGroup();
+    const grid = h('div', { class: 'groups' });
+    ROUTINES.forEach((r) => {
+      const today = todaySession(r.id, false);
+      const status = today ? 'En curso hoy · ' + today.entries.length + ' series'
+        : lastDone[r.id] ? 'Último: ' + agoText(lastDone[r.id]) : 'Sin registros aún';
+      grid.append(h('button', { class: 'group', type: 'button', onclick: () => go('#/g/' + r.id) },
+        h('span', { class: 'cover' },
+          h('img', { src: imgSrc(r.exercises[0], 0), alt: '', loading: 'lazy' }),
+          today ? h('span', { class: 'pill live' }, 'Hoy') : null),
+        h('span', { class: 'group-txt' },
+          h('strong', {}, r.name),
+          h('span', {}, r.exercises.length + ' ejercicios'),
+          h('span', {}, status))));
+    });
+    return grid;
+  }
+
   function renderRutina(root) {
     root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu plan de 3 días y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
     DAYS.forEach((d) => {
@@ -815,6 +825,9 @@
         h('div', { class: 'muted small' }, d.focus),
         h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))));
     });
+    root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
+    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Para un día en que quieras entrenar un solo grupo.'));
+    root.append(groupsGrid());
     ROUTINES.forEach((r) => {
       root.append(h('div', { class: 'section-title' }, r.name));
       r.exercises.forEach((ex, i) => {

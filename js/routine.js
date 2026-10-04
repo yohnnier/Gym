@@ -285,23 +285,23 @@ const PLAN = {
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea' }, { id: 'extension-sobre-cabeza' }
+        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }
       ]
     },
     {
-      id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior',
+      id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
       exercises: [
         { id: 'jalon-pecho', sets: 4 }, { id: 'remo-maquina' }, { id: 'remo-mancuerna' },
         { id: 'face-pull' }, { id: 'pajaros' },
-        { id: 'curl-inclinado' }, { id: 'curl-martillo' }
+        { id: 'curl-inclinado', sets: 4 }, { id: 'curl-martillo', sets: 4 },
+        { id: 'crunch-polea' }
       ]
     },
     {
-      id: 'dia-piernas', name: 'Día 3 · Piernas y core', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas · Abdomen',
+      id: 'dia-piernas', name: 'Día 3 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
-        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral' }, { id: 'hip-thrust' },
-        { id: 'extension-cuadriceps' }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' },
-        { id: 'crunch-polea' }
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust' },
+        { id: 'extension-cuadriceps' }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
       ]
     }
   ]
