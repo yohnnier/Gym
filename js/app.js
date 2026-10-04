@@ -54,13 +54,21 @@
       const s = JSON.parse(localStorage.getItem(KEY));
       if (s && Array.isArray(s.sessions)) return { sessions: s.sessions, current: s.current || null };
     } catch (e) { /* sin datos */ }
-    return { sessions: [JSON.parse(JSON.stringify(SEED_SESSION))], current: null };
+    return { sessions: [], current: null };
   }
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* almacenamiento no disponible */ }
   }
+  // Historial del repositorio (data/sessions.json), solo lectura; se une al guardado en este dispositivo.
+  let repoSessions = [];
+  function allSessions() {
+    const ids = {};
+    repoSessions.forEach((x) => { ids[x.id] = true; });
+    return repoSessions.concat(state.sessions.filter((x) => !ids[x.id]));
+  }
+  const isRepo = (s) => repoSessions.indexOf(s) !== -1;
   function sortedSessions() {
-    return state.sessions.slice().sort((a, b) =>
+    return allSessions().sort((a, b) =>
       a.date === b.date ? (b.createdAt || 0) - (a.createdAt || 0) : (a.date < b.date ? 1 : -1));
   }
 
@@ -257,6 +265,7 @@
     root.replaceChildren();
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     if (view === 'hoy') renderHoy(root);
+    else if (view === 'prog') renderProg(root);
     else if (view === 'hist') renderHist(root);
     else renderRutina(root);
   }
@@ -351,6 +360,42 @@
     return card;
   }
 
+  function renderProg(root) {
+    const sessions = sortedSessions().reverse(); // de la mas antigua a la mas reciente
+    let any = false;
+    ROUTINES.forEach((r) => {
+      const cards = [];
+      r.exercises.forEach((ex) => {
+        const rows = [];
+        sessions.forEach((s) => {
+          const sets = s.entries.filter((x) => x.exerciseId === ex.id && x.weight != null && !x.badTech);
+          if (!sets.length) return;
+          const maxW = Math.max.apply(null, sets.map((x) => x.weight));
+          const best = sets.filter((x) => x.weight === maxW).reduce((a, b) => (b.reps > a.reps ? b : a));
+          rows.push({ date: s.date, weight: maxW, reps: best.reps, vol: sets.reduce((t, x) => t + x.weight * x.reps, 0) });
+        });
+        if (!rows.length) return;
+        const tbody = h('tbody');
+        rows.forEach((x, i) => {
+          const d = i ? x.weight - rows[i - 1].weight : 0;
+          tbody.append(h('tr', {},
+            h('td', {}, fmtDate(x.date)),
+            h('td', { class: 'num' }, fmt(x.weight) + ' × ' + x.reps),
+            h('td', { class: 'num' }, fmt(Math.round(x.vol))),
+            h('td', { class: 'num' }, i ? (d > 0 ? '+' : '') + fmt(d) : '—')));
+        });
+        cards.push(h('section', { class: 'card' },
+          h('div', { class: 'ex-name' }, ex.name),
+          h('div', { class: 'muted small' }, 'Mejor serie por sesión · ' + ex.unit),
+          h('table', { class: 'sets' },
+            h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso × reps'), h('th', { class: 'num' }, 'Volumen'), h('th', { class: 'num' }, 'Δ peso'))),
+            tbody)));
+      });
+      if (cards.length) { any = true; root.append(h('h2', { class: 'grp' }, r.name)); cards.forEach((c) => root.append(c)); }
+    });
+    if (!any) root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Aún no hay registros para mostrar el progreso.')));
+  }
+
   function renderHist(root) {
     const sessions = sortedSessions();
     if (!sessions.length) {
@@ -369,7 +414,7 @@
       });
       inner.append(h('div', { class: 'row wrap', style: 'margin-top:10px' },
         h('button', { class: 'btn small', type: 'button', onclick: () => download('rutina-' + routineOf(s).id + '-' + s.date + '.md', sessionToMd(s), 'text/markdown') }, 'Exportar .md'),
-        h('button', {
+        isRepo(s) ? h('span', { class: 'muted small' }, 'Registro del repositorio') : h('button', {
           class: 'btn small danger', type: 'button',
           onclick: () => {
             if (!confirm('¿Eliminar esta sesión?')) return;
@@ -429,6 +474,11 @@
     openId = next ? next.id : null;
   }
   render();
+
+  fetch('data/sessions.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : []))
+    .then((list) => { if (Array.isArray(list)) { repoSessions = list; render(); } })
+    .catch(() => { /* sin historial del repositorio */ });
 
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     navigator.serviceWorker.register('sw.js').catch(() => { /* sin offline */ });

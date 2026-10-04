@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v2';
+const CACHE = 'rutinas-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './js/routine.js',
   './js/app.js',
   './manifest.webmanifest',
+  './data/sessions.json',
   './icons/icon.svg'
 ];
 
