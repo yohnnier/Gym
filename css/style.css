@@ -286,12 +286,15 @@ img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; fl
 .sheet.hidden { display: none; }
 .sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
 .sheet-panel {
-  position: absolute; left: 0; right: 0; bottom: 0; max-height: 92vh; overflow: auto;
-  max-width: 640px; margin: 0 auto; padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
-  background: var(--surface); border-radius: 22px 22px 0 0; animation: up .2s ease;
+  /* Ventana flotante centrada: cabe siempre en la parte visible de la pantalla */
+  position: absolute; inset: 0; margin: auto; height: fit-content;
+  width: min(560px, calc(100% - 24px));
+  max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow: auto;
+  padding: 18px 18px 20px; border-radius: 22px;
+  background: var(--surface); box-shadow: 0 20px 60px rgba(0, 0, 0, .35); animation: up .2s ease;
 }
 @keyframes up { from { transform: translateY(30px); opacity: .5; } to { transform: none; opacity: 1; } }
-.sheet-grip { width: 40px; height: 5px; border-radius: 9px; background: var(--line); margin: 4px auto 10px; }
+.sheet-grip { display: none; }
 .sheet-panel h2 { margin: 0; font-size: 19px; }
 .sheet-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 6px; }
 .sheet-imgs.one { grid-template-columns: 1fr; }

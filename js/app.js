@@ -940,7 +940,10 @@
   document.querySelectorAll('.tabs button').forEach((b) => {
     b.addEventListener('click', () => { go(b.dataset.view === 'hoy' ? '#/' : '#/' + b.dataset.view); });
   });
-  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+  window.addEventListener('hashchange', () => {
+    const sh = $('#sheet'); sh.classList.add('hidden'); sh.replaceChildren(); // no dejar la ventana abierta al cambiar de pagina
+    render(); window.scrollTo(0, 0);
+  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const s = $('#sheet'); s.classList.add('hidden'); s.replaceChildren(); } });
   $('#t-plus').addEventListener('click', () => {
     if (!timerHandle) { startTimer(15); return; }
