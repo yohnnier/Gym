@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '21';
+  const VERSION = '22';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -676,7 +676,7 @@
         h('li', {}, 'Abre ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'github.com/settings/personal-access-tokens/new'), '.'),
         h('li', {}, 'Nombre: "Rutinas". Caducidad: la que prefieras (por ejemplo, 1 año).'),
         h('li', {}, 'En "Repository access" elige "Only select repositories" y marca ', h('b', {}, 'Gym'), '.'),
-        h('li', {}, 'En "Permissions" → "Repository permissions" → ', h('b', {}, 'Contents'), ': "Read and write".'),
+        h('li', {}, 'En "Permissions" pulsa "+ Add permissions", marca ', h('b', {}, 'Contents'), ' y cambia su acceso a ', h('b', {}, '"Read and write"'), '.'),
         h('li', {}, 'Pulsa "Generate token", copia la llave y pégala aquí.')),
       h('div', { class: 'row' }, input, btn),
       msg,
