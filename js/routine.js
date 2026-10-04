@@ -9,54 +9,55 @@
  *  step            salto de peso al progresar
  *  perLeg          true si las repeticiones son por pierna
  *  provisional     true si el rango no venia en tu rutina original (ajustalo)
+ *  muscle          musculo principal (para contar el volumen semanal)
  */
 const PIERNAS = {
   id: 'piernas', name: 'Piernas',
   exercises: [
     {
-      id: 'sentadilla-pendular', name: 'Sentadilla pendular',
+      id: 'sentadilla-pendular', name: 'Sentadilla pendular', muscle: 'cuadriceps',
       sets: 3, repMin: 8, repMax: 10, rest: 120, restText: '2 min',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso provisorios: no estaban definidos en la rutina original.'
     },
     {
-      id: 'prensa', name: 'Prensa',
+      id: 'prensa', name: 'Prensa', muscle: 'cuadriceps',
       sets: 3, repMin: 10, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg/lado', step: 5, provisional: true,
       notes: 'Rango y descanso provisorios: no estaban definidos en la rutina original.'
     },
     {
-      id: 'curl-femoral', name: 'Curl femoral sentado',
+      id: 'curl-femoral', name: 'Curl femoral sentado', muscle: 'isquios',
       sets: 3, repMin: 10, repMax: 15, rest: 90, restText: '75–90 s',
       unit: 'kg', step: 2.5,
       notes: 'Objetivo: quedar con 0–2 repeticiones en reserva.'
     },
     {
-      id: 'hip-thrust', name: 'Hip thrust en máquina',
+      id: 'hip-thrust', name: 'Hip thrust en máquina', muscle: 'gluteos',
       sets: 3, repMin: 10, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg/lado', step: 2.5,
       notes: 'Peso exigente con buena técnica. Pausa de 1 s arriba.'
     },
     {
-      id: 'extension-cuadriceps', name: 'Extensión de cuádriceps',
+      id: 'extension-cuadriceps', name: 'Extensión de cuádriceps', muscle: 'cuadriceps',
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 7.5,
       notes: 'Controla especialmente la bajada. La máquina salta de 47,5 a 55 kg.'
     },
     {
-      id: 'abductores', name: 'Abductores',
+      id: 'abductores', name: 'Abductores', muscle: 'gluteos',
       sets: 3, repMin: 15, repMax: 20, rest: 60, restText: '60 s',
       unit: 'kg/lado', step: 2.5,
       notes: 'Máquina de discos. Si inclinas el torso un poco hacia adelante cargas más el glúteo.'
     },
     {
-      id: 'patada-gluteo', name: 'Patada de glúteo en máquina',
+      id: 'patada-gluteo', name: 'Patada de glúteo en máquina', muscle: 'gluteos',
       sets: 3, setsText: '2–3', repMin: 12, repMax: 15, perLeg: true, rest: 60, restText: '60 s',
       unit: 'kg/pierna', step: 2.5,
       notes: 'Pausa de 1 s arriba, sin arquear la zona lumbar. Anota cada pierna si difieren.'
     },
     {
-      id: 'pantorrillas', name: 'Pantorrillas en máquina',
+      id: 'pantorrillas', name: 'Pantorrillas en máquina', muscle: 'pantorrillas',
       sets: 4, repMin: 12, repMax: 20, rest: 90, restText: '60–90 s',
       unit: 'kg', step: 2.5,
       notes: 'Máquina sentada de carga única (discos en un solo lado). Pausa de 1 s abajo, sin rebotar.'
@@ -68,31 +69,31 @@ const PECHO = {
   id: 'pecho', name: 'Pecho',
   exercises: [
     {
-      id: 'press-pecho-maquina', name: 'Press de pecho en máquina',
+      id: 'press-pecho-maquina', name: 'Press de pecho en máquina', muscle: 'pecho',
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Escápulas atrás y abajo, codos a ~45°.'
     },
     {
-      id: 'press-inclinado', name: 'Press inclinado con mancuernas',
+      id: 'press-inclinado', name: 'Press inclinado con mancuernas', muscle: 'pecho',
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg/mancuerna', step: 2, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja controlado hasta estirar el pecho.'
     },
     {
-      id: 'aperturas-peck-deck', name: 'Aperturas en peck deck',
+      id: 'aperturas-peck-deck', name: 'Aperturas en peck deck', muscle: 'pecho',
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Junta con control, pausa de 1 s al cerrar.'
     },
     {
-      id: 'cruce-poleas', name: 'Cruce de poleas',
+      id: 'cruce-poleas', name: 'Cruce de poleas', muscle: 'pecho',
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Ligera flexión de codos constante.'
     },
     {
-      id: 'fondos-asistidos', name: 'Fondos asistidos',
+      id: 'fondos-asistidos', name: 'Fondos asistidos', muscle: 'pecho',
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg asistencia', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Torso inclinado hacia adelante para enfatizar el pecho.'
@@ -104,37 +105,37 @@ const ESPALDA = {
   id: 'espalda', name: 'Espalda',
   exercises: [
     {
-      id: 'jalon-pecho', name: 'Jalón al pecho',
+      id: 'jalon-pecho', name: 'Jalón al pecho', muscle: 'espalda',
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Lleva los codos hacia las costillas, sin balancear.'
     },
     {
-      id: 'remo-maquina', name: 'Remo sentado en máquina',
+      id: 'remo-maquina', name: 'Remo sentado en máquina', muscle: 'espalda',
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Pecho apoyado, pausa de 1 s al contraer.'
     },
     {
-      id: 'remo-mancuerna', name: 'Remo con mancuerna',
+      id: 'remo-mancuerna', name: 'Remo con mancuerna', muscle: 'espalda',
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg', step: 2, provisional: true, perLeg: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Anota cada lado si difieren.'
     },
     {
-      id: 'pullover-polea', name: 'Pullover en polea',
+      id: 'pullover-polea', name: 'Pullover en polea', muscle: 'espalda',
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Brazos casi rectos, siente el dorsal.'
     },
     {
-      id: 'face-pull', name: 'Face pull',
+      id: 'face-pull', name: 'Face pull', muscle: 'hombros',
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Trabaja deltoides posterior y escápulas.'
     },
     {
-      id: 'extension-lumbar', name: 'Extensión lumbar',
+      id: 'extension-lumbar', name: 'Extensión lumbar', muscle: 'lumbar',
       sets: 3, repMin: 10, repMax: 15, rest: 90, restText: '90 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin hiperextender arriba.'
@@ -146,31 +147,31 @@ const HOMBROS = {
   id: 'hombros', name: 'Hombros',
   exercises: [
     {
-      id: 'press-hombro-maquina', name: 'Press de hombros en máquina',
+      id: 'press-hombro-maquina', name: 'Press de hombros en máquina', muscle: 'hombros',
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin arquear la zona lumbar.'
     },
     {
-      id: 'elevaciones-laterales', name: 'Elevaciones laterales',
+      id: 'elevaciones-laterales', name: 'Elevaciones laterales', muscle: 'hombros',
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
       unit: 'kg/mancuerna', step: 1, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Codos ligeramente flexionados, sin impulso.'
     },
     {
-      id: 'elevaciones-laterales-polea', name: 'Elevaciones laterales en polea',
+      id: 'elevaciones-laterales-polea', name: 'Elevaciones laterales en polea', muscle: 'hombros',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'kg', step: 1.25, provisional: true, perLeg: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Tensión constante durante todo el recorrido.'
     },
     {
-      id: 'pajaros', name: 'Pájaros (deltoides posterior)',
+      id: 'pajaros', name: 'Pájaros (deltoides posterior)', muscle: 'hombros',
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Peck deck invertido o mancuernas inclinado.'
     },
     {
-      id: 'encogimientos', name: 'Encogimientos de trapecio',
+      id: 'encogimientos', name: 'Encogimientos de trapecio', muscle: 'trapecio',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg/mancuerna', step: 2, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sube recto, sin rotar los hombros.'
@@ -182,25 +183,25 @@ const BICEPS = {
   id: 'biceps', name: 'Bíceps',
   exercises: [
     {
-      id: 'curl-barra', name: 'Curl con barra',
+      id: 'curl-barra', name: 'Curl con barra', muscle: 'biceps',
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Codos pegados al torso.'
     },
     {
-      id: 'curl-inclinado', name: 'Curl inclinado con mancuernas',
+      id: 'curl-inclinado', name: 'Curl inclinado con mancuernas', muscle: 'biceps',
       sets: 3, repMin: 10, repMax: 12, rest: 75, restText: '60–75 s',
       unit: 'kg/mancuerna', step: 1, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Mayor estiramiento en la parte baja.'
     },
     {
-      id: 'curl-martillo', name: 'Curl martillo',
+      id: 'curl-martillo', name: 'Curl martillo', muscle: 'biceps',
       sets: 3, repMin: 10, repMax: 12, rest: 75, restText: '60–75 s',
       unit: 'kg/mancuerna', step: 1, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Trabaja braquial y braquiorradial.'
     },
     {
-      id: 'curl-predicador', name: 'Curl en banco predicador',
+      id: 'curl-predicador', name: 'Curl en banco predicador', muscle: 'biceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja completo sin rebotar.'
@@ -212,25 +213,25 @@ const TRICEPS = {
   id: 'triceps', name: 'Tríceps',
   exercises: [
     {
-      id: 'extension-polea', name: 'Extensión en polea (cuerda)',
+      id: 'extension-polea', name: 'Extensión en polea (cuerda)', muscle: 'triceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Abre la cuerda abajo, codos fijos.'
     },
     {
-      id: 'press-frances', name: 'Press francés',
+      id: 'press-frances', name: 'Press francés', muscle: 'triceps',
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja controlado hacia la frente o detrás de la cabeza.'
     },
     {
-      id: 'extension-sobre-cabeza', name: 'Extensión sobre la cabeza',
+      id: 'extension-sobre-cabeza', name: 'Extensión sobre la cabeza', muscle: 'triceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Gran estiramiento de la cabeza larga.'
     },
     {
-      id: 'fondos-banco', name: 'Fondos en paralelas o banco',
+      id: 'fondos-banco', name: 'Fondos en paralelas o banco', muscle: 'triceps',
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg adicional', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Torso vertical para enfatizar el tríceps.'
@@ -242,36 +243,75 @@ const CORE = {
   id: 'core', name: 'Abdomen / Core',
   exercises: [
     {
-      id: 'crunch-maquina', name: 'Crunch en máquina',
+      id: 'crunch-maquina', name: 'Crunch en máquina', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Redondea la columna, exhala al contraer.'
     },
     {
-      id: 'elevacion-piernas', name: 'Elevación de piernas colgado',
+      id: 'elevacion-piernas', name: 'Elevación de piernas colgado', muscle: 'abdomen',
       sets: 3, repMin: 10, repMax: 15, rest: 60, restText: '60 s',
       unit: 'kg adicional', step: 0, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin balanceo; inclina la pelvis hacia arriba.'
     },
     {
-      id: 'crunch-polea', name: 'Crunch en polea alta',
+      id: 'crunch-polea', name: 'Crunch en polea alta', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Caderas fijas, flexiona el tronco.'
     },
     {
-      id: 'rotacion-polea', name: 'Rotación en polea (leñador)',
+      id: 'rotacion-polea', name: 'Rotación en polea (leñador)', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'kg', step: 2.5, provisional: true, perLeg: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Gira desde el tronco, no los brazos.'
     },
     {
-      id: 'plancha', name: 'Plancha (segundos)',
+      id: 'plancha', name: 'Plancha (segundos)', muscle: 'abdomen',
       sets: 3, repMin: 30, repMax: 60, rest: 60, restText: '60 s',
       unit: 'kg adicional', step: 0, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Las "repeticiones" son segundos de mantención.'
     }
   ]
+};
+
+/* Plan de 3 dias por semana (empuje / tiron / piernas). Cada dia junta ejercicios de varios grupos.
+ * sets: series para ese dia (si se omite, usa las del ejercicio). */
+const PLAN = {
+  name: 'Plan de 3 días',
+  days: [
+    {
+      id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
+      exercises: [
+        { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
+        { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
+        { id: 'extension-polea' }, { id: 'extension-sobre-cabeza' }
+      ]
+    },
+    {
+      id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior',
+      exercises: [
+        { id: 'jalon-pecho', sets: 4 }, { id: 'remo-maquina' }, { id: 'remo-mancuerna' },
+        { id: 'face-pull' }, { id: 'pajaros' },
+        { id: 'curl-inclinado' }, { id: 'curl-martillo' }
+      ]
+    },
+    {
+      id: 'dia-piernas', name: 'Día 3 · Piernas y core', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas · Abdomen',
+      exercises: [
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral' }, { id: 'hip-thrust' },
+        { id: 'extension-cuadriceps' }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' },
+        { id: 'crunch-polea' }
+      ]
+    }
+  ]
+};
+
+/* Nombres de los musculos para el volumen semanal (series directas por semana). */
+const MUSCLES = {
+  cuadriceps: 'Cuádriceps', isquios: 'Isquiotibiales', gluteos: 'Glúteos', pantorrillas: 'Pantorrillas',
+  pecho: 'Pecho', espalda: 'Espalda', lumbar: 'Lumbar', hombros: 'Hombros', trapecio: 'Trapecio',
+  biceps: 'Bíceps', triceps: 'Tríceps', abdomen: 'Abdomen'
 };
 
 const ROUTINES = [PIERNAS, PECHO, ESPALDA, HOMBROS, BICEPS, TRICEPS, CORE];

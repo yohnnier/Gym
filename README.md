@@ -4,15 +4,17 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 
 ## Funciones
 
-- **Inicio**: saludo, resumen (sesiones en 7 días, en el mes y series totales) y grilla de grupos musculares con imagen. Marca el grupo **sugerido** (el que llevas más tiempo sin entrenar).
+- **Plan de 3 días** (empuje / tirón / piernas y core), editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día según el último que hiciste.
+- **Inicio**: saludo, resumen, el plan de 3 días, **volumen semanal** por músculo (referencia 10–20 series) y los grupos musculares sueltos con imagen.
 - **Página por grupo** (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): cada ejercicio muestra su imagen, tu **último registro** y, al lado, las filas para registrar **hoy**. La fecha se guarda sola.
 - **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
-  - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango.
-  - Si quedaste bajo el mínimo: **baja el peso** para volver al rango.
+  - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango. Si el salto supera el 15 % del peso (p. ej. mancuernas ligeras), primero pide 3 repeticiones más.
+  - **Estancamiento**: 3 sesiones sin superar la anterior → **descarga** (~90 % del peso, 3–4 reps en reserva).
+  - Bajo el mínimo **dos sesiones seguidas**: **baja el peso**. Si fue una sola, mantiene el peso.
   - En otro caso: **mantén el peso y suma +1 repetición** por serie.
   - Las filas vienen prellenadas con el peso y las repeticiones sugeridas; durante la sesión se ajustan según la serie anterior.
 - **Imágenes de las máquinas**: toca la imagen para verla grande (inicio y final del movimiento) o **cambiarla por una foto de tu gimnasio** (queda guardada en el dispositivo).
-- **Temporizador de descanso** automático, con aviso sonoro y vibración.
+- **Cronómetro** en la cabecera (libre, para planchas o tiempo total) con **descansos rápidos** de 45 s a 3 min. El descanso también arranca solo al registrar cada serie, con aviso sonoro y vibración.
 - **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
 - **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.
 

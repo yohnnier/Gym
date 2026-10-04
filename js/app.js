@@ -8,6 +8,12 @@
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
   const routineById = {};
   ROUTINES.forEach((r) => { routineById[r.id] = r; });
+  // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
+  const DAYS = PLAN.days.map((d) => ({
+    id: d.id, name: d.name, focus: d.focus, isDay: true,
+    exercises: d.exercises.map((x) => Object.assign({}, exById[x.id], x.sets ? { sets: x.sets, setsText: null } : {}))
+  }));
+  DAYS.forEach((d) => { routineById[d.id] = d; });
   const routineOf = (s) => routineById[(s && s.routineId) || 'piernas'] || ROUTINES[0];
 
   let state = load();
@@ -127,16 +133,34 @@
     return s ? s.entries.filter((x) => x.exerciseId === ex.id) : [];
   }
 
-  // Ultimo registro de este ejercicio, sin contar lo que estas registrando hoy en este dispositivo
-  function lastRecord(exId) {
+  // Registros anteriores de este ejercicio (mas reciente primero), sin contar lo que registras hoy en este dispositivo
+  function records(exId, n) {
     const today = todayISO();
+    const out = [];
     const sessions = sortedSessions();
-    for (let i = 0; i < sessions.length; i++) {
+    for (let i = 0; i < sessions.length && out.length < n; i++) {
       if (!isRepo(sessions[i]) && sessions[i].date >= today) continue;
       const sets = sessions[i].entries.filter((x) => x.exerciseId === exId);
-      if (sets.length) return { session: sessions[i], sets: sets };
+      if (sets.length) out.push({ session: sessions[i], sets: sets });
     }
-    return null;
+    return out;
+  }
+  function lastRecord(exId) { return records(exId, 1)[0] || null; }
+
+  // Resumen de una sesion: peso de trabajo (el maximo valido), series con ese peso y fuerza estimada
+  function summarize(rec) {
+    const valid = rec.sets.filter((x) => x.weight != null && !x.badTech);
+    if (!valid.length) return null;
+    const W = Math.max.apply(null, valid.map((x) => x.weight));
+    const top = valid.filter((x) => x.weight === W);
+    const best = top.reduce((a, b) => (b.reps > a.reps ? b : a));
+    const rpes = top.map((x) => x.rpe).filter((x) => x != null);
+    return {
+      W: W, top: top,
+      avgReps: top.reduce((t, x) => t + x.reps, 0) / top.length,
+      avgRpe: rpes.length ? rpes.reduce((x, y) => x + y, 0) / rpes.length : null,
+      e1rm: W * (1 + best.reps / 30) // Epley: sirve para comparar sesiones entre si
+    };
   }
 
   function bestWeight(exId, sessions) {
@@ -148,59 +172,120 @@
   }
 
   // ---------- progresion (doble progresion para hipertrofia) ----------
-  // Devuelve el plan de hoy: peso, repeticiones objetivo por serie, tendencia y explicacion.
+  // Reglas:
+  //  1. Subir peso cuando completas el tope del rango en todas las series (o te sobraban, dificultad <= 7).
+  //     Si el salto de peso es grande para ese ejercicio (> 15 %), primero se piden mas repeticiones.
+  //  2. Estancamiento: 3 sesiones sin superar la de antes -> descarga (~90 % del peso, mas reps en reserva).
+  //  3. Bajar peso solo si quedaste bajo el minimo dos sesiones seguidas; si fue una, se mantiene.
+  //  4. Si no, mantener el peso y sumar +1 repeticion por serie.
+  const BIG_JUMP = 0.15;
+  const EXTRA_REPS = 3;
+
   function plan(ex) {
-    const last = lastRecord(ex.id);
+    const recs = records(ex.id, 4);
     const range = ex.repMin + '–' + ex.repMax;
     const reps = (n) => Array(ex.sets).fill(n);
-    if (!last) {
+    const last = recs[0] && summarize(recs[0]);
+    if (!recs.length) {
       return { weight: null, reps: reps(ex.repMin), trend: 'new',
         title: 'Primera vez',
         text: 'Elige un peso con el que completes ' + range + ' reps dejando 1–2 en reserva. Prioriza la técnica.' };
     }
-    const valid = last.sets.filter((x) => x.weight != null && !x.badTech);
-    if (!valid.length) {
+    if (!last) {
       return { weight: null, reps: reps(ex.repMin), trend: 'new',
         title: 'Sin peso de referencia',
         text: 'La última vez no quedó un peso válido. Busca uno para ' + range + ' reps con 1–2 en reserva.' };
     }
-    const W = Math.max.apply(null, valid.map((x) => x.weight));
-    const top = valid.filter((x) => x.weight === W);
-    const avgReps = top.reduce((t, x) => t + x.reps, 0) / top.length;
-    const rpes = top.map((x) => x.rpe).filter((x) => x != null);
-    const avgRpe = rpes.length ? rpes.reduce((a, b) => a + b, 0) / rpes.length : null;
-    const allTop = top.length >= Math.min(ex.sets, last.sets.length) && top.every((x) => x.reps >= ex.repMax);
+    const W = last.W;
+    const jump = W > 0 ? ex.step / W : 0;
+    const big = jump > BIG_JUMP;
+    const cap = big ? ex.repMax + EXTRA_REPS : ex.repMax; // tope de reps antes de subir el peso
+    const setsDone = Math.min(ex.sets, recs[0].sets.length);
+    const allTop = last.top.length >= setsDone && last.top.every((x) => x.reps >= cap);
+    const easy = last.avgRpe != null && last.avgRpe <= 7 && last.avgReps >= ex.repMin && !big;
 
-    if (allTop || (avgRpe != null && avgRpe <= 7 && avgReps >= ex.repMin)) {
+    // 1. Subir
+    if (allTop || easy) {
       const nw = W + ex.step;
       return { weight: nw, reps: reps(ex.repMin), trend: 'up',
         title: 'Sube a ' + fmt(nw) + ' ' + ex.unit,
         text: allTop
-          ? 'Completaste ' + ex.repMax + ' reps con ' + fmt(W) + '. Sube el peso y vuelve a construir desde ' + ex.repMin + ' reps.'
+          ? 'Completaste ' + cap + ' reps con ' + fmt(W) + '. Sube el peso y vuelve a construir desde ' + ex.repMin + ' reps.'
           : 'Te sobraron repeticiones con ' + fmt(W) + '. Más carga = más estímulo para crecer.' };
     }
-    if (avgReps < ex.repMin) {
-      const nw = Math.max(0, W - ex.step);
-      return { weight: nw, reps: reps(ex.repMin), trend: 'down',
-        title: 'Baja a ' + fmt(nw) + ' ' + ex.unit,
-        text: 'Quedaste bajo ' + ex.repMin + ' reps. Un peso un poco menor te mantiene en el rango de hipertrofia (' + range + ').' };
+
+    // 2. Estancamiento
+    const sums = recs.map(summarize);
+    if (sums.length >= 4 && sums.every(Boolean)) {
+      const ref = sums[3].e1rm;
+      if (Math.max(sums[0].e1rm, sums[1].e1rm, sums[2].e1rm) <= ref) {
+        const dw = Math.max(0, Math.min(W - ex.step, Math.round(W * 0.9 / ex.step) * ex.step));
+        return { weight: dw, reps: reps(ex.repMin), trend: 'deload', title: 'Semana de descarga: ' + fmt(dw) + ' ' + ex.unit,
+          text: 'Llevas 3 sesiones sin superar tu marca. Es normal: hoy baja el peso y deja 3–4 reps en reserva. Si sigue igual tras la descarga, prueba otra variante.' };
+      }
     }
+
+    // 3. Bajo el minimo
+    if (last.avgReps < ex.repMin) {
+      const prev = sums[1];
+      if (prev && prev.avgReps < ex.repMin && prev.W <= W) {
+        const nw = Math.max(0, W - ex.step);
+        return { weight: nw, reps: reps(ex.repMin), trend: 'down',
+          title: 'Baja a ' + fmt(nw) + ' ' + ex.unit,
+          text: 'Dos sesiones seguidas bajo ' + ex.repMin + ' reps. Un poco menos de peso te devuelve al rango de hipertrofia (' + range + ').' };
+      }
+      return { weight: W, reps: reps(ex.repMin), trend: 'same',
+        title: 'Mantén ' + fmt(W) + ' ' + ex.unit,
+        text: 'La última vez quedaste bajo ' + ex.repMin + ' reps. Un día flojo no define tu progreso: intenta llegar a ' + ex.repMin + '. Si vuelve a pasar, bajamos el peso.' };
+    }
+
+    // 4. Mantener y sumar repeticiones
     const target = [];
     for (let i = 0; i < ex.sets; i++) {
-      const prev = top[Math.min(i, top.length - 1)].reps;
-      target.push(Math.min(ex.repMax, prev + 1));
+      const prev = last.top[Math.min(i, last.top.length - 1)].reps;
+      target.push(Math.min(cap, prev + 1));
     }
     return { weight: W, reps: target, trend: 'same',
       title: 'Mantén ' + fmt(W) + ' ' + ex.unit + ' y suma reps',
-      text: 'Busca +1 repetición por serie. Cuando hagas ' + ex.repMax + ' en todas, sube el peso.' };
+      text: big
+        ? 'Subir a ' + fmt(W + ex.step) + ' sería un salto de ' + Math.round(jump * 100) + ' %. Antes, llega a ' + cap + ' reps en todas las series.'
+        : 'Busca +1 repetición por serie. Cuando hagas ' + cap + ' en todas, sube el peso.' };
   }
 
   // Ajuste dentro de la sesion segun la serie recien hecha
   function adjustAfter(ex, set, base) {
     if (set.weight == null) return base;
     if (set.reps < ex.repMin) return Math.max(0, set.weight - ex.step);
-    if (set.rpe != null && set.rpe <= 7 && set.reps >= ex.repMin) return set.weight + ex.step;
+    if (set.rpe != null && set.rpe <= 7 && set.reps >= ex.repMin && ex.step / Math.max(set.weight, 1) <= BIG_JUMP) return set.weight + ex.step;
     return set.weight;
+  }
+
+  // ---------- volumen semanal ----------
+  // Series directas por musculo en los ultimos 7 dias. Referencia para hipertrofia: 10–20 por semana.
+  const VOL_MIN = 10, VOL_MAX = 20, VOL_SCALE = 26;
+  function weeklyVolume() {
+    const out = {};
+    Object.keys(MUSCLES).forEach((k) => { out[k] = 0; });
+    allSessions().forEach((s) => {
+      if (daysSince(s.date) >= 7) return;
+      s.entries.forEach((x) => { const ex = exById[x.exerciseId]; if (ex && ex.muscle) out[ex.muscle]++; });
+    });
+    return out;
+  }
+  function volStatus(n) {
+    return n < VOL_MIN ? { cls: 'low', icon: '○', text: 'Bajo' }
+      : n > VOL_MAX ? { cls: 'high', icon: '▲', text: 'Alto' }
+      : { cls: 'ok', icon: '✓', text: 'En rango' };
+  }
+  function volumeMeter(key, n) {
+    const st = volStatus(n);
+    const pct = (v) => Math.min(100, 100 * v / VOL_SCALE) + '%';
+    return h('div', { class: 'vol-row', title: MUSCLES[key] + ': ' + n + ' series en 7 días (' + st.text + ')' },
+      h('span', { class: 'vol-name' }, MUSCLES[key]),
+      h('span', { class: 'vol-track', 'aria-hidden': 'true' },
+        h('span', { class: 'vol-band', style: 'left:' + pct(VOL_MIN) + ';width:calc(' + pct(VOL_MAX) + ' - ' + pct(VOL_MIN) + ')' }),
+        n ? h('span', { class: 'vol-fill ' + st.cls, style: 'width:' + pct(n) }) : null),
+      h('span', { class: 'vol-val' }, h('b', {}, n), ' ', h('span', { class: 'vol-st ' + st.cls }, st.icon + ' ' + st.text)));
   }
 
   // ---------- acciones ----------
@@ -343,6 +428,46 @@
     });
   }
 
+  // ---------- cronometro libre ----------
+  let swAcc = 0, swStart = null, swHandle = null;
+  const swMs = () => swAcc + (swStart ? Date.now() - swStart : 0);
+  function swText() { const t = Math.floor(swMs() / 1000); return mmss(t); }
+  function swUpdate() {
+    const btn = $('#sw-label');
+    if (btn) btn.textContent = swStart || swAcc ? swText() : 'Cronómetro';
+    const big = $('#sw-big');
+    if (big) big.textContent = swText();
+    const el = $('#elapsed');
+    if (el) { const r = route(); const s = r.group && todaySession(r.group.id, false); if (s) el.textContent = elapsedText(s); }
+  }
+  function swToggle() {
+    if (swStart) { swAcc += Date.now() - swStart; swStart = null; } else swStart = Date.now();
+    swUpdate(); openStopwatch();
+  }
+  function swReset() { swAcc = 0; swStart = null; swUpdate(); openStopwatch(); }
+
+  function openStopwatch() {
+    const sheet = $('#sheet');
+    const close = () => { sheet.classList.add('hidden'); sheet.replaceChildren(); };
+    const rest = (sec) => { startTimer(sec); close(); toast('Descanso de ' + (sec < 60 ? sec + ' s' : mmss(sec)) + ' en marcha.'); };
+    const panel = h('div', { class: 'sheet-panel', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Cronómetro' },
+      h('div', { class: 'sheet-grip' }),
+      h('div', { class: 'row between' },
+        h('h2', {}, 'Cronómetro'),
+        h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: close }, '×')),
+      h('div', { class: 'sw-big', id: 'sw-big' }, swText()),
+      h('div', { class: 'sw-actions' },
+        h('button', { class: 'btn primary big', type: 'button', onclick: swToggle }, swStart ? 'Pausar' : (swAcc ? 'Continuar' : 'Iniciar')),
+        h('button', { class: 'btn big', type: 'button', onclick: swReset, disabled: !swStart && !swAcc }, 'Reiniciar')),
+      h('p', { class: 'muted small' }, 'Útil para planchas, tiempo total o descansos libres. Sigue contando aunque cierres esta ventana.'),
+      h('div', { class: 'section-title', style: 'margin-top:18px' }, 'Descanso rápido'),
+      h('div', { class: 'rest-presets' },
+        [45, 60, 90, 120, 180].map((sec) => h('button', { class: 'btn', type: 'button', onclick: () => rest(sec) }, sec < 60 ? sec + ' s' : mmss(sec)))),
+      h('p', { class: 'muted small' }, 'El descanso también arranca solo cada vez que registras una serie, con el tiempo indicado para ese ejercicio.'));
+    sheet.replaceChildren(h('div', { class: 'sheet-bg', onclick: close }), panel);
+    sheet.classList.remove('hidden');
+  }
+
   // ---------- exportar / importar ----------
   function download(name, text, type) {
     const a = document.createElement('a');
@@ -439,13 +564,46 @@
       h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
 
     const lastDone = lastDoneByGroup();
-    const suggested = ROUTINES.slice().sort((a, b) => {
-      const da = lastDone[a.id] ? daysSince(lastDone[a.id]) : 1e9;
-      const db = lastDone[b.id] ? daysSince(lastDone[b.id]) : 1e9;
-      return db - da;
-    })[0];
 
-    root.append(h('div', { class: 'section-title' }, 'Elige grupo muscular'));
+    // Plan de 3 dias: el siguiente es el que sigue al ultimo dia del plan que hiciste
+    let lastDay = -1;
+    const sorted = sortedSessions();
+    for (let i = 0; i < sorted.length; i++) {
+      const k = DAYS.findIndex((d) => d.id === sorted[i].routineId);
+      if (k !== -1) { lastDay = k; break; }
+    }
+    const nextDay = DAYS[(lastDay + 1) % DAYS.length];
+    root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
+    const days = h('div', { class: 'days' });
+    DAYS.forEach((d, i) => {
+      const today = todaySession(d.id, false);
+      const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
+      const status = today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+        : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
+      days.append(h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
+        h('span', { class: 'day-n' }, i + 1),
+        h('span', { class: 'day-txt' },
+          h('strong', {}, d.name.replace(/^Día \d+ · /, '')),
+          h('span', {}, d.focus),
+          h('span', { class: 'day-st' }, status)),
+        today ? h('span', { class: 'pill live static' }, 'Hoy')
+          : d === nextDay ? h('span', { class: 'pill static' }, 'Siguiente') : null));
+    });
+    root.append(days);
+
+    const vol = weeklyVolume();
+    const volCard = h('section', { class: 'card vol' },
+      h('div', { class: 'row between' },
+        h('strong', {}, 'Volumen semanal'),
+        h('span', { class: 'muted small' }, 'Series en 7 días')),
+      h('p', { class: 'muted small', style: 'margin:4px 0 10px' }, 'La franja marca 10–20 series por músculo, el rango más usado para hipertrofia.'));
+    // Lumbar y trapecio no estan en el plan: solo se muestran si tienen series
+    Object.keys(MUSCLES).filter((k) => vol[k] || (k !== 'lumbar' && k !== 'trapecio')).forEach((k) => volCard.append(volumeMeter(k, vol[k])));
+    root.append(h('div', { class: 'section-title' }, 'Tu semana'));
+    root.append(volCard);
+
+
+    root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
     const grid = h('div', { class: 'groups' });
     ROUTINES.forEach((r) => {
       const today = todaySession(r.id, false);
@@ -454,7 +612,6 @@
       grid.append(h('button', { class: 'group', type: 'button', onclick: () => go('#/g/' + r.id) },
         h('span', { class: 'cover' },
           h('img', { src: imgSrc(r.exercises[0], 0), alt: '', loading: 'lazy' }),
-          r === suggested && !today ? h('span', { class: 'pill' }, 'Sugerido') : null,
           today ? h('span', { class: 'pill live' }, 'Hoy') : null),
         h('span', { class: 'group-txt' },
           h('strong', {}, r.name),
@@ -462,6 +619,11 @@
           h('span', {}, status))));
     });
     root.append(grid);
+  }
+
+  function elapsedText(s) {
+    const first = s.entries.length ? (s.startedAt || s.createdAt) : Date.now();
+    return 'En sesión: ' + Math.max(0, Math.round((Date.now() - first) / 60000)) + ' min';
   }
 
   function renderGroup(root, r) {
@@ -474,13 +636,23 @@
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/') }),
       h('div', { class: 'grow' },
         h('h2', {}, r.name),
-        h('div', { class: 'muted small' }, 'Hoy · ' + longDate(new Date())))));
+        h('div', { class: 'muted small' }, r.focus ? r.focus : 'Hoy · ' + longDate(new Date())),
+        today ? h('div', { class: 'muted small', id: 'elapsed' }, elapsedText(today)) : null)));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     root.append(h('div', { class: 'progress-wrap' },
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
         ? done + ' de ' + total + ' series' + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
         : total + ' series planificadas · la fecha se guarda sola')));
+
+    const vol = weeklyVolume();
+    const muscles = [];
+    r.exercises.forEach((e) => { if (muscles.indexOf(e.muscle) === -1) muscles.push(e.muscle); });
+    root.append(h('details', { class: 'card vol compact' },
+      h('summary', {}, h('strong', {}, 'Volumen esta semana'), h('span', { class: 'muted small' },
+        muscles.map((m) => MUSCLES[m] + ' ' + vol[m]).join(' · '))),
+      h('div', { style: 'margin-top:10px' }, muscles.map((m) => volumeMeter(m, vol[m]))),
+      h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Referencia: 10–20 series por músculo a la semana. Incluye lo que registres hoy.')));
 
     r.exercises.forEach((ex, i) => root.append(exerciseCard(ex, i, r)));
   }
@@ -504,7 +676,7 @@
           : h('span', { class: 'muted' }, 'Sin registro anterior'))),
       h('span', { class: 'badge' + (complete ? ' ok' : '') }, logged.length + '/' + ex.sets));
 
-    const icon = { up: '↑', down: '↓', same: '→', new: '★' }[p.trend];
+    const icon = { up: '↑', down: '↓', same: '→', new: '★', deload: '↺' }[p.trend];
     const sugg = h('div', { class: 'sugg ' + p.trend },
       h('span', { class: 'sugg-ico', 'aria-hidden': 'true' }, icon),
       h('div', {},
@@ -636,7 +808,13 @@
   }
 
   function renderRutina(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Ejercicios, rangos y descansos de cada grupo. Toca una imagen para cambiarla.')));
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu plan de 3 días y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
+    DAYS.forEach((d) => {
+      root.append(h('section', { class: 'card' },
+        h('div', { class: 'ex-name' }, d.name),
+        h('div', { class: 'muted small' }, d.focus),
+        h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))));
+    });
     ROUTINES.forEach((r) => {
       root.append(h('div', { class: 'section-title' }, r.name));
       r.exercises.forEach((ex, i) => {
@@ -682,6 +860,8 @@
     timerEnd += 15000; timerTotal += 15; tick();
   });
   $('#t-skip').addEventListener('click', () => stopTimer(false));
+  $('#sw-btn').addEventListener('click', openStopwatch);
+  swHandle = setInterval(swUpdate, 500);
 
   save();
   render();
