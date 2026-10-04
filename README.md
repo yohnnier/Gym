@@ -4,21 +4,21 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 
 ## Funciones
 
-- **Rutinas precargadas** por grupo muscular (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen), con rangos de repeticiones y descansos. Las de piernas son las originales; el resto son sugeridas y editables.
-- **Registro por serie**: peso, repeticiones y dificultad (1–10), con nota opcional y marca de "técnica incompleta".
-- **Sugerencia de progresión** (doble progresión, orientada a hipertrofia con 0–2 repeticiones en reserva):
-  - Si no llegas al mínimo de repeticiones, baja el peso.
-  - Si te sobraban repeticiones (dificultad ≤ 7) o llegas al tope con dificultad ≤ 8, sube el peso.
-  - En otro caso, mantiene el peso.
-  - Al abrir un ejercicio, el punto de partida sale de tu última sesión.
-- **Inicio** con saludo, resumen semanal y mensual, rutina sugerida (el grupo que llevas más tiempo sin entrenar) y resumen al terminar cada sesión.
-- **Progreso** por ejercicio: mejor serie de cada sesión y cambio de peso.
-- **Temporizador de descanso** automático al registrar cada serie, con aviso sonoro y vibración.
-- **Historial** de sesiones, con exportación a Markdown.
-- **Copia de seguridad**: exportar e importar todos los datos en JSON.
-- **Funciona sin conexión** una vez abierta (service worker).
+- **Inicio**: saludo, resumen (sesiones en 7 días, en el mes y series totales) y grilla de grupos musculares con imagen. Marca el grupo **sugerido** (el que llevas más tiempo sin entrenar).
+- **Página por grupo** (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): cada ejercicio muestra su imagen, tu **último registro** y, al lado, las filas para registrar **hoy**. La fecha se guarda sola.
+- **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
+  - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango.
+  - Si quedaste bajo el mínimo: **baja el peso** para volver al rango.
+  - En otro caso: **mantén el peso y suma +1 repetición** por serie.
+  - Las filas vienen prellenadas con el peso y las repeticiones sugeridas; durante la sesión se ajustan según la serie anterior.
+- **Imágenes de las máquinas**: toca la imagen para verla grande (inicio y final del movimiento) o **cambiarla por una foto de tu gimnasio** (queda guardada en el dispositivo).
+- **Temporizador de descanso** automático, con aviso sonoro y vibración.
+- **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
+- **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.
 
-La primera vez que se abre carga como ejemplo la sesión del 04-10-2026; puedes eliminarla desde el historial.
+## Registrar desde el chat
+
+El historial publicado está en `data/sessions.json`. La app lo une con lo que registres en el dispositivo.
 
 ## Probar en local
 
@@ -61,8 +61,14 @@ js/app.js             lógica: registro, progresión, temporizador, historial
 sw.js                 service worker (modo sin conexión)
 manifest.webmanifest  instalación como app
 icons/icon.svg        icono
+img/ex/               imágenes de los ejercicios (inicio y final)
+data/sessions.json    historial publicado
 .github/workflows/    despliegue a GitHub Pages
 ```
+
+## Créditos
+
+Imágenes de ejercicios: [free-exercise-db](https://github.com/yuhonas/free-exercise-db), dominio público (Unlicense).
 
 ## Nota
 

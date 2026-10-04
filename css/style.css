@@ -100,7 +100,6 @@ main { padding: 18px 16px; max-width: 640px; margin: 0 auto; }
 .card.soft { background: var(--accent-soft); border-color: transparent; box-shadow: none; }
 .card.warm { background: var(--warm-soft); border-color: transparent; box-shadow: none; }
 .card.done { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
-.card.ex { padding: 0; overflow: hidden; }
 .card-head {
   width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
   background: none; border: 0; color: inherit; text-align: left; padding: 16px; cursor: pointer;
@@ -108,27 +107,113 @@ main { padding: 18px 16px; max-width: 640px; margin: 0 auto; }
 .ex-name { font-weight: 600; letter-spacing: -.005em; }
 .ex-body { padding: 0 16px 16px; border-top: 1px solid var(--line); }
 
-/* rutina sugerida */
-.next { display: flex; align-items: center; gap: 14px; }
-.next .txt { flex: 1; min-width: 0; }
-.next .txt strong { display: block; font-size: 17px; }
-
 /* grilla de grupos musculares */
-.groups { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.groups { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .group {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  display: flex; flex-direction: column; padding: 0; overflow: hidden;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px; color: inherit; text-align: left; cursor: pointer; box-shadow: var(--shadow);
+  color: inherit; text-align: left; cursor: pointer; box-shadow: var(--shadow);
   transition: transform .12s ease, border-color .12s ease;
 }
 .group:active { transform: scale(.98); }
 .group:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
-.group .ico {
-  width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
-  background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px;
+.cover { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--surface-2); }
+.cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.35), transparent 55%); }
+.pill {
+  position: absolute; top: 8px; left: 8px; z-index: 1;
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  background: var(--accent); color: var(--accent-ink);
 }
-.group strong { font-size: 15px; }
-.group span { font-size: 12px; color: var(--muted); }
+.pill.live { background: var(--warm); color: #2a1300; }
+.group-txt { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 12px; }
+.group-txt strong { font-size: 15px; }
+.group-txt span { font-size: 12px; color: var(--muted); }
+
+/* cabecera de la pagina del grupo */
+.group-head { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.group-head h2 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
+.back {
+  width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.grow { flex: 1; min-width: 0; }
+.progress-wrap { margin: 0 0 16px; }
+
+/* tarjeta de ejercicio */
+.card.ex { padding: 14px; }
+.ex-head { display: flex; align-items: flex-start; gap: 12px; }
+.thumb {
+  position: relative; flex: none; width: 76px; height: 76px; padding: 0; overflow: hidden;
+  border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb-edit {
+  position: absolute; right: 4px; bottom: 4px; width: 22px; height: 22px; display: grid; place-items: center;
+  border-radius: 7px; background: rgba(0,0,0,.55); color: #fff; font-size: 12px;
+}
+.last { margin-top: 6px; color: var(--text); line-height: 1.35; }
+.last b { font-weight: 600; color: var(--muted); }
+
+.sugg {
+  display: flex; gap: 10px; margin: 12px 0 10px; padding: 10px 12px;
+  border-radius: var(--radius-sm); background: var(--accent-soft); font-size: 13px; line-height: 1.4;
+}
+.sugg strong { display: block; font-size: 14px; color: var(--accent); margin-bottom: 1px; }
+.sugg-ico {
+  flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--accent); color: var(--accent-ink); font-weight: 800;
+}
+.sugg.down { background: var(--warm-soft); }
+.sugg.down strong { color: var(--warm); }
+.sugg.down .sugg-ico { background: var(--warm); color: #2a1300; }
+
+/* registro: anterior | hoy */
+.log { display: flex; flex-direction: column; gap: 6px; }
+.log-row {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr) 72px 58px 44px; align-items: center; gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.log-th { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.log-th span:first-child, .log-th span:nth-child(3), .log-th span:nth-child(4) { text-align: center; }
+.log-row .n {
+  width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--surface-2); color: var(--muted); font-size: 13px; font-weight: 700;
+}
+.log-row .prev { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-row input { padding: 9px 6px; text-align: center; font-weight: 600; }
+.log-row .val { text-align: center; font-weight: 700; }
+.log-row.next .n { background: var(--accent); color: var(--accent-ink); }
+.log-row.done { background: var(--accent-soft); border-radius: 10px; padding: 4px 0; }
+.log-row.done .n { background: transparent; color: var(--accent); }
+.tick {
+  width: 44px; height: 40px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--muted); font-size: 18px; font-weight: 800; cursor: pointer;
+}
+.tick.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.log-row.next .tick { border-color: var(--accent); color: var(--accent); }
+.rpe-ask { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 6px 36px; }
+.add { margin-top: 6px; padding-left: 0; }
+img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
+
+/* hoja inferior con imagen grande */
+.sheet { position: fixed; inset: 0; z-index: 30; }
+.sheet.hidden { display: none; }
+.sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.sheet-panel {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 92vh; overflow: auto;
+  max-width: 640px; margin: 0 auto; padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
+  background: var(--surface); border-radius: 22px 22px 0 0; animation: up .2s ease;
+}
+@keyframes up { from { transform: translateY(30px); opacity: .5; } to { transform: none; opacity: 1; } }
+.sheet-grip { width: 40px; height: 5px; border-radius: 9px; background: var(--line); margin: 4px auto 10px; }
+.sheet-panel h2 { margin: 0; font-size: 19px; }
+.sheet-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 6px; }
+.sheet-imgs.one { grid-template-columns: 1fr; }
+.sheet-imgs img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; background: var(--surface-2); }
+.sheet-imgs.one img { aspect-ratio: auto; max-height: 50vh; object-fit: contain; }
+.stack { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.credit { margin: 12px 0 0; font-size: 11px; color: var(--muted); text-align: center; }
 
 /* ---------- sesion en curso ---------- */
 .session-head { margin-bottom: 14px; }
@@ -253,6 +338,9 @@ ul.plain li { margin: 4px 0; }
 .tabs button.active { color: var(--accent); }
 
 @media (max-width: 360px) {
-  .stats { grid-template-columns: 1fr 1fr; }
-  .groups { grid-template-columns: 1fr; }
+  .log-row { grid-template-columns: 26px minmax(0, 1fr) 62px 50px 40px; gap: 4px; }
+  .thumb { width: 64px; height: 64px; }
+}
+@media (min-width: 560px) {
+  .groups { grid-template-columns: repeat(3, 1fr); }
 }
