@@ -283,6 +283,20 @@ img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; fl
 .chart-ghost { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 3 3; }
 .chart-ghost-line { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .6; }
 
+/* metas */
+.log-row.done.hit .tick.on { background: var(--accent); }
+.log-row.done.miss .tick.on { background: var(--warm); border-color: var(--warm); color: #2a1300; }
+.goal-miss { margin: -2px 0 2px 36px; font-size: 12px; color: var(--warm); font-weight: 600; }
+.goal-line { margin: 10px 0 0; font-size: 13px; font-weight: 600; color: var(--muted); }
+.goal-line.ok { color: var(--accent); }
+.next-plan summary { list-style: none; display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+.next-plan summary::-webkit-details-marker { display: none; }
+.next-list { margin-top: 12px; display: flex; flex-direction: column; }
+.next-item { padding: 10px 0; border-top: 1px solid var(--line); }
+.next-goal { margin: 3px 0; font-size: 15px; font-weight: 700; color: var(--accent); }
+.sugg-tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.sugg-tag.down, .sugg-tag.deload { background: var(--warm-soft); color: var(--warm); }
+
 /* aviso de version nueva */
 .update-bar {
   position: fixed; left: 12px; right: 12px; top: calc(10px + env(safe-area-inset-top)); z-index: 40;

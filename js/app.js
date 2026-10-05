@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '30';
+  const VERSION = '32';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -196,12 +196,12 @@
   }
 
   // Registros anteriores de este ejercicio (mas reciente primero), sin contar lo que registras hoy en este dispositivo
-  function records(exId, n) {
+  function records(exId, n, includeToday) {
     const today = todayISO();
     const out = [];
     const sessions = sortedSessions();
     for (let i = 0; i < sessions.length && out.length < n; i++) {
-      if (sessions[i].date >= today) continue; // lo de hoy no cuenta como "registro anterior"
+      if (!includeToday && sessions[i].date >= today) continue; // lo de hoy no cuenta como "registro anterior"
       const sets = sessions[i].entries.filter((x) => x.exerciseId === exId);
       if (sets.length) out.push({ session: sessions[i], sets: sets });
     }
@@ -217,8 +217,9 @@
     const top = valid.filter((x) => x.weight === W);
     const best = top.reduce((a, b) => (b.reps > a.reps ? b : a));
     const rpes = top.map((x) => x.rpe).filter((x) => x != null);
+    const warm = valid.filter((x) => x.weight < 0.85 * W).slice(0, 3).map((x) => ({ w: x.weight, r: x.reps }));
     return {
-      W: W, top: top,
+      W: W, top: top, warm: warm,
       avgReps: top.reduce((t, x) => t + x.reps, 0) / top.length,
       avgRpe: rpes.length ? rpes.reduce((x, y) => x + y, 0) / rpes.length : null,
       e1rm: W * (1 + best.reps / 30) // Epley: sirve para comparar sesiones entre si
@@ -243,8 +244,16 @@
   const BIG_JUMP = 0.15;
   const EXTRA_REPS = 3;
 
-  function plan(ex) {
-    const recs = records(ex.id, 4);
+  // includeToday = true calcula la meta de la PROXIMA sesion, usando tambien lo registrado hoy
+  function plan(ex, includeToday) {
+    const p = planCore(ex, includeToday);
+    const rec = records(ex.id, 1, includeToday)[0];
+    const sm = rec && summarize(rec);
+    p.warm = sm ? sm.warm : []; // series de calentamiento de la ultima vez (mas ligeras que el peso de trabajo)
+    return p;
+  }
+  function planCore(ex, includeToday) {
+    const recs = records(ex.id, 4, includeToday);
     const range = ex.repMin + '–' + ex.repMax;
     const reps = (n) => Array(ex.sets).fill(n);
     const last = recs[0] && summarize(recs[0]);
@@ -298,20 +307,45 @@
       }
       return { weight: W, reps: reps(ex.repMin), trend: 'same',
         title: 'Mantén ' + fmt(W) + ' ' + ex.unit,
-        text: 'La última vez quedaste bajo ' + ex.repMin + ' reps. Un día flojo no define tu progreso: intenta llegar a ' + ex.repMin + '. Si vuelve a pasar, bajamos el peso.' };
+        text: 'La última vez quedaste bajo ' + ex.repMin + ' reps' + (last.avgRpe != null && last.avgRpe >= 9.5 ? ' y al límite (dificultad ' + fmt(last.avgRpe) + ')' : '') + '. Un día flojo no define tu progreso: intenta llegar a ' + ex.repMin + ', con 1 repetición en reserva en la primera serie. Si vuelve a pasar, bajamos el peso.' };
     }
 
     // 4. Mantener y sumar repeticiones
     const target = [];
     for (let i = 0; i < ex.sets; i++) {
       const prev = last.top[Math.min(i, last.top.length - 1)].reps;
-      target.push(Math.min(cap, prev + 1));
+      target.push(Math.max(ex.repMin, Math.min(cap, prev + 1)));
     }
     return { weight: W, reps: target, trend: 'same',
       title: 'Mantén ' + fmt(W) + ' ' + ex.unit + ' y suma reps',
       text: big
         ? 'Subir a ' + fmt(W + ex.step) + ' sería un salto de ' + Math.round(jump * 100) + ' %. Antes, llega a ' + cap + ' reps en todas las series.'
-        : 'Busca +1 repetición por serie. Cuando hagas ' + cap + ' en todas, sube el peso.' };
+        : 'Busca +1 repetición por serie. Cuando hagas ' + cap + ' en todas, sube el peso.' +
+          (last.avgRpe != null && last.avgRpe >= 9.5 ? ' La última vez llegaste al límite (dificultad ' + fmt(last.avgRpe) + '): deja 1 repetición en reserva y descansa un poco más.' : '') };
+  }
+
+  // Texto corto de la meta: "80 kg/lado · 8 reps"
+  function targetText(ex, p) {
+    const same = p.reps.every((x) => x === p.reps[0]);
+    const w = p.warm || [];
+    return (w.length ? 'Calienta ' + w.map((x) => fmt(x.w)).join(' y ') + ', luego ' : '') +
+      (p.weight != null ? fmt(p.weight) + ' ' + ex.unit + ' · ' : '') + (same ? p.reps[0] + ' reps' : p.reps.join(' / ') + ' reps') +
+      ' × ' + Math.max(1, ex.sets - w.length) + ' series de trabajo';
+  }
+
+  // Cumplimiento de las metas de hoy: las series claramente mas ligeras que la meta se toman como calentamiento
+  function goalStats(ex, routineId) {
+    const p = plan(ex);
+    const logged = todaySets(ex, routineId);
+    let wi = 0; // indice entre las series de trabajo (el calentamiento no cuenta)
+    const rows = logged.map((e) => {
+      const work = p.weight == null || (e.weight != null && e.weight >= 0.85 * p.weight);
+      const tr = p.reps[Math.min(wi, p.reps.length - 1)];
+      if (work) wi++;
+      const hit = work && e.reps >= tr && (p.weight == null || e.weight == null || e.weight >= p.weight);
+      return { work: work, hit: hit, target: tr };
+    });
+    return { rows: rows, work: rows.filter((x) => x.work).length, hit: rows.filter((x) => x.hit).length, plan: p };
   }
 
   // Ajuste dentro de la sesion segun la serie recien hecha
@@ -884,6 +918,8 @@
     const todayAll = allSessions().find((x) => x.date === todayISO() && (x.routineId || 'piernas') === r.id);
     const done = todayAll ? Math.min(todayAll.entries.length, total) : 0;
     const pct = Math.round(100 * done / total);
+    const goalTotals = { work: 0, hit: 0 };
+    r.exercises.forEach((ex) => { const g = goalStats(ex, r.id); goalTotals.work += g.work; goalTotals.hit += g.hit; });
 
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/') }),
@@ -895,7 +931,7 @@
     root.append(h('div', { class: 'progress-wrap' },
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
-        ? done + ' de ' + total + ' series' + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
+        ? done + ' de ' + total + ' series' + (goalTotals.work ? ' · Metas: ' + goalTotals.hit + ' de ' + goalTotals.work : '') + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
         : total + ' series planificadas · la fecha se guarda sola'),
       syncBadge()));
 
@@ -910,6 +946,23 @@
       h('div', { style: 'margin-top:12px' }, muscles.map((m) => volumeMeter(m, vol[m]))),
       h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Meta: al menos ' + VOL_MIN + ' series por músculo en 7 días. Lo que registres hoy se suma al momento.')));
 
+    // Metas para la proxima sesion, calculadas con lo que ya registraste hoy
+    const doneEx = r.exercises.filter((ex) => todaySets(ex, r.id).length);
+    if (doneEx.length) {
+      const list = h('div', { class: 'next-list' });
+      doneEx.forEach((ex) => {
+        const np = plan(ex, true);
+        list.append(h('div', { class: 'next-item' },
+          h('div', { class: 'row between' }, h('strong', {}, ex.name), h('span', { class: 'sugg-tag ' + np.trend }, { up: '↑ Sube', down: '↓ Baja', same: '→ Mantén', new: '★ Nuevo', deload: '↺ Descarga' }[np.trend])),
+          h('div', { class: 'next-goal' }, targetText(ex, np)),
+          h('div', { class: 'muted small' }, np.text)));
+      });
+      root.append(h('details', { class: 'card next-plan', open: doneEx.length > 0 ? true : false },
+        h('summary', {}, h('strong', {}, '🎯 Tus metas para la próxima sesión'),
+          h('span', { class: 'muted small' }, 'Se actualizan con cada serie que registras. Cumplirlas es lo que te hace progresar.')),
+        list));
+    }
+
     r.exercises.forEach((ex, i) => root.append(exerciseCard(ex, i, r)));
   }
 
@@ -923,7 +976,8 @@
 
   function exerciseCard(ex, idx, r) {
     const last = lastRecord(ex.id);
-    const p = plan(ex);
+    const gs = goalStats(ex, r.id);
+    const p = gs.plan;
     const logged = todaySets(ex, r.id);
     const rows = Math.max(ex.sets, logged.length, (drafts[ex.id] && drafts[ex.id].extra) || 0);
     const complete = logged.length >= ex.sets;
@@ -959,12 +1013,15 @@
       const entry = logged[i];
       if (entry) {
         carry = adjustAfter(ex, entry, carry);
-        table.append(h('div', { class: 'log-row done' },
+        const gr = gs.rows[i];
+        const gcls = !gr || !gr.work ? '' : gr.hit ? ' hit' : ' miss';
+        table.append(h('div', { class: 'log-row done' + gcls },
           h('span', { class: 'n' }, i + 1),
           h('span', { class: 'prev' }, prev ? setStr(prev) : '—'),
           h('span', { class: 'val' }, fmt(entry.weight)),
           h('span', { class: 'val' }, entry.reps),
           h('button', { class: 'tick on', type: 'button', 'aria-label': 'Deshacer serie ' + (i + 1), onclick: () => unlogSet(entry, r.id) }, '✓')));
+        if (gr && gr.work && !gr.hit) table.append(h('div', { class: 'goal-miss' }, 'Meta: ' + (p.weight != null ? fmt(p.weight) + ' × ' : '') + gr.target + ' reps'));
         if (entry.rpe == null && i === logged.length - 1) {
           const chips = h('div', { class: 'rpe-ask' }, h('span', { class: 'muted small' }, '¿Qué tan difícil fue?'));
           const row = h('div', { class: 'rpe' });
@@ -980,8 +1037,9 @@
         continue;
       }
       // Valor sugerido por defecto; lo que escribas se guarda como borrador y tiene prioridad.
-      const defW = carry != null ? fmt(carry) : (prev && prev.weight != null ? fmt(prev.weight) : '');
-      const defR = String(p.reps[Math.min(i, p.reps.length - 1)] || ex.repMin);
+      const wu = p.warm && p.warm[i]; // fila de calentamiento, como la ultima vez
+      const defW = wu ? fmt(wu.w) : carry != null ? fmt(carry) : (prev && prev.weight != null ? fmt(prev.weight) : '');
+      const defR = wu ? String(wu.r) : String(p.reps[Math.min(i - ((p.warm && p.warm.length) || 0), p.reps.length - 1)] || ex.repMin);
       const d = drafts[ex.id][i] || {};
       const keep = () => { drafts[ex.id][i] = d; };
       const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); } });
@@ -997,7 +1055,10 @@
       drafts[ex.id].extra = rows + 1; render();
     } }, '+ Añadir serie');
 
-    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, addRow);
+    const goalLine = gs.work
+      ? h('div', { class: 'goal-line ' + (gs.hit === gs.work ? 'ok' : '') }, (gs.hit === gs.work ? '✓ ' : '') + 'Metas cumplidas: ' + gs.hit + ' de ' + gs.work + ' series de trabajo')
+      : null;
+    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, addRow);
   }
 
   // ---------- grafica de progreso (una linea por ejercicio) ----------
