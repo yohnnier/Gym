@@ -236,6 +236,12 @@ const TRICEPS = {
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg adicional', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Torso vertical para enfatizar el tríceps.'
+    },
+    {
+      id: 'fondos-maquina', name: 'Fondos en máquina', muscle: 'triceps', secondary: ['pecho', 'hombros'],
+      sets: 2, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
+      unit: 'kg', step: 5, provisional: true,
+      notes: 'Máquina sentada con selector de pesas. Espalda apoyada, agarra los mangos y empuja hacia abajo hasta extender los codos sin bloquearlos. Sube controlado, con los codos cerca del cuerpo y los hombros relajados.'
     }
   ]
 };
@@ -286,7 +292,7 @@ const PLAN = {
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }, { id: 'press-frances', sets: 2 }
+        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
       ]
     },
     {
