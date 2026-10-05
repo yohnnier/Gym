@@ -193,7 +193,7 @@
   "date": "2026-10-05",
   "routineId": "dia-empuje",
   "createdAt": 1791216869341,
-  "updatedAt": 1791217829924,
+  "updatedAt": 1791217988886,
   "entries": [
    {
     "exerciseId": "press-pecho-maquina",
@@ -333,6 +333,13 @@
     "set": 2,
     "weight": 20,
     "reps": 9,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 3,
+    "weight": 20,
+    "reps": 6,
     "rpe": 10
    }
   ]
