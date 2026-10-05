@@ -228,7 +228,7 @@ const TRICEPS = {
     {
       id: 'extension-sobre-cabeza', name: 'Extensión sobre la cabeza', muscle: 'triceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Gran estiramiento de la cabeza larga.'
     },
     {
