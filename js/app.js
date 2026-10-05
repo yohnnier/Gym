@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '26';
+  const VERSION = '27';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -168,14 +168,27 @@
   }
 
   // Sesion de hoy para un grupo (solo en este dispositivo). Se crea al registrar la primera serie.
+  const sameDay = (x, routineId) => x.date === todayISO() && (x.routineId || 'piernas') === routineId;
+
+  // create = false: vista de lectura de la sesion de hoy (une lo registrado en la app con lo subido desde el chat).
+  // create = true: version editable. Si hay mas de una copia, se unen en una sola y las demas se retiran.
   function todaySession(routineId, create) {
-    const today = todayISO();
-    let s = state.sessions.find((x) => x.date === today && x.source === 'app' && (x.routineId || 'piernas') === routineId);
-    if (!s && create) {
-      s = { id: uid(), date: today, createdAt: Date.now(), routineId: routineId, source: 'app', entries: [] };
-      state.sessions.push(s);
+    const view = allSessions().find((x) => sameDay(x, routineId)) || null;
+    if (!create) return view;
+    const locals = state.sessions.filter((x) => sameDay(x, routineId));
+    const repos = repoSessions.filter((x) => sameDay(x, routineId));
+    if (locals.length === 1 && repos.length === 0) return locals[0];
+    if (!view) {
+      const n = { id: uid(), date: todayISO(), createdAt: Date.now(), routineId: routineId, source: 'app', entries: [] };
+      state.sessions.push(n);
+      return n;
     }
-    return s || null;
+    const keepId = locals.length ? locals[0].id : view.id;
+    const n = Object.assign({}, view, { id: keepId, source: 'app', entries: view.entries.map((e) => Object.assign({}, e)) });
+    locals.concat(repos).forEach((x) => { if (x.id !== keepId && state.deleted.indexOf(x.id) === -1) state.deleted.push(x.id); });
+    state.sessions = state.sessions.filter((x) => !sameDay(x, routineId));
+    state.sessions.push(n);
+    return n;
   }
   function todaySets(ex, routineId) {
     const s = todaySession(routineId, false);
@@ -372,9 +385,10 @@
   }
 
   function unlogSet(entry, routineId) {
-    const s = todaySession(routineId, false);
-    if (!s) return;
-    s.entries = s.entries.filter((x) => x !== entry);
+    const s = todaySession(routineId, true);
+    // La entrada puede venir de la vista unida: se busca por contenido en la copia editable
+    const target = s.entries.find((x) => x.exerciseId === entry.exerciseId && x.set === entry.set);
+    s.entries = s.entries.filter((x) => x !== target);
     renumber(s.entries);
     touch(s);
     if (!s.entries.length) forget(s);
@@ -956,7 +970,7 @@
           const row = h('div', { class: 'rpe' });
           [6, 7, 8, 9, 10].forEach((v) => row.append(h('button', {
             type: 'button', title: RPE_TEXT[v],
-            onclick: () => { entry.rpe = v; const ts = todaySession(r.id, false); if (ts) touch(ts); save(true); toast(RPE_TEXT[v] + '. Anotado.'); render(); }
+            onclick: () => { const ts = todaySession(r.id, true); const te = ts.entries.find((x) => x.exerciseId === entry.exerciseId && x.set === entry.set); if (te) te.rpe = v; touch(ts); save(true); toast(RPE_TEXT[v] + '. Anotado.'); render(); }
           }, String(v))));
           chips.append(row);
           table.append(chips);
