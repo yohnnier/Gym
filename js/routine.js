@@ -84,7 +84,7 @@ const PECHO = {
     {
       id: 'aperturas-peck-deck', name: 'Aperturas en peck deck', muscle: 'pecho', secondary: ['hombros'],
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Junta con control, pausa de 1 s al cerrar.'
     },
     {
