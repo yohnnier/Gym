@@ -216,7 +216,7 @@ const TRICEPS = {
     {
       id: 'extension-polea', name: 'Extensión en polea (cuerda)', muscle: 'triceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Abre la cuerda abajo, codos fijos.'
     },
     {

@@ -193,7 +193,7 @@
   "date": "2026-10-05",
   "routineId": "dia-empuje",
   "createdAt": 1791216869341,
-  "updatedAt": 1791217182496,
+  "updatedAt": 1791217410330,
   "entries": [
    {
     "exerciseId": "press-pecho-maquina",
@@ -292,6 +292,20 @@
     "weight": 10,
     "reps": 10,
     "rpe": 10
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 1,
+    "weight": 80,
+    "reps": 10,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 2,
+    "weight": 80,
+    "reps": 10,
+    "rpe": 9
    }
   ]
  }
