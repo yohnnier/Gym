@@ -76,10 +76,10 @@ const PECHO = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Escápulas atrás y abajo, codos a ~45°.'
     },
     {
-      id: 'press-inclinado', name: 'Press inclinado con mancuernas', muscle: 'pecho', secondary: ['hombros', 'triceps'],
+      id: 'press-inclinado', name: 'Press inclinado con barra', muscle: 'pecho', secondary: ['hombros', 'triceps'],
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg/mancuerna', step: 2, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja controlado hasta estirar el pecho.'
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Banco inclinado, barra con discos: anota el peso de los discos de un lado. Baja controlado hasta rozar la parte alta del pecho. Usa seguros o un compañero con cargas altas.'
     },
     {
       id: 'aperturas-peck-deck', name: 'Aperturas en peck deck', muscle: 'pecho', secondary: ['hombros'],
