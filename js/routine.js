@@ -154,10 +154,10 @@ const HOMBROS = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin arquear la zona lumbar.'
     },
     {
-      id: 'elevaciones-laterales', name: 'Elevaciones laterales', muscle: 'hombros', secondary: ['trapecio'],
+      id: 'elevaciones-laterales', name: 'Elevaciones laterales en máquina', muscle: 'hombros', secondary: ['trapecio'],
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
-      unit: 'kg/mancuerna', step: 1, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Codos ligeramente flexionados, sin impulso.'
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Máquina de discos: anota el peso de los discos de un lado. Sube hasta la altura de los hombros, sin impulso y sin encoger los hombros. Baja lento. La imagen es de referencia: toca la imagen para poner la foto de tu máquina.'
     },
     {
       id: 'elevaciones-laterales-polea', name: 'Elevaciones laterales en polea', muscle: 'hombros', secondary: ['trapecio'],

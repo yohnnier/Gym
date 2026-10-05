@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '25';
+  const VERSION = '26';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -125,7 +125,40 @@
       const b = map.get(x.id);
       if (!b || (x.updatedAt || 0) > (b.updatedAt || 0)) map.set(x.id, x);
     });
-    return Array.from(map.values());
+    return collapseDays(Array.from(map.values()));
+  }
+  // Si hay dos sesiones del mismo dia y mismo grupo (por ejemplo una subida desde el chat y otra
+  // registrada en la app), se unen: por cada ejercicio se queda la copia mas reciente, sin duplicar series.
+  function collapseDays(list) {
+    const groups = new Map();
+    list.forEach((x) => {
+      const k = x.date + '|' + (x.routineId || 'piernas');
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(x);
+    });
+    const out = [];
+    groups.forEach((g) => {
+      if (g.length === 1) { out.push(g[0]); return; }
+      const byTime = g.slice().sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      const order = [];
+      const best = {};
+      byTime.forEach((x) => {
+        const per = {};
+        x.entries.forEach((e) => { (per[e.exerciseId] = per[e.exerciseId] || []).push(e); });
+        Object.keys(per).forEach((id) => {
+          if (order.indexOf(id) === -1) order.push(id);
+          const cur = best[id];
+          if (!cur || (x.updatedAt || 0) > (cur.t || 0) || ((x.updatedAt || 0) === (cur.t || 0) && per[id].length > cur.list.length)) best[id] = { t: x.updatedAt || 0, list: per[id] };
+        });
+      });
+      const entries = [];
+      order.forEach((id) => best[id].list.forEach((e) => entries.push(e)));
+      renumber(entries);
+      const app = g.find((x) => x.source === 'app');
+      const base = app || byTime[0];
+      out.push(Object.assign({}, base, { entries: entries, updatedAt: Math.max.apply(null, g.map((x) => x.updatedAt || 0)) }));
+    });
+    return out;
   }
   // Historial del repositorio (data/sessions.json) unido con lo guardado en este dispositivo.
   function allSessions() { return mergeSessions(repoSessions, state.sessions, state.deleted); }
@@ -155,7 +188,7 @@
     const out = [];
     const sessions = sortedSessions();
     for (let i = 0; i < sessions.length && out.length < n; i++) {
-      if (sessions[i].source === 'app' && sessions[i].date >= today) continue;
+      if (sessions[i].date >= today) continue; // lo de hoy no cuenta como "registro anterior"
       const sets = sessions[i].entries.filter((x) => x.exerciseId === exId);
       if (sets.length) out.push({ session: sessions[i], sets: sets });
     }
@@ -833,7 +866,9 @@
   function renderGroup(root, r) {
     const today = todaySession(r.id, false);
     const total = r.exercises.reduce((t, e) => t + e.sets, 0);
-    const done = today ? Math.min(today.entries.length, total) : 0;
+    // Cuenta tambien lo subido desde el chat (sesion de hoy en el historial)
+    const todayAll = allSessions().find((x) => x.date === todayISO() && (x.routineId || 'piernas') === r.id);
+    const done = todayAll ? Math.min(todayAll.entries.length, total) : 0;
     const pct = Math.round(100 * done / total);
 
     root.append(h('div', { class: 'group-head' },

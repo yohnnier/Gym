@@ -187,5 +187,84 @@
     "rpe": 10
    }
   ]
+ },
+ {
+  "id": "chat-2026-10-05-dia-empuje",
+  "date": "2026-10-05",
+  "routineId": "dia-empuje",
+  "createdAt": 1791216869341,
+  "updatedAt": 1791216869341,
+  "entries": [
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 1,
+    "weight": 40,
+    "reps": 10,
+    "rpe": null
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 2,
+    "weight": 60,
+    "reps": 10,
+    "rpe": null
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 3,
+    "weight": 80,
+    "reps": 8,
+    "rpe": null
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 4,
+    "weight": 80,
+    "reps": 5,
+    "rpe": null
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 1,
+    "weight": 15,
+    "reps": 10,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 2,
+    "weight": 15,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 3,
+    "weight": 15,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 1,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 2,
+    "weight": 60,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 3,
+    "weight": 60,
+    "reps": 11,
+    "rpe": 10
+   }
+  ]
  }
 ]
