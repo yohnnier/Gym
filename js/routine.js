@@ -72,7 +72,7 @@ const PECHO = {
     {
       id: 'press-pecho-maquina', name: 'Press de pecho en máquina', muscle: 'pecho', secondary: ['triceps', 'hombros'],
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg', step: 5, provisional: true,
+      unit: 'kg/lado', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Escápulas atrás y abajo, codos a ~45°.'
     },
     {
