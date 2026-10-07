@@ -469,8 +469,15 @@
     "weight": 60,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "pajaros-polea",
+    "set": 3,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1791386595813
+  "updatedAt": 1791386856803
  }
 ]
