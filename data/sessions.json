@@ -546,8 +546,36 @@
     "weight": 60,
     "reps": 10,
     "rpe": 10
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 4,
+    "weight": 60,
+    "reps": 10,
+    "rpe": null
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 1,
+    "weight": 106,
+    "reps": 12,
+    "rpe": null
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 2,
+    "weight": 119,
+    "reps": 12,
+    "rpe": null
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 3,
+    "weight": 132,
+    "reps": 12,
+    "rpe": null
    }
   ],
-  "updatedAt": 1791388234280
+  "updatedAt": 1791389110038
  }
 ]
