@@ -378,5 +378,21 @@
     "rpe": 10
    }
   ]
+ },
+ {
+  "id": "chat-2026-10-07-dia-tiron",
+  "date": "2026-10-07",
+  "routineId": "dia-tiron",
+  "createdAt": 1791383716585,
+  "entries": [
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 1,
+    "weight": 20,
+    "reps": 12,
+    "rpe": 7
+   }
+  ],
+  "updatedAt": 1791383716585
  }
 ]
