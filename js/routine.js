@@ -192,8 +192,8 @@ const HOMBROS = {
     {
       id: 'pajaros-polea', name: 'Pájaros en polea (cruce inverso)', muscle: 'hombros', secondary: ['espalda', 'trapecio'],
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
-      unit: 'lb', step: 5, provisional: true,
-      notes: 'Poleas altas cruzadas: con cada mano toma el cable contrario y abre los brazos hacia los lados, con los codos ligeramente flexionados. Trabaja el hombro posterior; peso ligero y sin impulso.'
+      unit: 'lb/lado', step: 5, provisional: true,
+      notes: 'Poleas altas cruzadas: con cada mano toma el cable contrario y abre los brazos hacia los lados, con los codos ligeramente flexionados. Trabaja el hombro posterior; peso ligero y sin impulso. Anota las libras de una polea (cada lado).'
     }
   ]
 };
