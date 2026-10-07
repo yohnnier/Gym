@@ -114,8 +114,8 @@ const ESPALDA = {
     {
       id: 'remo-maquina', name: 'Remo sentado (máquina con selector)', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,
       sets: 3, repMin: 10, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg', step: 5, provisional: true,
-      notes: 'Ajusta el asiento para que el pecho quede apoyado. Tira llevando los codos hacia atrás, pausa de 1 s al contraer y estira completo al volver. Anota el peso que marca el selector (kg).'
+      unit: 'lb', step: 5, provisional: true,
+      notes: 'Ajusta el asiento para que el pecho quede apoyado. Tira llevando los codos hacia atrás, pausa de 1 s al contraer y estira completo al volver. Anota el peso que marca el selector (libras).'
     },
     {
       id: 'remo-mancuerna', name: 'Remo con mancuerna', muscle: 'espalda', secondary: ['biceps', 'hombros'],
