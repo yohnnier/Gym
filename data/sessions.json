@@ -499,34 +499,34 @@
     "rpe": 10
    },
    {
-    "exerciseId": "curl-polea",
+    "exerciseId": "curl-martillo-polea",
     "set": 1,
     "weight": 80,
     "reps": 12,
     "rpe": 7
    },
    {
-    "exerciseId": "curl-polea",
+    "exerciseId": "curl-martillo-polea",
     "set": 2,
     "weight": 90,
     "reps": 15,
     "rpe": 9
    },
    {
-    "exerciseId": "curl-polea",
+    "exerciseId": "curl-martillo-polea",
     "set": 3,
     "weight": 100,
     "reps": 10,
     "rpe": 9
    },
    {
-    "exerciseId": "curl-polea",
+    "exerciseId": "curl-martillo-polea",
     "set": 4,
     "weight": 100,
     "reps": 11,
     "rpe": 10
    }
   ],
-  "updatedAt": 1791387811461
+  "updatedAt": 1791387892717
  }
 ]
