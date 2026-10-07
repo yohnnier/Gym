@@ -413,8 +413,15 @@
     "reps": 20,
     "rpe": 10,
     "note": "Descanso largo por una llamada"
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 3,
+    "weight": 30,
+    "reps": 15,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1791384960101
+  "updatedAt": 1791385175935
  }
 ]

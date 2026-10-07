@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '37';
+  const VERSION = '39';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
@@ -235,7 +235,8 @@
     const top = valid.filter((x) => x.weight === W);
     const best = top.reduce((a, b) => (b.reps > a.reps ? b : a));
     const rpes = top.map((x) => x.rpe).filter((x) => x != null);
-    const warm = valid.filter((x) => x.weight < 0.85 * W).slice(0, 3).map((x) => ({ w: x.weight, r: x.reps }));
+    // Calentamiento: series claramente mas ligeras y faciles (dificultad 8 o menos, o sin anotar). Una serie ligera pero dificil es de trabajo.
+    const warm = valid.filter((x) => x.weight < 0.85 * W && (x.rpe == null || x.rpe <= 8)).slice(0, 3).map((x) => ({ w: x.weight, r: x.reps }));
     return {
       W: W, top: top, warm: warm,
       avgReps: top.reduce((t, x) => t + x.reps, 0) / top.length,
@@ -290,7 +291,9 @@
     const big = jump > BIG_JUMP;
     const cap = big ? ex.repMax + EXTRA_REPS : ex.repMax; // tope de reps antes de subir el peso
     const setsDone = Math.min(ex.sets, recs[0].sets.length);
-    const allTop = last.top.length >= setsDone && last.top.every((x) => x.reps >= cap);
+    // La ultima serie de la sesion fue con el peso de trabajo (por ejemplo, tras series mas ligeras)
+    const lastSetAtTop = recs[0].sets.length && recs[0].sets[recs[0].sets.length - 1].weight === W;
+    const allTop = last.top.every((x) => x.reps >= cap) && (last.top.length >= Math.min(setsDone, 2) || lastSetAtTop);
     const easy = last.avgRpe != null && last.avgRpe <= 7 && last.avgReps >= ex.repMin && !big;
 
     // 1. Subir
