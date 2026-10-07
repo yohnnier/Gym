@@ -189,11 +189,11 @@
   ]
  },
  {
-  "id": "chat-2026-10-05-dia-empuje",
+  "id": "muvekdtm6xatc",
   "date": "2026-10-05",
+  "createdAt": 1791213997306,
   "routineId": "dia-empuje",
-  "createdAt": 1791216869341,
-  "updatedAt": 1791218626153,
+  "source": "app",
   "entries": [
    {
     "exerciseId": "press-pecho-maquina",
@@ -377,7 +377,8 @@
     "reps": 8,
     "rpe": 10
    }
-  ]
+  ],
+  "updatedAt": 1791218626153
  },
  {
   "id": "chat-2026-10-07-dia-tiron",
