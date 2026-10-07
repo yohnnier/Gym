@@ -2,12 +2,13 @@
 (function () {
   'use strict';
 
-  const VERSION = '44';
+  const VERSION = '45';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
+  const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
@@ -27,6 +28,11 @@
     try { const b = JSON.parse(localStorage.getItem(BODY_KEY)); if (b && Array.isArray(b.controls)) return b; } catch (e) { /* sin datos */ }
     return { profile: {}, controls: [] };
   })();
+  let cardio = (function () {
+    try { const c = JSON.parse(localStorage.getItem(CARDIO_KEY)); if (c && Array.isArray(c.sessions)) return c; } catch (e) { /* sin datos */ }
+    return { sessions: [] };
+  })();
+  function saveCardio() { try { localStorage.setItem(CARDIO_KEY, JSON.stringify(cardio)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
   const lastBody = () => { const s = bodySorted(); return s.length ? s[s.length - 1] : null; };
@@ -836,6 +842,7 @@
         if (!confirm('Esto reemplaza tus datos actuales. ¿Continuar?')) return;
         state = { sessions: data.sessions, deleted: Array.isArray(data.deleted) ? data.deleted : [] };
         if (data.body && Array.isArray(data.body.controls)) { body = data.body; saveBody(); }
+        if (data.cardio && Array.isArray(data.cardio.sessions)) { cardio = data.cardio; saveCardio(); }
         save(true); render();
       } catch (e) {
         alert('El archivo no es una exportación válida de esta app.');
@@ -849,7 +856,7 @@
   function route() {
     const p = location.hash.replace(/^#\/?/, '').split('/');
     if (p[0] === 'g' && routineById[p[1]]) return { view: 'group', group: routineById[p[1]] };
-    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo') return { view: p[0] };
+    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio') return { view: p[0] };
     return { view: 'hoy' };
   }
   function go(hash) {
@@ -862,11 +869,12 @@
     const root = $('#app');
     root.replaceChildren();
     $('#sub').textContent = longDate(new Date());
-    const tab = r.view === 'group' ? 'hoy' : r.view === 'cuerpo' ? 'prog' : r.view;
+    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio') ? 'prog' : r.view;
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === tab));
     if (r.view === 'group') renderGroup(root, r.group);
     else if (r.view === 'prog') renderProg(root);
     else if (r.view === 'cuerpo') renderCuerpo(root);
+    else if (r.view === 'cardio') renderCardio(root);
     else if (r.view === 'hist') renderHist(root);
     else if (r.view === 'rutina') renderRutina(root);
     else renderHome(root);
@@ -1198,7 +1206,7 @@
     ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
     ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'], ['tmb', 'Metabolismo basal', 'kcal'],
     ['edadCorporal', 'Edad corporal', 'años'], ['puntuacion', 'Puntuación corporal', '/100'], ['agua', 'Agua', 'kg'], ['proteina', 'Proteína', 'kg'],
-    ['osea', 'Masa ósea', 'kg'], ['whr', 'Relación cintura-cadera', '']
+    ['osea', 'Masa ósea', 'kg'], ['whr', 'Relación cintura-cadera', ''], ['pulsoReposo', 'Pulso en reposo', 'lpm']
   ];
   function importBody(text) {
     let data;
@@ -1211,6 +1219,7 @@
       BODY_FIELDS.forEach((f) => { if (c[f[0]] != null && !isNaN(+c[f[0]])) ctl[f[0]] = +c[f[0]]; });
       if (c.altura) body.profile.altura = +c.altura;
       if (c.edad) body.profile.edad = +c.edad;
+      if (c.pulsoReposo) body.profile.pulsoReposo = +c.pulsoReposo;
       body.controls = body.controls.filter((x) => x.date !== ctl.date); // un control por fecha
       body.controls.push(ctl); added++;
     });
@@ -1239,7 +1248,7 @@
       root.append(h('div', { class: 'section-title' }, 'Último control · ' + fmtDate(last.date)), stats);
       if (last.tmb) root.append(h('p', { class: 'muted small', style: 'margin:8px 4px' }, 'Metabolismo basal: ' + fmt(last.tmb) + ' kcal · gasto en días de entreno aprox. ' + fmt(Math.round(last.tmb * 1.4 / 10) * 10) + ' kcal.'));
     }
-    ['peso', 'grasa', 'musculo'].forEach((key) => {
+    ['peso', 'grasa', 'musculo', 'pulsoReposo'].forEach((key) => {
       const pts = ctrls.filter((c) => c[key] != null);
       if (!pts.length) return;
       const f = BODY_FIELDS.find((x) => x[0] === key);
@@ -1291,6 +1300,102 @@
     }
   }
 
+  // ---------- cardio ----------
+  const CARDIO_GOAL = 90; // minutos por semana en zona 2 (2-3 sesiones de 30-40 min)
+  const CARDIO_TYPES = [['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
+  function cardioWeekMinutes() {
+    return cardio.sessions.filter((c) => daysSince(c.date) >= 0 && daysSince(c.date) < 7).reduce((t, c) => t + (c.min || 0), 0);
+  }
+  function hrZones() {
+    const lb = bodySorted().filter((c) => c.pulsoReposo != null).pop();
+    const rest = (lb && lb.pulsoReposo) || body.profile.pulsoReposo;
+    const age = body.profile.edad;
+    if (!rest || !age) return null;
+    const max = 220 - age, res = max - rest;
+    const at = (f) => Math.round(rest + f * res);
+    return { max: max, rest: rest, z: [
+      { n: 1, name: 'Recuperación', lo: at(0.5), hi: at(0.6) },
+      { n: 2, name: 'Quema de grasa', lo: at(0.6), hi: at(0.7) },
+      { n: 3, name: 'Moderado', lo: at(0.7), hi: at(0.8) },
+      { n: 4, name: 'Intenso', lo: at(0.8), hi: at(0.9) }] };
+  }
+  const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
+
+  function renderCardio(root) {
+    root.append(h('div', { class: 'group-head' },
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('div', { class: 'grow' }, h('h2', {}, 'Cardio'), h('div', { class: 'muted small' }, 'Zona 2 · quema de grasa'))));
+    $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo.')));
+
+    // Semana
+    const min = cardioWeekMinutes();
+    const pct = Math.min(100, Math.round(100 * min / CARDIO_GOAL));
+    root.append(h('section', { class: 'card' },
+      h('div', { class: 'row between' }, h('strong', {}, 'Esta semana'), h('span', { class: 'muted small' }, 'Meta: ' + CARDIO_GOAL + ' min')),
+      h('div', { class: 'goal-top', style: 'margin-top:8px' }, h('span', { class: 'goal-num' }, h('b', {}, min), ' de ' + CARDIO_GOAL + ' min')),
+      h('div', { class: 'goal-bar' }, h('i', { style: 'width:' + pct + '%' + (min >= CARDIO_GOAL ? ';background:var(--accent)' : '') })),
+      h('div', { class: 'goal-msg' }, min >= CARDIO_GOAL ? '✓ ¡Meta cumplida!' : 'Te faltan ' + (CARDIO_GOAL - min) + ' min para la meta. Son 2 o 3 sesiones de 30 a 40 min.')));
+
+    // Zonas
+    const zones = hrZones();
+    const zform = h('form', { class: 'body-form', autocomplete: 'off' },
+      h('label', {}, 'Edad', h('input', { name: 'edad', inputmode: 'numeric', value: body.profile.edad || '' })),
+      h('label', {}, 'Pulso en reposo (lpm)', h('input', { name: 'rest', inputmode: 'numeric', value: body.profile.pulsoReposo || '' })),
+      h('button', { class: 'btn full', type: 'submit' }, 'Calcular mis zonas'));
+    zform.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const e = parseNum(zform.elements.edad.value), r = parseNum(zform.elements.rest.value);
+      if (!e || !r) { toast('Escribe tu edad y tu pulso en reposo.'); return; }
+      body.profile.edad = e; body.profile.pulsoReposo = r; saveBody(); toast('Zonas calculadas.'); render();
+    });
+    const zcard = h('section', { class: 'card' }, h('strong', {}, 'Mis zonas de pulso'));
+    if (zones) {
+      zcard.append(h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'FC máxima ≈ ' + zones.max + ' lpm · pulso en reposo ' + zones.rest + ' lpm (fórmula de Karvonen).'));
+      zones.z.forEach((z) => zcard.append(h('div', { class: 'zone-row' + (z.n === 2 ? ' base' : '') },
+        h('span', {}, 'Zona ' + z.n + ' · ' + z.name), h('b', {}, z.lo + '–' + z.hi + ' lpm'))));
+      zcard.append(h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Para el cardio base apunta a la zona 2. Si puedes conversar en frases completas, vas bien.'));
+    } else zcard.append(h('p', { class: 'muted small' }, 'Escribe tu edad y tu pulso en reposo para calcular tus zonas.'));
+    zcard.append(zform);
+    root.append(zcard);
+
+    // Nueva sesion
+    const form = h('form', { class: 'body-form', autocomplete: 'off' });
+    const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0] }, t[0])));
+    form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
+      h('label', { class: 'full' }, 'Tipo', typeSel),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric' })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
+      h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
+      if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value) });
+      saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
+    });
+    root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));
+
+    // Historial
+    const lb = lastBody();
+    if (cardio.sessions.length) {
+      const list = h('section', { class: 'card' });
+      cardio.sessions.slice().sort((x, y) => (x.date < y.date ? 1 : -1)).forEach((c) => {
+        const met = (CARDIO_TYPES.find((t) => t[0] === c.tipo) || [0, 5])[1];
+        const kcal = lb && lb.peso ? Math.round(met * lb.peso * c.min / 60) : null;
+        const z = zoneOf(zones, c.hr);
+        list.append(h('div', { class: 'ctl-row cardio-row' },
+          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')),
+            z != null ? h('span', { class: 'sugg-tag' + (z === 2 ? '' : ' down') }, z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z) : null),
+          h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
+            if (!confirm('¿Eliminar esta sesión de cardio?')) return;
+            cardio.sessions = cardio.sessions.filter((x) => x.id !== c.id); saveCardio(); render();
+          } }, '×')));
+      });
+      root.append(h('div', { class: 'section-title' }, 'Tus sesiones'), list);
+    }
+  }
+
   function renderProg(root) {
     root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.')));
     const lb = lastBody();
@@ -1299,6 +1404,11 @@
         h('div', { class: 'muted small' }, lb
           ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '')
           : 'Guarda tus controles de peso y composición corporal')),
+      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    const cmin = cardioWeekMinutes();
+    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cardio') },
+      h('div', {}, h('strong', {}, '🏃 Cardio'),
+        h('div', { class: 'muted small' }, cmin + ' de ' + CARDIO_GOAL + ' min en los últimos 7 días')),
       h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
     const sessions = sortedSessions().reverse(); // de la mas antigua a la mas reciente
     let any = false;
@@ -1438,7 +1548,7 @@
     root.append(h('section', { class: 'card' },
       h('p', { class: 'muted small', style: 'margin-top:0' }, 'Descarga o carga un archivo con tus registros. Útil como respaldo extra.'),
       h('div', { class: 'row wrap' },
-        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(Object.assign({}, state, { body: body }), null, 2), 'application/json') }, 'Exportar datos'),
+        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(Object.assign({}, state, { body: body, cardio: cardio }), null, 2), 'application/json') }, 'Exportar datos'),
         h('button', { class: 'btn', type: 'button', onclick: () => fileInput.click() }, 'Importar datos'),
         h('button', {
           class: 'btn danger', type: 'button',

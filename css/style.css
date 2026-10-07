@@ -305,6 +305,11 @@ details.ctl summary::-webkit-details-marker { display: none; }
 .ctl-body { padding-top: 8px; }
 .ctl-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 14px; }
 
+.zone-row { display: flex; justify-content: space-between; padding: 7px 10px; border-radius: 10px; font-size: 14px; }
+.zone-row.base { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.cardio-row { align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--line); }
+.cardio-row:first-child { border-top: 0; }
+
 /* metas */
 .log-row.done.hit .tick.on { background: var(--accent); }
 .log-row.done.miss .tick.on { background: var(--warm); border-color: var(--warm); color: #2a1300; }
