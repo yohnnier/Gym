@@ -404,14 +404,14 @@
     "set": 3,
     "weight": 30,
     "reps": 8,
-    "rpe": null
+    "rpe": 9
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 4,
     "weight": 30,
     "reps": 8,
-    "rpe": null
+    "rpe": 10
    },
    {
     "exerciseId": "remo-lineal",
@@ -436,6 +436,6 @@
     "rpe": 9
    }
   ],
-  "updatedAt": 1791385466791
+  "updatedAt": 1791385624053
  }
 ]
