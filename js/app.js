@@ -2,9 +2,10 @@
 (function () {
   'use strict';
 
-  const VERSION = '34';
+  const VERSION = '35';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
+  const REST_KEY = 'rutinas.rest.v1';
   const exById = {};
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
   const routineById = {};
@@ -19,6 +20,17 @@
 
   let state = load();
   let customImg = loadImages();
+  // Descanso entre series elegido por ti para cada ejercicio (segundos); si no hay, se usa el del plan
+  let customRest = (function () { try { return JSON.parse(localStorage.getItem(REST_KEY)) || {}; } catch (e) { return {}; } })();
+  const REST_OPTIONS = [45, 60, 75, 90, 120, 150, 180, 240];
+  const restOf = (ex) => customRest[ex.id] || ex.rest;
+  function restTxt(sec) { return sec < 60 ? sec + ' s' : sec % 60 === 0 ? (sec / 60) + ' min' : Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') + ' min'; }
+  function setRest(ex, sec) {
+    if (sec === ex.rest) delete customRest[ex.id]; else customRest[ex.id] = sec;
+    try { localStorage.setItem(REST_KEY, JSON.stringify(customRest)); } catch (e) { /* sin almacenamiento */ }
+    toast('Descanso de ' + ex.name + ': ' + restTxt(sec) + '.');
+    render();
+  }
   let repoSessions = [];
   const drafts = {}; // valores escritos y aun no registrados: drafts[exId][fila] = { w, r }
 
@@ -411,7 +423,7 @@
     touch(s);
     delete drafts[ex.id][row];
     save(true);
-    startTimer(ex.rest);
+    startTimer(restOf(ex));
     if (entry.weight != null && before != null && entry.weight > before) toast('¡Nuevo récord en ' + ex.name + '! 🎉');
     else if (entry.reps < ex.repMin) toast('Está bien quedarse corto: ajusta el peso y sigue.');
     else toast('Serie ' + (row + 1) + ' registrada. ¡Bien hecho!');
@@ -833,7 +845,7 @@
   }
 
   function specText(ex) {
-    return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + ex.restText;
+    return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + (customRest[ex.id] ? restTxt(customRest[ex.id]) : ex.restText);
   }
 
   function lastDoneByGroup() {
@@ -976,6 +988,16 @@
         : null);
   }
 
+  function restPicker(ex) {
+    const cur = restOf(ex);
+    const opts = REST_OPTIONS.slice();
+    if (opts.indexOf(cur) === -1) opts.push(cur);
+    opts.sort((x, y) => x - y);
+    const sel = h('select', { class: 'rest-sel', 'aria-label': 'Descanso entre series de ' + ex.name, onchange: (e) => setRest(ex, parseInt(e.target.value, 10)) },
+      opts.map((sec) => h('option', { value: sec, selected: sec === cur }, restTxt(sec) + (sec === ex.rest ? ' (plan)' : ''))));
+    return h('label', { class: 'rest-pick' }, '⏱ Descanso:', sel);
+  }
+
   function exerciseCard(ex, idx, r) {
     const last = lastRecord(ex.id);
     const gs = goalStats(ex, r.id);
@@ -992,6 +1014,7 @@
         h('div', { class: 'ex-name' }, (idx + 1) + '. ' + ex.name),
         musclesLine(ex),
         h('div', { class: 'muted small' }, specText(ex)),
+        restPicker(ex),
         h('div', { class: 'last small' }, last
           ? h('span', {}, h('b', {}, 'Último (' + fmtDate(last.session.date) + '): '), last.sets.map(setStr).join(' · '))
           : h('span', { class: 'muted' }, 'Sin registro anterior'))),

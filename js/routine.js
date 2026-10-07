@@ -107,7 +107,7 @@ const ESPALDA = {
   exercises: [
     {
       id: 'jalon-pecho', name: 'Jalón al pecho (máquina de discos)', muscle: 'espalda', secondary: ['biceps'], single: true,
-      sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
+      sets: 3, repMin: 8, repMax: 12, rest: 180, restText: '3 min',
       unit: 'kg', step: 5, provisional: true,
       notes: 'Máquina "Universal Row" de discos: anota el peso total cargado (suma de los discos de ambos lados). Asiento con los muslos bajo los topes. Lleva los codos hacia las costillas, pecho arriba, sin balancear el tronco.'
     },
