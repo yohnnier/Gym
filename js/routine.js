@@ -106,16 +106,16 @@ const ESPALDA = {
   id: 'espalda', name: 'Espalda',
   exercises: [
     {
-      id: 'jalon-pecho', name: 'Jalón al pecho', muscle: 'espalda', secondary: ['biceps'],
+      id: 'jalon-pecho', name: 'Jalón al pecho (máquina de discos)', muscle: 'espalda', secondary: ['biceps'], single: true,
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg', step: 5, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Lleva los codos hacia las costillas, sin balancear.'
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Máquina "Universal Row" de discos: anota el peso de los discos de un lado. Asiento con los muslos bajo los topes. Lleva los codos hacia las costillas, pecho arriba, sin balancear el tronco.'
     },
     {
-      id: 'remo-maquina', name: 'Remo sentado en máquina', muscle: 'espalda', secondary: ['biceps', 'hombros'],
-      sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
+      id: 'remo-maquina', name: 'Remo sentado (máquina con selector)', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,
+      sets: 3, repMin: 10, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg', step: 5, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Pecho apoyado, pausa de 1 s al contraer.'
+      notes: 'Ajusta el asiento para que el pecho quede apoyado. Tira llevando los codos hacia atrás, pausa de 1 s al contraer y estira completo al volver. Anota el peso que marca el selector (kg).'
     },
     {
       id: 'remo-mancuerna', name: 'Remo con mancuerna', muscle: 'espalda', secondary: ['biceps', 'hombros'],
@@ -132,7 +132,7 @@ const ESPALDA = {
     {
       id: 'face-pull', name: 'Face pull', muscle: 'hombros', secondary: ['trapecio', 'espalda'],
       sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Trabaja deltoides posterior y escápulas.'
     },
     {
@@ -140,6 +140,18 @@ const ESPALDA = {
       sets: 3, repMin: 10, repMax: 15, rest: 90, restText: '90 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin hiperextender arriba.'
+    },
+    {
+      id: 'remo-lineal', name: 'Remo con apoyo de pecho (Linear Row)', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,
+      sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Máquina de discos con apoyo de pecho y plataforma para los pies. Pecho apoyado, tira de los mangos llevando los codos atrás y junta los omóplatos. Pausa de 1 s y baja controlado. Anota los discos de un lado.'
+    },
+    {
+      id: 'remo-alto-discos', name: 'Remo alto con discos', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,
+      sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Máquina de discos con apoyo de pecho y brazos articulados. Opción para variar el jalón o el remo. Confirma el movimiento con el cartel de la máquina. Anota los discos de un lado.'
     }
   ]
 };
@@ -176,6 +188,12 @@ const HOMBROS = {
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg/mancuerna', step: 2, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sube recto, sin rotar los hombros.'
+    },
+    {
+      id: 'pajaros-polea', name: 'Pájaros en polea (cruce inverso)', muscle: 'hombros', secondary: ['espalda', 'trapecio'],
+      sets: 3, repMin: 12, repMax: 20, rest: 60, restText: '60 s',
+      unit: 'lb', step: 5, provisional: true,
+      notes: 'Poleas altas cruzadas: con cada mano toma el cable contrario y abre los brazos hacia los lados, con los codos ligeramente flexionados. Trabaja el hombro posterior; peso ligero y sin impulso.'
     }
   ]
 };
@@ -206,6 +224,24 @@ const BICEPS = {
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja completo sin rebotar.'
+    },
+    {
+      id: 'curl-polea', name: 'Curl en polea baja (barra)', muscle: 'biceps',
+      sets: 4, repMin: 10, repMax: 12, rest: 75, restText: '60–75 s',
+      unit: 'lb', step: 5, provisional: true,
+      notes: 'Polea baja con barra recta o curvada. Codos pegados al cuerpo, sube sin balancear y baja lento: la polea mantiene tensión todo el recorrido.'
+    },
+    {
+      id: 'curl-martillo-polea', name: 'Curl martillo en polea (cuerda)', muscle: 'biceps',
+      sets: 4, repMin: 10, repMax: 12, rest: 75, restText: '60–75 s',
+      unit: 'lb', step: 5, provisional: true,
+      notes: 'Polea baja con cuerda, agarre neutro (palmas enfrentadas). Trabaja bíceps y braquial. Codos fijos y control en la bajada.'
+    },
+    {
+      id: 'curl-predicador-polea', name: 'Curl predicador en polea', muscle: 'biceps',
+      sets: 2, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
+      unit: 'lb', step: 5, provisional: true,
+      notes: 'En el banco predicador con la polea baja. Brazos apoyados en la almohadilla, sin despegar los codos. Baja completo sin rebotar.'
     }
   ]
 };
@@ -264,7 +300,7 @@ const CORE = {
     {
       id: 'crunch-polea', name: 'Crunch en polea alta', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Caderas fijas, flexiona el tronco.'
     },
     {
@@ -298,9 +334,9 @@ const PLAN = {
     {
       id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
       exercises: [
-        { id: 'jalon-pecho', sets: 4 }, { id: 'remo-maquina' }, { id: 'remo-mancuerna' },
-        { id: 'face-pull' }, { id: 'pajaros' },
-        { id: 'curl-inclinado', sets: 4 }, { id: 'curl-martillo', sets: 4 }, { id: 'curl-predicador', sets: 2 },
+        { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal' }, { id: 'remo-maquina' },
+        { id: 'face-pull' }, { id: 'pajaros-polea' },
+        { id: 'curl-polea', sets: 4 }, { id: 'curl-martillo-polea', sets: 4 }, { id: 'curl-predicador-polea', sets: 2 },
         { id: 'crunch-polea' }
       ]
     },

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '32';
+  const VERSION = '33';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const exById = {};
@@ -468,23 +468,25 @@
       }).catch(() => toast('No se pudo leer la imagen.'));
     });
     const custom = !!customImg[ex.id];
+    const one = custom || !!ex.single; // foto unica (la tuya, o la de la maquina del gimnasio)
     const panel = h('div', { class: 'sheet-panel', role: 'dialog', 'aria-modal': 'true', 'aria-label': ex.name },
       h('div', { class: 'sheet-grip' }),
       h('div', { class: 'row between' },
         h('h2', {}, ex.name),
         h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: close }, '×')),
-      h('div', { class: 'sheet-imgs' + (custom ? ' one' : '') },
+      h('div', { class: 'sheet-imgs' + (one ? ' one' : '') },
         h('img', { src: imgSrc(ex, 0), alt: ex.name + ' — posición inicial' }),
-        custom ? null : h('img', { src: imgSrc(ex, 1), alt: ex.name + ' — posición final' })),
+        one ? null : h('img', { src: imgSrc(ex, 1), alt: ex.name + ' — posición final' })),
       h('p', { class: 'muted small' }, custom
         ? 'Foto de tu gimnasio (guardada en este dispositivo).'
+        : ex.single ? 'Foto de la máquina de tu gimnasio.'
         : 'Inicio y final del movimiento. Imagen de referencia: la máquina de tu gimnasio puede verse distinta.'),
       ex.notes ? h('p', { class: 'note' }, ex.notes) : null,
       h('div', { class: 'stack' },
         h('button', { class: 'btn primary big', type: 'button', onclick: () => fileInput.click() }, custom ? 'Cambiar foto' : 'Usar foto de mi gimnasio'),
         custom ? h('button', { class: 'btn big', type: 'button', onclick: () => { delete customImg[ex.id]; saveImages(); toast('Imagen original restaurada.'); close(); render(); } }, 'Restaurar imagen original') : null),
       fileInput,
-      custom ? null : h('p', { class: 'credit' }, 'Imágenes: free-exercise-db (dominio público).'));
+      (custom || ex.single) ? null : h('p', { class: 'credit' }, 'Imágenes: free-exercise-db (dominio público).'));
     sheet.replaceChildren(h('div', { class: 'sheet-bg', onclick: close }), panel);
     sheet.classList.remove('hidden');
   }
