@@ -2,10 +2,12 @@
 (function () {
   'use strict';
 
-  const VERSION = '43';
+  const VERSION = '44';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
+  const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
+  const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
@@ -899,6 +901,22 @@
       h('div', { class: 'stat' }, h('b', {}, week), h('span', {}, 'Sesiones en 7 días')),
       h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
       h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
+
+    // Aviso de control corporal: pasan 5 semanas desde el ultimo
+    const lbody = lastBody();
+    let snoozed = 0;
+    try { snoozed = +localStorage.getItem(SNOOZE_KEY) || 0; } catch (e) { /* sin almacenamiento */ }
+    if (lbody && daysSince(lbody.date) >= BODY_REMIND_DAYS && Date.now() > snoozed) {
+      root.append(h('section', { class: 'card warm remind' },
+        h('strong', {}, '📏 Toca un nuevo control corporal'),
+        h('p', { class: 'small', style: 'margin:4px 0 10px' }, 'Tu último control fue el ' + fmtDate(lbody.date) + ' (hace ' + daysSince(lbody.date) + ' días). Hazlo en las mismas condiciones: en ayunas o a la misma hora, sin entrenar antes, para poder comparar.'),
+        h('div', { class: 'row wrap' },
+          h('button', { class: 'btn primary small', type: 'button', onclick: () => go('#/cuerpo') }, 'Registrar control'),
+          h('button', { class: 'btn small', type: 'button', onclick: () => {
+            try { localStorage.setItem(SNOOZE_KEY, String(Date.now() + 7 * DAY)); } catch (e) { /* sin almacenamiento */ }
+            toast('Te lo recordaré en una semana.'); render();
+          } }, 'Más tarde'))));
+    }
 
     const lastDone = lastDoneByGroup();
 
