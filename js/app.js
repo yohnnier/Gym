@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '35';
+  const VERSION = '36';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
@@ -25,11 +25,17 @@
   const REST_OPTIONS = [45, 60, 75, 90, 120, 150, 180, 240];
   const restOf = (ex) => customRest[ex.id] || ex.rest;
   function restTxt(sec) { return sec < 60 ? sec + ' s' : sec % 60 === 0 ? (sec / 60) + ' min' : Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') + ' min'; }
-  function setRest(ex, sec) {
+  function saveRest() { try { localStorage.setItem(REST_KEY, JSON.stringify(customRest)); } catch (e) { /* sin almacenamiento */ } }
+  function setRest(ex, sec, quiet) {
+    sec = Math.max(15, Math.min(600, sec));
     if (sec === ex.rest) delete customRest[ex.id]; else customRest[ex.id] = sec;
-    try { localStorage.setItem(REST_KEY, JSON.stringify(customRest)); } catch (e) { /* sin almacenamiento */ }
-    toast('Descanso de ' + ex.name + ': ' + restTxt(sec) + '.');
+    saveRest();
+    if (!quiet) toast('Descanso de ' + ex.name + ': ' + restTxt(sec) + '.');
     render();
+  }
+  function resetRests() {
+    if (!confirm('¿Volver todos los descansos a los del plan?')) return;
+    customRest = {}; saveRest(); toast('Descansos restaurados al plan.'); render();
   }
   let repoSessions = [];
   const drafts = {}; // valores escritos y aun no registrados: drafts[exId][fila] = { w, r }
@@ -995,7 +1001,10 @@
     opts.sort((x, y) => x - y);
     const sel = h('select', { class: 'rest-sel', 'aria-label': 'Descanso entre series de ' + ex.name, onchange: (e) => setRest(ex, parseInt(e.target.value, 10)) },
       opts.map((sec) => h('option', { value: sec, selected: sec === cur }, restTxt(sec) + (sec === ex.rest ? ' (plan)' : ''))));
-    return h('label', { class: 'rest-pick' }, '⏱ Descanso:', sel);
+    return h('div', { class: 'rest-pick' }, '⏱',
+      h('button', { class: 'rest-step', type: 'button', 'aria-label': 'Menos 15 segundos', onclick: () => setRest(ex, cur - 15, true) }, '−15'),
+      sel,
+      h('button', { class: 'rest-step', type: 'button', 'aria-label': 'Más 15 segundos', onclick: () => setRest(ex, cur + 15, true) }, '+15'));
   }
 
   function exerciseCard(ex, idx, r) {
@@ -1267,6 +1276,17 @@
 
     const fileInput = h('input', { type: 'file', accept: 'application/json', style: 'display:none' });
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) importData(fileInput.files[0]); });
+
+    // Descansos de todos los ejercicios en un solo lugar
+    root.append(h('div', { class: 'section-title' }, 'Tiempos de descanso'));
+    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Ajusta cuánto descansas entre series en cada ejercicio. El cronómetro automático usa este tiempo cuando marcas ✓.'));
+    const restCard = h('section', { class: 'card' });
+    DAYS.forEach((d) => {
+      restCard.append(h('div', { class: 'rest-day' }, d.name));
+      d.exercises.forEach((ex) => restCard.append(h('div', { class: 'rest-row' }, h('span', { class: 'rest-name' }, ex.name), restPicker(ex))));
+    });
+    restCard.append(h('button', { class: 'btn small', type: 'button', style: 'margin-top:12px', onclick: resetRests }, 'Restaurar los del plan'));
+    root.append(restCard);
 
     root.append(h('div', { class: 'section-title' }, 'Guardado en la nube'));
     root.append(cloudCard());

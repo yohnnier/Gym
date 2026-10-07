@@ -283,8 +283,14 @@ img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; fl
 .chart-ghost { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 3 3; }
 .chart-ghost-line { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .6; }
 
-.rest-pick { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: var(--muted); }
-.rest-sel { width: auto; padding: 4px 8px; font-size: 13px; border-radius: 8px; }
+.rest-pick { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 14px; color: var(--muted); }
+.rest-sel { width: auto; padding: 5px 8px; font-size: 13px; border-radius: 8px; }
+.rest-step { padding: 5px 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font-size: 12px; font-weight: 700; cursor: pointer; }
+.rest-day { margin: 14px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.rest-day:first-child { margin-top: 0; }
+.rest-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.rest-name { font-size: 13px; font-weight: 600; min-width: 0; }
+.rest-row .rest-pick { margin-top: 0; flex: none; }
 
 /* metas */
 .log-row.done.hit .tick.on { background: var(--accent); }
