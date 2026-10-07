@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v42';
+const CACHE = 'rutinas-v43';
 const ASSETS = [
   './',
   './index.html',

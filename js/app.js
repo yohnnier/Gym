@@ -2,10 +2,11 @@
 (function () {
   'use strict';
 
-  const VERSION = '42';
+  const VERSION = '43';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
+  const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
   const routineById = {};
@@ -20,6 +21,20 @@
 
   let state = load();
   let customImg = loadImages();
+  let body = (function () {
+    try { const b = JSON.parse(localStorage.getItem(BODY_KEY)); if (b && Array.isArray(b.controls)) return b; } catch (e) { /* sin datos */ }
+    return { profile: {}, controls: [] };
+  })();
+  function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
+  const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+  const lastBody = () => { const s = bodySorted(); return s.length ? s[s.length - 1] : null; };
+  // Estimacion de calorias de una sesion: ~3,2 min por serie (trabajo + descanso), MET 4 para pesas con descansos largos
+  function kcalEstimate(nSets) {
+    const lb = lastBody();
+    if (!lb || !lb.peso || !nSets) return null;
+    const minutes = nSets * 3.2;
+    return { minutes: Math.round(minutes), kcal: Math.round(4 * lb.peso * minutes / 60) };
+  }
   // Descanso entre series elegido por ti para cada ejercicio (segundos); si no hay, se usa el del plan
   let customRest = (function () { try { return JSON.parse(localStorage.getItem(REST_KEY)) || {}; } catch (e) { return {}; } })();
   const REST_OPTIONS = [45, 60, 75, 90, 120, 150, 180, 240];
@@ -818,6 +833,7 @@
         if (!data || !Array.isArray(data.sessions)) throw new Error('formato');
         if (!confirm('Esto reemplaza tus datos actuales. ¿Continuar?')) return;
         state = { sessions: data.sessions, deleted: Array.isArray(data.deleted) ? data.deleted : [] };
+        if (data.body && Array.isArray(data.body.controls)) { body = data.body; saveBody(); }
         save(true); render();
       } catch (e) {
         alert('El archivo no es una exportación válida de esta app.');
@@ -831,7 +847,7 @@
   function route() {
     const p = location.hash.replace(/^#\/?/, '').split('/');
     if (p[0] === 'g' && routineById[p[1]]) return { view: 'group', group: routineById[p[1]] };
-    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina') return { view: p[0] };
+    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo') return { view: p[0] };
     return { view: 'hoy' };
   }
   function go(hash) {
@@ -844,10 +860,11 @@
     const root = $('#app');
     root.replaceChildren();
     $('#sub').textContent = longDate(new Date());
-    const tab = r.view === 'group' ? 'hoy' : r.view;
+    const tab = r.view === 'group' ? 'hoy' : r.view === 'cuerpo' ? 'prog' : r.view;
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === tab));
     if (r.view === 'group') renderGroup(root, r.group);
     else if (r.view === 'prog') renderProg(root);
+    else if (r.view === 'cuerpo') renderCuerpo(root);
     else if (r.view === 'hist') renderHist(root);
     else if (r.view === 'rutina') renderRutina(root);
     else renderHome(root);
@@ -954,7 +971,7 @@
     root.append(h('div', { class: 'progress-wrap' },
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
-        ? done + ' de ' + total + ' series' + (goalTotals.work ? ' · Metas: ' + goalTotals.hit + ' de ' + goalTotals.work : '') + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
+        ? done + ' de ' + total + ' series' + (goalTotals.work ? ' · Metas: ' + goalTotals.hit + ' de ' + goalTotals.work : '') + (kcalEstimate(done) ? ' · ≈ ' + kcalEstimate(done).kcal + ' kcal' : '') + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
         : total + ' series planificadas · la fecha se guarda sola'),
       syncBadge()));
 
@@ -1114,7 +1131,8 @@
     return '→ Llevas ' + same + ' sesiones con ' + fmt(last.weight) + ' ' + unit + '. Intenta sumar una repetición.';
   }
 
-  function progressChart(rows, unit) {
+  function progressChart(rows, unit, opts) {
+    opts = opts || {};
     const W = 320, H = 150, L = 14, R = 14, T = 26, B = 24;
     const n = rows.length;
     const ws = rows.map((x) => x.weight);
@@ -1128,7 +1146,7 @@
     const labelIdx = (i) => n <= 6 || i === 0 || i === n - 1 || i === maxI;
     const dateIdx = (i) => n <= 5 || i === 0 || i === n - 1;
     const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="Peso por sesión en ' + esc(unit) + '">';
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="' + esc(opts.label || 'Peso por sesión') + ' en ' + esc(unit) + '">';
     svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" class="chart-base"/>';
     if (n === 1) {
       // Con una sola sesion: punto punteado donde ira la proxima
@@ -1136,14 +1154,14 @@
       svg += '<line x1="' + (x(0) + 8) + '" y1="' + gy + '" x2="' + (gx - 8) + '" y2="' + gy + '" class="chart-ghost-line"/>' +
         '<circle cx="' + gx + '" cy="' + gy + '" r="4.5" class="chart-ghost"/>' +
         '<text x="' + gx + '" y="' + (gy - 10) + '" class="chart-val" text-anchor="middle">?</text>' +
-        '<text x="' + gx + '" y="' + (H - 6) + '" class="chart-date" text-anchor="middle">Próxima</text>';
+        '<text x="' + gx + '" y="' + (H - 6) + '" class="chart-date" text-anchor="middle">' + (opts.nextLabel || 'Próxima') + '</text>';
     }
     if (n > 1) svg += '<polyline class="chart-line" points="' + rows.map((r, i) => x(i).toFixed(1) + ',' + y(r.weight).toFixed(1)).join(' ') + '"/>';
     rows.forEach((r, i) => {
       const cx = x(i).toFixed(1), cy = y(r.weight).toFixed(1);
       svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="12" class="chart-hit"/>' +
         '<circle cx="' + cx + '" cy="' + cy + '" r="4.5" class="chart-dot' + (i === n - 1 ? ' last' : '') + '"/>' +
-        '<title>' + fmtDate(r.date) + ': ' + esc(fmt(r.weight) + ' ' + unit + ' × ' + r.reps + ' reps') + '</title></g>';
+        '<title>' + fmtDate(r.date) + ': ' + esc(fmt(r.weight) + ' ' + unit + (opts.noReps ? '' : ' × ' + r.reps + ' reps')) + '</title></g>';
       if (labelIdx(i)) svg += '<text x="' + cx + '" y="' + (+cy - 10) + '" class="chart-val' + (i === n - 1 ? ' last' : '') + '" text-anchor="middle">' + esc(fmt(r.weight)) + '</text>';
       if (dateIdx(i)) {
         const p = r.date.split('-');
@@ -1157,8 +1175,113 @@
     return box;
   }
 
+  // ---------- mi cuerpo ----------
+  const BODY_FIELDS = [
+    ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
+    ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'], ['tmb', 'Metabolismo basal', 'kcal'],
+    ['edadCorporal', 'Edad corporal', 'años'], ['puntuacion', 'Puntuación corporal', '/100'], ['agua', 'Agua', 'kg'], ['proteina', 'Proteína', 'kg'],
+    ['osea', 'Masa ósea', 'kg'], ['whr', 'Relación cintura-cadera', '']
+  ];
+  function importBody(text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
+    const list = Array.isArray(data) ? data : [data];
+    let added = 0;
+    list.forEach((c) => {
+      if (!c || !c.fecha || !/^\d{4}-\d{2}-\d{2}$/.test(c.fecha)) return;
+      const ctl = { id: uid(), date: c.fecha };
+      BODY_FIELDS.forEach((f) => { if (c[f[0]] != null && !isNaN(+c[f[0]])) ctl[f[0]] = +c[f[0]]; });
+      if (c.altura) body.profile.altura = +c.altura;
+      if (c.edad) body.profile.edad = +c.edad;
+      body.controls = body.controls.filter((x) => x.date !== ctl.date); // un control por fecha
+      body.controls.push(ctl); added++;
+    });
+    if (!added) { toast('No encontré controles en el texto.'); return; }
+    saveBody(); toast(added + ' control' + (added > 1 ? 'es' : '') + ' guardado' + (added > 1 ? 's' : '') + ' en este dispositivo.'); render();
+  }
+
+  function renderCuerpo(root) {
+    root.append(h('div', { class: 'group-head' },
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('div', { class: 'grow' }, h('h2', {}, 'Mi cuerpo'), h('div', { class: 'muted small' }, 'Controles de peso y composición corporal'))));
+    $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo. No se suben a GitHub ni forman parte del repositorio público.')));
+
+    const ctrls = bodySorted();
+    const last = ctrls[ctrls.length - 1], prev = ctrls[ctrls.length - 2];
+    if (last) {
+      const stats = h('div', { class: 'stats' });
+      [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg']].forEach((k) => {
+        if (last[k[0]] == null) return;
+        const d = prev && prev[k[0]] != null ? last[k[0]] - prev[k[0]] : null;
+        const f = BODY_FIELDS.find((x) => x[0] === k[0]);
+        stats.append(h('div', { class: 'stat' }, h('b', {}, fmt(last[k[0]])),
+          h('span', {}, f[1] + ' (' + k[1] + ')' + (d != null ? ' · ' + (d > 0 ? '+' : '') + fmt(Math.round(d * 10) / 10) : ''))));
+      });
+      root.append(h('div', { class: 'section-title' }, 'Último control · ' + fmtDate(last.date)), stats);
+      if (last.tmb) root.append(h('p', { class: 'muted small', style: 'margin:8px 4px' }, 'Metabolismo basal: ' + fmt(last.tmb) + ' kcal · gasto en días de entreno aprox. ' + fmt(Math.round(last.tmb * 1.4 / 10) * 10) + ' kcal.'));
+    }
+    ['peso', 'grasa', 'musculo'].forEach((key) => {
+      const pts = ctrls.filter((c) => c[key] != null);
+      if (!pts.length) return;
+      const f = BODY_FIELDS.find((x) => x[0] === key);
+      root.append(h('section', { class: 'card' },
+        h('div', { class: 'ex-name' }, f[1] + ' (' + f[2] + ')'),
+        h('p', { class: 'headline' }, pts.length === 1 ? 'Primer control. El punto punteado es tu próximo control.'
+          : (pts[pts.length - 1][key] - pts[0][key] > 0 ? '↑ +' : pts[pts.length - 1][key] - pts[0][key] < 0 ? '↓ ' : '→ ') + fmt(Math.round((pts[pts.length - 1][key] - pts[0][key]) * 10) / 10) + ' ' + f[2] + ' desde ' + fmtDate(pts[0].date)),
+        progressChart(pts.map((c) => ({ date: c.date, weight: c[key] })), f[2], { noReps: true, nextLabel: 'Próximo', label: f[1] })));
+    });
+
+    // Nuevo control
+    const form = h('form', { class: 'body-form', autocomplete: 'off' });
+    form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })));
+    BODY_FIELDS.forEach((f) => form.append(h('label', {}, f[1] + (f[2] ? ' (' + f[2] + ')' : ''), h('input', { name: f[0], inputmode: 'decimal' }))));
+    form.append(h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar control'));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const date = form.elements.fecha.value;
+      const peso = parseNum(form.elements.peso.value);
+      if (!date || peso == null) { toast('Escribe al menos la fecha y el peso.'); return; }
+      const c = { id: uid(), date: date };
+      BODY_FIELDS.forEach((f) => { const v = parseNum(form.elements[f[0]].value); if (v != null) c[f[0]] = v; });
+      body.controls = body.controls.filter((x) => x.date !== date); body.controls.push(c);
+      saveBody(); toast('Control guardado en este dispositivo.'); render();
+    });
+    root.append(h('div', { class: 'section-title' }, 'Nuevo control'), h('section', { class: 'card' }, form));
+
+    // Importar desde texto
+    const ta = h('textarea', { class: 'body-paste', rows: '3', placeholder: '{"fecha":"2026-08-05","peso":…}', 'aria-label': 'Texto de controles para importar' });
+    root.append(h('div', { class: 'section-title' }, 'Importar controles'),
+      h('section', { class: 'card' },
+        h('p', { class: 'muted small', style: 'margin-top:0' }, 'Pega aquí el texto que te dé el asistente para cargar un control de una vez.'),
+        ta, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => { importBody(ta.value.trim()); } }, 'Importar')));
+
+    // Historial de controles
+    if (ctrls.length) {
+      const list = h('section', { class: 'card' });
+      ctrls.slice().reverse().forEach((c) => {
+        list.append(h('details', { class: 'ctl' },
+          h('summary', {}, h('strong', {}, fmtDate(c.date)), h('span', { class: 'muted small' }, (c.peso ? fmt(c.peso) + ' kg' : '') + (c.grasa ? ' · ' + fmt(c.grasa) + ' % grasa' : ''))),
+          h('div', { class: 'ctl-body' },
+            BODY_FIELDS.filter((f) => c[f[0]] != null).map((f) => h('div', { class: 'ctl-row' }, h('span', {}, f[1]), h('b', {}, fmt(c[f[0]]) + (f[2] ? ' ' + f[2] : '')))),
+            h('button', { class: 'btn small danger', type: 'button', style: 'margin-top:8px', onclick: () => {
+              if (!confirm('¿Eliminar el control del ' + fmtDate(c.date) + '?')) return;
+              body.controls = body.controls.filter((x) => x.id !== c.id); saveBody(); render();
+            } }, 'Eliminar'))));
+      });
+      root.append(h('div', { class: 'section-title' }, 'Todos los controles'), list);
+    }
+  }
+
   function renderProg(root) {
     root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.')));
+    const lb = lastBody();
+    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cuerpo') },
+      h('div', {}, h('strong', {}, '🧍 Mi cuerpo'),
+        h('div', { class: 'muted small' }, lb
+          ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '')
+          : 'Guarda tus controles de peso y composición corporal')),
+      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
     const sessions = sortedSessions().reverse(); // de la mas antigua a la mas reciente
     let any = false;
     ROUTINES.forEach((r) => {
@@ -1227,7 +1350,7 @@
           }
         }, 'Eliminar')));
       root.append(h('details', { class: 'sess' },
-        h('summary', {}, h('span', {}, h('strong', {}, routineOf(s).name), h('div', { class: 'muted small' }, fmtDate(s.date) + ' · ' + agoText(s.date))), h('span', { class: 'muted small' }, exIds.length + ' ej. · ' + n + ' series')),
+        h('summary', {}, h('span', {}, h('strong', {}, routineOf(s).name), h('div', { class: 'muted small' }, fmtDate(s.date) + ' · ' + agoText(s.date))), h('span', { class: 'muted small' }, exIds.length + ' ej. · ' + n + ' series' + (kcalEstimate(n) ? ' · ≈ ' + kcalEstimate(n).kcal + ' kcal' : ''))),
         inner));
     });
     root.append(h('p', { class: 'muted small' }, 'Formato de cada serie: peso×repeticiones (dificultad). ⚠ = técnica incompleta.'));
@@ -1297,7 +1420,7 @@
     root.append(h('section', { class: 'card' },
       h('p', { class: 'muted small', style: 'margin-top:0' }, 'Descarga o carga un archivo con tus registros. Útil como respaldo extra.'),
       h('div', { class: 'row wrap' },
-        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(state, null, 2), 'application/json') }, 'Exportar datos'),
+        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(Object.assign({}, state, { body: body }), null, 2), 'application/json') }, 'Exportar datos'),
         h('button', { class: 'btn', type: 'button', onclick: () => fileInput.click() }, 'Importar datos'),
         h('button', {
           class: 'btn danger', type: 'button',

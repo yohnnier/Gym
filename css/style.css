@@ -292,6 +292,19 @@ img.mini { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; fl
 .rest-name { font-size: 13px; font-weight: 600; min-width: 0; }
 .rest-row .rest-pick { margin-top: 0; flex: none; }
 
+/* mi cuerpo */
+.body-link { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; color: inherit; cursor: pointer; }
+.body-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.body-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.body-form .full { grid-column: 1 / -1; }
+.body-paste { width: 100%; padding: 10px; font: inherit; font-size: 13px; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+details.ctl { border-top: 1px solid var(--line); padding: 8px 0; }
+details.ctl:first-child { border-top: 0; }
+details.ctl summary { display: flex; justify-content: space-between; gap: 10px; cursor: pointer; list-style: none; }
+details.ctl summary::-webkit-details-marker { display: none; }
+.ctl-body { padding-top: 8px; }
+.ctl-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 14px; }
+
 /* metas */
 .log-row.done.hit .tick.on { background: var(--accent); }
 .log-row.done.miss .tick.on { background: var(--warm); border-color: var(--warm); color: #2a1300; }
