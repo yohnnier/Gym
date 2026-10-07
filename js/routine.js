@@ -144,8 +144,8 @@ const ESPALDA = {
     {
       id: 'remo-lineal', name: 'Remo con apoyo de pecho (Linear Row)', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg/lado', step: 2.5, provisional: true,
-      notes: 'Máquina de discos con apoyo de pecho y plataforma para los pies. Pecho apoyado, tira de los mangos llevando los codos atrás y junta los omóplatos. Pausa de 1 s y baja controlado. Anota los discos de un lado.'
+      unit: 'kg', step: 5, provisional: true,
+      notes: 'Máquina de discos con apoyo de pecho y plataforma para los pies. Pecho apoyado, tira de los mangos llevando los codos atrás y junta los omóplatos. Pausa de 1 s y baja controlado. Anota el peso total cargado.'
     },
     {
       id: 'remo-alto-discos', name: 'Remo alto con discos', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true,

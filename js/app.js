@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '36';
+  const VERSION = '37';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
