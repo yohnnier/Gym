@@ -226,7 +226,7 @@ const BICEPS = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Baja completo sin rebotar.'
     },
     {
-      id: 'curl-polea', name: 'Curl en polea baja (barra)', muscle: 'biceps',
+      id: 'curl-polea', name: 'Curl en polea baja con barra (agarre supino)', muscle: 'biceps',
       sets: 4, repMin: 10, repMax: 12, rest: 75, restText: '60–75 s',
       unit: 'lb', step: 5, provisional: true,
       notes: 'Polea baja con barra recta o curvada. Codos pegados al cuerpo, sube sin balancear y baja lento: la polea mantiene tensión todo el recorrido.'
@@ -336,7 +336,7 @@ const PLAN = {
       exercises: [
         { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal' }, { id: 'remo-maquina' },
         { id: 'face-pull' }, { id: 'pajaros-polea' },
-        { id: 'curl-polea', sets: 4 }, { id: 'curl-martillo-polea', sets: 4 }, { id: 'curl-predicador-polea', sets: 2 },
+        { id: 'curl-polea', sets: 4 }, { id: 'curl-martillo-polea', sets: 4 },
         { id: 'crunch-polea' }
       ]
     },
