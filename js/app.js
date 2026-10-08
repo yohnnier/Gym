@@ -475,6 +475,18 @@
 
   // ---------- imagenes ----------
   function imgSrc(ex, i) { return (i === 0 && customImg[ex.id]) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
+  // Respaldo: si un ejercicio aun no tiene foto, evita la imagen rota con un marcador neutro.
+  const IMG_PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">' +
+    '<rect width="200" height="200" fill="#e9eef5"/>' +
+    '<path d="M100 66a22 22 0 1 0 0 44 22 22 0 0 0 0-44zm-52 86c0-23 23-36 52-36s52 13 52 36v6H48z" fill="#b9c4d4"/>' +
+    '</svg>');
+  document.addEventListener('error', (e) => {
+    const t = e.target;
+    if (t && t.tagName === 'IMG' && t.src.indexOf('img/ex/') !== -1 && t.src !== IMG_PLACEHOLDER) {
+      t.src = IMG_PLACEHOLDER;
+    }
+  }, true);
 
   function resizeImage(file, max) {
     return new Promise((resolve, reject) => {

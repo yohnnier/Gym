@@ -314,6 +314,30 @@ const CORE = {
       sets: 3, repMin: 30, repMax: 60, rest: 60, restText: '60 s',
       unit: 'kg adicional', step: 0, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Las "repeticiones" son segundos de mantención.'
+    },
+    {
+      id: 'rollout-rodante', name: 'Rollout de rodillas (plataforma rodante)', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Arrodíllate con las manos o antebrazos en la plataforma y rueda hacia adelante lo que controles; frena y vuelve con el abdomen. La espalda baja NUNCA se arquea: mete el ombligo y aprieta los glúteos. Empieza con poco recorrido.'
+    },
+    {
+      id: 'plancha-rodante', name: 'Plancha con pies en plataforma (segundos)', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 30, repMax: 45, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Plancha con los pies sobre la plataforma, cuerpo recto, sin levantar la cadera. Las "repeticiones" son segundos de mantención.'
+    },
+    {
+      id: 'pike-rodante', name: 'Encogimiento / pike en plataforma', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 10, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Desde plancha con pies en la plataforma, acerca las rodillas al pecho (encogimiento) o sube la cadera con piernas rectas (pike). Vuelve despacio con control.'
+    },
+    {
+      id: 'tuck-oblicuo-rodante', name: 'Encogimiento oblicuo en plataforma', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 8, repMax: 12, perLeg: true, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Plancha con pies en la plataforma; lleva las dos rodillas juntas hacia un codo, vuelve y alterna al otro lado. Cuenta las repeticiones por lado. Cadera estable, sin girar los hombros.'
     }
   ]
 };

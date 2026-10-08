@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v45';
+const CACHE = 'rutinas-v46';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,7 @@ const ASSETS = [
   './icons/icon.svg'
 ].concat(
   // Imagen principal de cada ejercicio, para usar la app sin conexion
-  ["abductores-0.jpg", "aperturas-peck-deck-0.jpg", "cruce-poleas-0.jpg", "crunch-maquina-0.jpg", "crunch-polea-0.jpg", "curl-barra-0.jpg", "curl-femoral-0.jpg", "curl-inclinado-0.jpg", "curl-martillo-0.jpg", "curl-martillo-polea-0.jpg", "curl-polea-0.jpg", "curl-predicador-0.jpg", "curl-predicador-polea-0.jpg", "elevacion-piernas-0.jpg", "elevaciones-laterales-0.jpg", "elevaciones-laterales-polea-0.jpg", "encogimientos-0.jpg", "extension-cuadriceps-0.jpg", "extension-lumbar-0.jpg", "extension-polea-0.jpg", "extension-sobre-cabeza-0.jpg", "face-pull-0.jpg", "fondos-asistidos-0.jpg", "fondos-banco-0.jpg", "fondos-maquina-0.jpg", "hip-thrust-0.jpg", "jalon-pecho-0.jpg", "pajaros-0.jpg", "pajaros-polea-0.jpg", "pantorrillas-0.jpg", "patada-gluteo-0.jpg", "plancha-0.jpg", "prensa-0.jpg", "press-frances-0.jpg", "press-hombro-maquina-0.jpg", "press-inclinado-0.jpg", "press-pecho-maquina-0.jpg", "pullover-polea-0.jpg", "remo-alto-discos-0.jpg", "remo-lineal-0.jpg", "remo-mancuerna-0.jpg", "remo-maquina-0.jpg", "rotacion-polea-0.jpg", "sentadilla-pendular-0.jpg"].map((f) => './img/ex/' + f)
+  ["abductores-0.jpg", "aperturas-peck-deck-0.jpg", "cruce-poleas-0.jpg", "crunch-maquina-0.jpg", "crunch-polea-0.jpg", "curl-barra-0.jpg", "curl-femoral-0.jpg", "curl-inclinado-0.jpg", "curl-martillo-0.jpg", "curl-martillo-polea-0.jpg", "curl-polea-0.jpg", "curl-predicador-0.jpg", "curl-predicador-polea-0.jpg", "elevacion-piernas-0.jpg", "elevaciones-laterales-0.jpg", "elevaciones-laterales-polea-0.jpg", "encogimientos-0.jpg", "extension-cuadriceps-0.jpg", "extension-lumbar-0.jpg", "extension-polea-0.jpg", "extension-sobre-cabeza-0.jpg", "face-pull-0.jpg", "fondos-asistidos-0.jpg", "fondos-banco-0.jpg", "fondos-maquina-0.jpg", "hip-thrust-0.jpg", "jalon-pecho-0.jpg", "pajaros-0.jpg", "pajaros-polea-0.jpg", "pantorrillas-0.jpg", "patada-gluteo-0.jpg", "plancha-0.jpg", "prensa-0.jpg", "press-frances-0.jpg", "press-hombro-maquina-0.jpg", "press-inclinado-0.jpg", "press-pecho-maquina-0.jpg", "pullover-polea-0.jpg", "remo-alto-discos-0.jpg", "remo-lineal-0.jpg", "remo-mancuerna-0.jpg", "remo-maquina-0.jpg", "rotacion-polea-0.jpg", "rollout-rodante-0.jpg", "plancha-rodante-0.jpg", "pike-rodante-0.jpg", "tuck-oblicuo-rodante-0.jpg", "sentadilla-pendular-0.jpg"].map((f) => './img/ex/' + f)
 );
 
 self.addEventListener('install', (e) => {
