@@ -578,5 +578,22 @@
    }
   ],
   "updatedAt": 1791389110038
+ },
+ {
+  "id": "mv0y6f1tcpvc9",
+  "date": "2026-10-09",
+  "createdAt": 1791549268914,
+  "routineId": "core",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "plancha-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 30,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1791549268914
  }
 ]
