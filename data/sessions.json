@@ -613,8 +613,15 @@
     "weight": null,
     "reps": 30,
     "rpe": 9
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 3,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1791549291058
+  "updatedAt": 1791549302696
  }
 ]
