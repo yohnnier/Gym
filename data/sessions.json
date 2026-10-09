@@ -805,8 +805,15 @@
     "weight": 30,
     "reps": 16,
     "rpe": 8
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 2,
+    "weight": 30,
+    "reps": 16,
+    "rpe": null
    }
   ],
-  "updatedAt": 1791560382807
+  "updatedAt": 1791560603890
  }
 ]
