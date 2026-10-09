@@ -637,5 +637,22 @@
    }
   ],
   "updatedAt": 1791549318213
+ },
+ {
+  "id": "mv10ap0hugnbz",
+  "date": "2026-10-09",
+  "createdAt": 1791552827681,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "prensa",
+    "set": 1,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 8
+   }
+  ],
+  "updatedAt": 1791552833218
  }
 ]
