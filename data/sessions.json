@@ -592,8 +592,29 @@
     "weight": null,
     "reps": 30,
     "rpe": null
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 15,
+    "rpe": null
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 1,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 2,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1791549268914
+  "updatedAt": 1791549291058
  }
 ]
