@@ -595,6 +595,262 @@
     });
   }
 
+  // ---------- sesion de intervalos guiada ----------
+  // Paso a paso: calentamiento -> (intervalo fuerte -> recuperacion) x rondas -> vuelta a la calma.
+  // Tu das "Iniciar" en cada intervalo; la app cuenta el tiempo, avisa con sonido y vibracion, te deja anotar
+  // el pulso al terminar el intervalo y al recuperarte, y al final suma los minutos activos.
+  const HIIT_KEY = 'rutinas.hiit.v1';
+  const HIIT_WARM = 480, HIIT_COOL = 300;
+  const HIIT_PRESETS = [
+    { id: 'a', name: 'Semanas 1–2', rounds: 6, hard: 30, easy: 90 },
+    { id: 'b', name: 'Semanas 3–4', rounds: 8, hard: 60, easy: 120 },
+    { id: 'c', name: 'Semana 5 en adelante', rounds: 8, hard: 60, easy: 90 }
+  ];
+  const HIIT_RUNNING = ['warm', 'hard', 'rec', 'cool'];
+  let hiit = null, hiitHandle = null, hiitLock = null, hiitLastLeft = null, hiitDoneSummary = null;
+  const hiitPreset = (id) => HIIT_PRESETS.find((x) => x.id === id) || HIIT_PRESETS[1];
+  const hiitSec = (step, pr) => step === 'warm' ? HIIT_WARM : step === 'cool' ? HIIT_COOL : step === 'hard' ? pr.hard : step === 'rec' ? pr.easy : 0;
+  const hiitTotalSec = (pr) => HIIT_WARM + pr.rounds * (pr.hard + pr.easy) + HIIT_COOL;
+  const secText = (n) => n < 60 ? n + ' s' : (n % 60 ? mmss(n) + ' min' : n / 60 + ' min');
+  function hiitStore(v) {
+    try { if (v) localStorage.setItem(HIIT_KEY, JSON.stringify(v)); else localStorage.removeItem(HIIT_KEY); } catch (e) { /* sin almacenamiento */ }
+  }
+  function hiitSavedRun() {
+    try {
+      const v = JSON.parse(localStorage.getItem(HIIT_KEY));
+      if (v && v.startedAt && v.preset && v.step && Date.now() - v.startedAt < 3 * 3600 * 1000) return v;
+    } catch (e) { /* sin datos */ }
+    return null;
+  }
+  function hiitPresetChoice() { try { return localStorage.getItem(HIIT_KEY + '.preset') || 'b'; } catch (e) { return 'b'; } }
+  function hiitSetPresetChoice(id) { try { localStorage.setItem(HIIT_KEY + '.preset', id); } catch (e) { /* sin almacenamiento */ } }
+  function hiitPersist() {
+    hiitStore({ preset: hiit.pr.id, step: hiit.step, r: hiit.r, phaseStart: hiit.phaseStart, pausedAcc: hiit.pausedAcc, pausedAt: hiit.pausedAt, active: hiit.active, rounds: hiit.rounds, startedAt: hiit.startedAt });
+  }
+
+  const hiitRunning = () => HIIT_RUNNING.indexOf(hiit.step) !== -1;
+  const hiitElapsed = () => Math.max(0, ((hiit.pausedAt || Date.now()) - hiit.phaseStart - hiit.pausedAcc) / 1000);
+  const hiitLeft = () => hiitSec(hiit.step, hiit.pr) - hiitElapsed();
+  // Segundos activos acumulados, incluida la fase en curso
+  const hiitActive = () => hiit.active + (hiitRunning() ? Math.min(hiitElapsed(), hiitSec(hiit.step, hiit.pr)) : 0);
+  const hiitRoundsDone = () => hiit.rounds.filter((x) => x.done).length;
+
+  function hiitTone(freq, at, dur) {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; g.gain.value = 0.18;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime + at); o.stop(audioCtx.currentTime + at + dur);
+  }
+  function hiitCue(kind) {
+    try {
+      if (kind === 'hard') { if (navigator.vibrate) navigator.vibrate([400, 120, 400]); hiitTone(1046, 0, 0.18); hiitTone(1046, 0.26, 0.18); hiitTone(1318, 0.52, 0.3); }
+      else if (kind === 'rec') { if (navigator.vibrate) navigator.vibrate([600]); hiitTone(587, 0, 0.5); }
+      else if (kind === 'end') beep();
+      else { if (navigator.vibrate) navigator.vibrate([200]); hiitTone(784, 0, 0.2); } // cuenta regresiva
+    } catch (e) { /* sin sonido */ }
+  }
+  async function hiitWake(on) {
+    try {
+      if (on && 'wakeLock' in navigator && !hiitLock) hiitLock = await navigator.wakeLock.request('screen');
+      else if (!on && hiitLock) { await hiitLock.release(); hiitLock = null; }
+    } catch (e) { hiitLock = null; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && hiit && !hiitDoneSummary) { hiitLock = null; hiitWake(true); hiitTick(); } });
+
+  function hiitOpen(saved) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && !audioCtx) audioCtx = new AC();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { /* sin audio */ }
+    hiitDoneSummary = null; hiitLastLeft = null;
+    if (saved) {
+      hiit = { pr: hiitPreset(saved.preset), step: saved.step, r: saved.r, phaseStart: saved.phaseStart, pausedAcc: saved.pausedAcc || 0, pausedAt: saved.pausedAt || null, active: saved.active || 0, rounds: saved.rounds, startedAt: saved.startedAt };
+    } else {
+      const pr = hiitPreset(hiitPresetChoice());
+      hiit = { pr: pr, step: 'warm-ready', r: 1, phaseStart: 0, pausedAcc: 0, pausedAt: null, active: 0, startedAt: Date.now(),
+        rounds: pr.rounds ? Array.from({ length: pr.rounds }, () => ({ max: null, rec: null, done: false })) : [] };
+      hiitPersist();
+    }
+    hiitWake(true);
+    if (!hiitHandle) hiitHandle = setInterval(hiitTick, 250);
+    hiitRender();
+  }
+  function hiitClose() {
+    clearInterval(hiitHandle); hiitHandle = null; hiit = null; hiitDoneSummary = null; hiitLastLeft = null;
+    hiitStore(null); hiitWake(false);
+    const el = $('#hiit'); if (el) el.remove();
+    render();
+  }
+  // Cierra la fase en curso sumando su tiempo activo
+  function hiitLeave() {
+    if (hiitRunning()) hiit.active += Math.min(hiitElapsed(), hiitSec(hiit.step, hiit.pr));
+  }
+  function hiitGo(step, r, startAt, cue) {
+    hiit.step = step; if (r) hiit.r = r;
+    hiit.phaseStart = startAt || Date.now(); hiit.pausedAcc = 0; hiit.pausedAt = null; hiitLastLeft = null;
+    hiitPersist(); hiitRender(); if (cue) hiitCue(cue);
+  }
+  function hiitTogglePause() {
+    if (hiit.pausedAt) { hiit.pausedAcc += Date.now() - hiit.pausedAt; hiit.pausedAt = null; } else hiit.pausedAt = Date.now();
+    hiitPersist(); hiitRender();
+  }
+  function hiitFinish(early) {
+    hiitLeave();
+    const rd = hiit.rounds.filter((x) => x.max);
+    hiitDoneSummary = {
+      early: early, rounds: hiitRoundsDone(), total: hiit.pr.rounds, min: Math.max(1, Math.round(hiit.active / 60)),
+      hr: rd.length ? Math.round(rd.reduce((t, x) => t + x.max, 0) / rd.length) : null, det: hiit.rounds.slice()
+    };
+    hiit.step = 'done';
+    clearInterval(hiitHandle); hiitHandle = null; hiitStore(null); hiitWake(false);
+    if (!early) hiitCue('end');
+    hiitRender();
+  }
+
+  // Avanza las fases que terminaron por tiempo y refresca solo los textos que cambian
+  function hiitTick() {
+    if (!hiit || hiit.step === 'done' || !hiitRunning() || hiit.pausedAt) return;
+    let left = hiitLeft();
+    const pr = hiit.pr;
+    if (left <= 0 && hiit.step === 'hard') {
+      hiit.rounds[hiit.r - 1].done = true; hiit.active += pr.hard;
+      hiitGo('rec', hiit.r, hiit.phaseStart + hiit.pausedAcc + pr.hard * 1000, 'rec'); return;
+    }
+    if (left <= 0 && hiit.step === 'warm') { hiit.active += HIIT_WARM; hiitGo('ready', 1, null, 'rec'); return; }
+    if (left <= 0 && hiit.step === 'cool') { hiitFinish(false); return; }
+    const sec = Math.ceil(Math.max(0, left));
+    if (hiitLastLeft != null && sec < hiitLastLeft) {
+      if (sec <= 3 && sec > 0) hiitCue('tick');
+      if (sec === 0 && hiit.step === 'rec') { // fin de la recuperacion: avisa y resalta el boton sin reconstruir la pantalla (no pierdes el teclado)
+        hiitCue('hard');
+        const nb = $('#hiit-next'); if (nb) { nb.classList.add('hiit-go'); nb.textContent = nb.dataset.over; }
+        const pt = $('#hiit-ptitle'); if (pt) pt.textContent = '¡Recuperado el tiempo!';
+      }
+    }
+    hiitLastLeft = sec;
+    const t = $('#hiit-time'); if (t) t.textContent = mmss(sec);
+    const bar = $('#hiit-bar'); if (bar) bar.style.width = Math.min(100, 100 * (1 - Math.max(0, left) / hiitSec(hiit.step, pr))) + '%';
+    const act = $('#hiit-active'); if (act) act.textContent = 'Activo ' + mmss(Math.floor(hiitActive()));
+  }
+
+  // Meta de pulso segun las zonas (si hay edad); si no, por sensacion
+  function hiitTargets() {
+    const z = hrZones();
+    return {
+      hard: z ? z.z[3].lo + '–' + z.z[3].hi + ' lpm' : 'esfuerzo de 8 de 10',
+      rec: z ? 'bajar de ' + z.z[1].hi + ' lpm' : 'bajar unos 25 lpm',
+      recMax: z ? z.z[1].hi : null
+    };
+  }
+  function hiitRecMsg(rd) {
+    const tg = hiitTargets();
+    if (!rd.rec) return { cls: '', text: 'Meta: ' + tg.rec + ' antes del siguiente intervalo.' };
+    const drop = rd.max ? rd.max - rd.rec : null;
+    const ok = tg.recMax ? rd.rec <= tg.recMax : (drop != null && drop >= 25);
+    return ok
+      ? { cls: 'ok', text: '✓ Recuperado' + (drop != null && drop > 0 ? ': bajó ' + drop + ' lpm' : '') + '. Listo para el siguiente.' }
+      : { cls: 'warn', text: 'Aún alto' + (drop != null ? ' (bajó ' + Math.max(0, drop) + ' lpm)' : '') + ': espera un poco más o pedalea más suave. Meta: ' + tg.rec + '.' };
+  }
+
+  const HIIT_LABEL = { warm: 'Calentamiento', hard: '¡FUERTE!', rec: 'Recupera', cool: 'Vuelta a la calma' };
+  function hiitHrInput(rd, key, label) {
+    const input = h('input', { inputmode: 'numeric', value: rd[key] || '', 'aria-label': label });
+    input.addEventListener('input', () => {
+      rd[key] = parseNum(input.value) || null; hiitPersist();
+      const m = $('#hiit-recmsg'); if (m) { const r = hiitRecMsg(rd); m.className = 'hiit-recmsg ' + r.cls; m.textContent = r.text; }
+    });
+    return h('label', {}, label, input);
+  }
+
+  function hiitRender() {
+    if (!hiit) return;
+    let el = $('#hiit');
+    if (!el) { el = h('div', { id: 'hiit', class: 'hiit', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Sesión de intervalos' }); document.body.append(el); }
+    const pr = hiit.pr, step = hiit.step, r = hiit.r, tg = hiitTargets(), paused = !!hiit.pausedAt;
+
+    if (step === 'done') {
+      const d = hiitDoneSummary;
+      const form = h('form', { class: 'body-form', autocomplete: 'off' },
+        h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: d.min })),
+        h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric', value: d.hr || '' })),
+        h('label', { class: 'full' }, 'Rondas completadas (de ' + d.total + ')', h('input', { name: 'rondas', inputmode: 'numeric', value: d.rounds })),
+        h('button', { class: 'btn primary big full', type: 'submit' }, 'Guardar sesión de cardio'),
+        h('button', { class: 'btn big full', type: 'button', onclick: hiitClose }, 'Descartar'));
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const m = parseNum(form.elements.min.value);
+        if (!m) { toast('Escribe los minutos.'); return; }
+        cardio.sessions.push({ id: uid(), date: todayISO(), tipo: 'Intervalos', min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: parseNum(form.elements.rondas.value) || undefined, dia: 'dia-cardio-2',
+          det: d.det.some((x) => x.max || x.rec) ? d.det.map((x) => [x.max || null, x.rec || null]) : undefined });
+        saveCardio(); toast('Cardio guardado en este dispositivo.'); hiitClose();
+      });
+      const table = d.det.some((x) => x.max || x.rec) ? h('div', { class: 'hiit-table' },
+        h('div', { class: 'hiit-tr head' }, h('span', {}, 'Ronda'), h('span', {}, 'Al terminar'), h('span', {}, 'Recuperado')),
+        d.det.map((x, i) => (x.done || x.max || x.rec) ? h('div', { class: 'hiit-tr' }, h('span', {}, i + 1), h('span', {}, x.max ? x.max + ' lpm' : '—'), h('span', {}, x.rec ? x.rec + ' lpm' : '—')) : null)) : null;
+      el.className = 'hiit end';
+      el.replaceChildren(h('div', { class: 'hiit-in' },
+        h('div', { class: 'hiit-end-ico', 'aria-hidden': 'true' }, d.early ? '⏹' : '🎉'),
+        h('h2', {}, d.early ? 'Sesión terminada' : '¡Sesión completa!'),
+        h('p', { class: 'hiit-sum' }, h('b', {}, d.rounds), ' de ' + d.total + ' rondas · ', h('b', {}, d.min), ' min activos'),
+        table, form));
+      return;
+    }
+
+    const running = hiitRunning();
+    const dots = [];
+    for (let i = 1; i <= pr.rounds; i++) dots.push(h('i', { class: hiit.rounds[i - 1].done ? 'on' : (step === 'hard' && r === i ? 'cur' : '') }));
+    const top = h('div', { class: 'hiit-top' }, h('span', {}, 'Intervalos · ' + pr.name), h('span', { id: 'hiit-active' }, 'Activo ' + mmss(Math.floor(hiitActive()))));
+    const dotsRow = h('div', { class: 'hiit-dots', 'aria-label': hiitRoundsDone() + ' de ' + pr.rounds + ' rondas completadas' }, dots);
+    const count = h('div', { class: 'hiit-count' }, h('b', {}, hiitRoundsDone()), ' de ' + pr.rounds + ' rondas hechas');
+    const endBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (confirm('¿Terminar la sesión ahora? Podrás guardar lo que llevas.')) hiitFinish(true); } }, 'Terminar y guardar');
+    const clock = () => [
+      h('div', { class: 'hiit-time', id: 'hiit-time' }, mmss(Math.ceil(Math.max(0, hiitLeft())))),
+      h('div', { class: 'hiit-bar' }, h('i', { id: 'hiit-bar', style: 'width:' + Math.min(100, 100 * (1 - Math.max(0, hiitLeft()) / hiitSec(step, pr))) + '%' }))];
+    const pauseBtn = h('button', { class: 'btn big', type: 'button', onclick: hiitTogglePause }, paused ? '▶ Continuar' : '⏸ Pausar');
+    let body;
+
+    if (step === 'warm-ready') {
+      body = [h('div', { class: 'hiit-phase' }, 'Calentamiento'), h('div', { class: 'hiit-round' }, secText(HIIT_WARM) + ' suave'),
+        h('p', { class: 'hiit-help' }, 'Bici, elíptica o caminadora. Sube poco a poco hasta sudar, sin cansarte.'),
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitGo('warm') }, '▶ Iniciar calentamiento'),
+        h('button', { class: 'btn big', type: 'button', onclick: () => hiitGo('ready', 1) }, 'Saltar al intervalo 1')];
+    } else if (step === 'warm') {
+      body = [h('div', { class: 'hiit-phase' }, 'Calentamiento'), h('div', { class: 'hiit-round' }, paused ? 'En pausa' : 'Suave, subiendo poco a poco'), ...clock(),
+        h('div', { class: 'hiit-actions' }, pauseBtn, h('button', { class: 'btn big', type: 'button', onclick: () => { hiitLeave(); hiitGo('ready', 1); } }, 'Saltar ›'))];
+    } else if (step === 'ready') {
+      body = [h('div', { class: 'hiit-round' }, 'Prepárate'), h('div', { class: 'hiit-phase' }, 'Intervalo ' + r + ' de ' + pr.rounds),
+        h('div', { class: 'hiit-bigline' }, secText(pr.hard) + ' fuerte'),
+        h('p', { class: 'hiit-help' }, 'Pulso objetivo: ' + tg.hard + '. Después recuperas ' + secText(pr.easy) + '.'),
+        h('button', { class: 'btn primary big hiit-go', type: 'button', onclick: () => hiitGo('hard', r, null, 'hard') }, '▶ Iniciar intervalo ' + r)];
+    } else if (step === 'hard') {
+      body = [h('div', { class: 'hiit-round' }, 'Intervalo ' + r + ' de ' + pr.rounds), h('div', { class: 'hiit-phase' }, HIIT_LABEL.hard), ...clock(),
+        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : 'Pulso objetivo: ' + tg.hard + '. Misma intensidad en todas las rondas.'),
+        h('div', { class: 'hiit-actions' }, pauseBtn,
+          h('button', { class: 'btn big', type: 'button', onclick: () => { hiitLeave(); const e = hiit.rounds[r - 1]; if (hiitElapsed() >= pr.hard * 0.8) e.done = true; hiitGo('rec', r, null, 'rec'); } }, 'Parar ›'))];
+    } else if (step === 'rec') {
+      const rd = hiit.rounds[r - 1], last = r >= pr.rounds, msg = hiitRecMsg(rd), over = hiitLeft() <= 0;
+      body = [h('div', { class: 'hiit-round' }, 'Después del intervalo ' + r), h('div', { class: 'hiit-phase', id: 'hiit-ptitle' }, over ? '¡Recuperado el tiempo!' : HIIT_LABEL.rec), ...clock(),
+        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : 'Respira y baja la intensidad. El pulso debe bajar.'),
+        h('div', { class: 'body-form hiit-hr' }, hiitHrInput(rd, 'max', 'Pulso al terminar el intervalo'), hiitHrInput(rd, 'rec', 'Pulso ahora (recuperado)')),
+        h('div', { class: 'hiit-recmsg ' + msg.cls, id: 'hiit-recmsg' }, msg.text),
+        h('button', { id: 'hiit-next', class: 'btn primary big' + (over ? ' hiit-go' : ''), type: 'button',
+          'data-over': last ? '▶ Vuelta a la calma · ' + secText(HIIT_COOL) : '▶ Iniciar intervalo ' + (r + 1),
+          onclick: () => { hiitLeave(); if (last) hiitGo('cool'); else hiitGo('hard', r + 1, null, 'hard'); } },
+          over ? (last ? '▶ Vuelta a la calma · ' + secText(HIIT_COOL) : '▶ Iniciar intervalo ' + (r + 1))
+            : (last ? 'Ya recuperé · Vuelta a la calma' : 'Ya me recuperé · Iniciar intervalo ' + (r + 1))),
+        pauseBtn];
+    } else { // cool
+      body = [h('div', { class: 'hiit-phase' }, HIIT_LABEL.cool), h('div', { class: 'hiit-round' }, paused ? 'En pausa' : 'Muy suave hasta bajar de 100 lpm'), ...clock(),
+        h('div', { class: 'hiit-actions' }, pauseBtn, h('button', { class: 'btn big', type: 'button', onclick: () => hiitFinish(false) }, 'Terminar ›')),
+        h('p', { class: 'hiit-help' }, 'Después estira cuádriceps, isquios, glúteos y pantorrillas, unos 30 s cada uno.')];
+    }
+    el.className = 'hiit ' + (step === 'hard' ? 'hard' : step === 'rec' ? 'easy' : '') + (paused ? ' paused' : '');
+    el.replaceChildren(h('div', { class: 'hiit-in' }, top, ...body, running || step === 'ready' ? [dotsRow, count] : null, step === 'warm-ready' ? null : endBtn));
+    if (step === 'warm-ready') el.querySelector('.hiit-in').append(h('button', { class: 'btn ghost', type: 'button', onclick: hiitClose }, 'Cancelar'));
+  }
+
   // ---------- cronometro libre ----------
   let swAcc = 0, swStart = null, swHandle = null;
   const swMs = () => swAcc + (swStart ? Date.now() - swStart : 0);
@@ -1345,6 +1601,11 @@
   }
   const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
 
+  // Pulsos de cada ronda de una sesion de intervalos: al terminar / recuperado
+  function detLine(c) {
+    if (!c.det || !c.det.some((x) => x && (x[0] || x[1]))) return null;
+    return h('div', { class: 'muted small' }, 'Pulsos: ' + c.det.map((x, i) => (i + 1) + ') ' + (x[0] || '—') + (x[1] ? '→' + x[1] : '')).join(' · '));
+  }
   // Sesiones de cardio guardadas hoy desde un dia del plan
   function cardioToday(day) { return cardio.sessions.filter((c) => c.date === todayISO() && c.dia === day.id); }
 
@@ -1386,18 +1647,42 @@
           h('li', {}, 'Deja 48 horas entre este día y el de piernas. Si dormiste mal o tienes las piernas cargadas, haz ritmo constante en zona 2.'))));
     }
 
+    if (intervals) {
+      // Sesion guiada con cronometro
+      const saved = hiitSavedRun();
+      let chosen = hiitPresetChoice();
+      const info = h('div', { class: 'muted small', style: 'margin:6px 0 10px' });
+      const refresh = () => {
+        const pr = hiitPreset(chosen);
+        info.textContent = pr.rounds + ' rondas · ' + secText(pr.hard) + ' fuerte + ' + secText(pr.easy) + ' de recuperación · unos ' + Math.round(hiitTotalSec(pr) / 60) + ' min con calentamiento y vuelta a la calma';
+      };
+      const sel = h('select', { 'aria-label': 'Semana del plan', onchange: (e) => { chosen = e.target.value; hiitSetPresetChoice(chosen); refresh(); } },
+        HIIT_PRESETS.map((x) => h('option', { value: x.id, selected: x.id === chosen }, x.name)));
+      refresh();
+      card.append(h('div', { class: 'hiit-launch' },
+        h('strong', {}, '⏱ Sesión guiada con cronómetro'),
+        h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'Te dice cada intervalo, tú das Iniciar y la app cuenta el tiempo. Al terminar anotas tu pulso, te indica cuánto recuperar y pasas al siguiente. Al final suma tus minutos. Mantén la pantalla encendida.'),
+        saved ? null : h('label', { class: 'full' }, 'Semana del plan', sel), saved ? null : info,
+        saved
+          ? h('div', { class: 'hiit-actions' },
+              h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitOpen(saved) }, '▶ Continuar sesión en curso'),
+              h('button', { class: 'btn big', type: 'button', onclick: () => { hiitStore(null); render(); } }, 'Descartarla'))
+          : h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitOpen(null) }, '▶ Empezar intervalos')));
+    }
+
     // Registro de hoy
     const done = cardioToday(day);
     done.forEach((c) => card.append(h('div', { class: 'ctl-row cardio-row', style: 'margin-top:10px' },
       h('div', {}, h('strong', {}, '✓ Registrado hoy'),
-        h('div', { class: 'muted small' }, c.tipo + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : ''))),
+        h('div', { class: 'muted small' }, c.tipo + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '')),
+        detLine(c)),
       h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
         if (!confirm('¿Eliminar esta sesión de cardio?')) return;
         cardio.sessions = cardio.sessions.filter((x) => x.id !== c.id); saveCardio(); render();
       } }, '✕'))));
     const form = h('form', { class: 'body-form', autocomplete: 'off', style: 'margin-top:12px' });
     const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : 'Bicicleta') }, t[0])));
-    form.append(h('strong', { class: 'full' }, done.length ? 'Registrar otra sesión' : 'Registrar la sesión'),
+    form.append(h('strong', { class: 'full' }, intervals ? 'O registrarla a mano' : (done.length ? 'Registrar otra sesión' : 'Registrar la sesión')),
       h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
       h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 35 })),
@@ -1482,7 +1767,7 @@
         const kcal = lb && lb.peso ? Math.round(met * lb.peso * c.min / 60) : null;
         const z = zoneOf(zones, c.hr);
         list.append(h('div', { class: 'ctl-row cardio-row' },
-          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')),
+          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')), detLine(c),
             z != null ? h('span', { class: 'sugg-tag' + (z === 2 ? '' : ' down') }, z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z) : null),
           h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
             if (!confirm('¿Eliminar esta sesión de cardio?')) return;
