@@ -896,9 +896,16 @@
     return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + (customRest[ex.id] ? restTxt(customRest[ex.id]) : ex.restText);
   }
 
+  // A que dia del plan cuenta una sesion de cardio: la guardada desde el dia, o por su tipo si vino de la pagina Cardio
+  function cardioDayOf(c) {
+    if (c.dia) return c.dia;
+    const want = c.tipo === 'Intervalos' ? 'dia-cardio-2' : 'dia-cardio';
+    return DAYS.some((d) => d.id === want) ? want : null;
+  }
   function lastDoneByGroup() {
     const out = {};
     sortedSessions().forEach((x) => { const id = x.routineId || 'piernas'; if (!out[id]) out[id] = x.date; });
+    cardio.sessions.forEach((c) => { const id = cardioDayOf(c); if (id && (!out[id] || c.date > out[id])) out[id] = c.date; });
     return out;
   }
 
@@ -940,16 +947,10 @@
 
     const lastDone = lastDoneByGroup();
 
-    // Plan: el siguiente es el que sigue al ultimo dia del plan que hiciste
-    // Los dias solo de cardio no tienen series con peso: no cuentan para saber cual sigue
-    const trainDays = DAYS.filter((d) => d.exercises.length);
-    let lastDay = -1;
-    const sorted = sortedSessions();
-    for (let i = 0; i < sorted.length; i++) {
-      const k = trainDays.findIndex((d) => d.id === sorted[i].routineId);
-      if (k !== -1) { lastDay = k; break; }
-    }
-    const nextDay = trainDays[(lastDay + 1) % trainDays.length];
+    // Plan: el siguiente es el primer dia que no hiciste en los ultimos 7 dias (cuenta tambien el cardio);
+    // si ya hiciste todos esta semana, el que hiciste hace mas tiempo
+    const pending = (d) => !lastDone[d.id] || daysSince(lastDone[d.id]) >= 7;
+    const nextDay = DAYS.find(pending) || DAYS.slice().sort((x, y) => (lastDone[x.id] < lastDone[y.id] ? -1 : 1))[0];
     root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
     const days = h('div', { class: 'days' });
     DAYS.forEach((d, i) => {
@@ -959,7 +960,7 @@
       const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
       const status = cDone.length ? 'Hoy: ' + cDone.reduce((t, c) => t + c.min, 0) + ' min registrados'
         : today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
-        : d.cardio ? 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana'
+        : d.cardio ? (lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) + ' · ' : '') + 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en 7 días'
         : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
       // Portada: una imagen por cada grupo principal del dia
       const covers = (d.covers || []).map((id) => [{ id: id }, 0]);
@@ -1371,6 +1372,7 @@
       h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, zones
         ? 'Pulso objetivo calculado con tu edad y pulso en reposo (' + zones.rest + ' lpm).'
         : 'Escribe tu edad en Cardio para ver tu pulso objetivo; mientras, guíate por la sensación (de 0 a 10).'),
+      lastDoneByGroup()[day.id] ? h('p', { class: 'small', style: 'margin:0 0 8px' }, 'Última vez que lo hiciste: ' + agoText(lastDoneByGroup()[day.id]) + '.') : null,
       steps.map((st) => h('div', { class: 'zone-row' + (st[3] ? ' base' : ''), style: 'align-items:center;gap:10px' },
         h('span', {}, st[0], st[1] ? h('div', { class: 'muted small', style: 'font-weight:400' }, st[1]) : null),
         st[2] ? h('b', { style: 'white-space:nowrap' }, st[2]) : null)));
@@ -1395,7 +1397,8 @@
       } }, '✕'))));
     const form = h('form', { class: 'body-form', autocomplete: 'off', style: 'margin-top:12px' });
     const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : 'Bicicleta') }, t[0])));
-    form.append(h('strong', { class: 'full' }, done.length ? 'Registrar otra sesión' : 'Registrar la sesión de hoy'),
+    form.append(h('strong', { class: 'full' }, done.length ? 'Registrar otra sesión' : 'Registrar la sesión'),
+      h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
       h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 35 })),
       h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
@@ -1403,10 +1406,10 @@
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
-      const m = parseNum(form.elements.min.value);
-      if (!m) { toast('Escribe los minutos.'); return; }
+      const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
+      if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
       const rondas = intervals ? parseNum(form.elements.rondas.value) : null;
-      cardio.sessions.push({ id: uid(), date: todayISO(), tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: rondas || undefined, dia: day.id });
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: rondas || undefined, dia: day.id });
       saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
     });
     card.append(form,
