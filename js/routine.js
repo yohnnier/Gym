@@ -379,9 +379,9 @@ const PLAN = {
     },
     {
       // cardio: 'constante' | 'intervalos' muestra el plan de cardio antes de los ejercicios
-      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen con plataforma', cardio: 'constante',
+      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
       exercises: [
-        { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
+        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
       ]
     },
     {

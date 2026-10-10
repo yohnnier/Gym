@@ -1699,7 +1699,7 @@
     });
     card.append(form,
       h('button', { class: 'btn small full', type: 'button', style: 'margin-top:8px', onclick: () => go('#/cardio') }, 'Ver historial y mis zonas de pulso'));
-    if (!intervals) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen con la plataforma: registra las series abajo.'));
+    if (!intervals) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen: silla romana y plataforma. Registra las series abajo.'));
     return card;
   }
 
