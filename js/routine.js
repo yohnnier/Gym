@@ -342,10 +342,10 @@ const CORE = {
   ]
 };
 
-/* Plan de 4 dias por semana (empuje / tiron / piernas / cardio). Cada dia junta ejercicios de varios grupos.
+/* Plan de 5 dias por semana (empuje / tiron / piernas / cardio constante / cardio intervalos). Cada dia junta ejercicios de varios grupos.
  * sets: series para ese dia (si se omite, usa las del ejercicio). */
 const PLAN = {
-  name: 'Plan de 4 días',
+  name: 'Plan de 5 días',
   days: [
     {
       id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
@@ -372,11 +372,17 @@ const PLAN = {
       ]
     },
     {
-      // cardio: true muestra el plan de cardio (zona 2) antes de los ejercicios
-      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen con plataforma', cardio: true,
+      // cardio: 'constante' | 'intervalos' muestra el plan de cardio antes de los ejercicios
+      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen con plataforma', cardio: 'constante',
       exercises: [
         { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
       ]
+    },
+    {
+      // Dia solo de cardio (sin series con peso): covers son imagenes img/ex/<id>-0.jpg para la portada
+      id: 'dia-cardio-2', name: 'Día 5 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave', cardio: 'intervalos',
+      covers: ['cardio-bici', 'cardio-eliptica', 'cardio-caminadora'],
+      exercises: []
     }
   ]
 };

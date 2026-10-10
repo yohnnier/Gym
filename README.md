@@ -4,9 +4,10 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 
 ## Funciones
 
-- **Plan de 4 días** (empuje / tirón + abdomen / piernas / cardio + abdomen con plataforma), con cuatro tarjetas en el inicio, editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día según el último que hiciste.
-- **Inicio**: saludo, resumen, el plan de 4 días, **meta de la semana**: cuántas series lleva cada músculo de las 10 recomendadas y cuántas le faltan . Los grupos musculares sueltos están en la pestaña Rutinas.
+- **Plan de 5 días** (empuje / tirón + abdomen / piernas / cardio + abdomen con plataforma / cardio de intervalos), con cinco tarjetas en el inicio, editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día según el último que hiciste.
+- **Inicio**: saludo, resumen, el plan de 5 días, **meta de la semana**: cuántas series lleva cada músculo de las 10 recomendadas y cuántas le faltan . Los grupos musculares sueltos están en la pestaña Rutinas.
 - **Día 4 · Cardio**: plan de la sesión (calentamiento, 25 min en zona 2, intervalos opcionales y vuelta a la calma) con tu pulso objetivo, botón para registrar los minutos y los ejercicios de abdomen con plataforma rodante.
+- **Día 5 · Cardio intervalos**: 8 rondas de 1 min fuerte y 2 min suave, con pulso objetivo, progresión por semanas y registro de minutos, pulso y rondas en la misma página.
 - **Página por grupo** (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): cada ejercicio muestra su imagen, tu **último registro** y, al lado, las filas para registrar **hoy**. La fecha se guarda sola.
 - **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
   - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango. Si el salto supera el 15 % del peso (p. ej. mancuernas ligeras), primero pide 3 repeticiones más.

@@ -16,7 +16,7 @@
   ROUTINES.forEach((r) => { routineById[r.id] = r; });
   // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
   const DAYS = PLAN.days.map((d) => ({
-    id: d.id, name: d.name, focus: d.focus, isDay: true, cardio: !!d.cardio,
+    id: d.id, name: d.name, focus: d.focus, isDay: true, cardio: d.cardio || null, covers: d.covers || null,
     exercises: d.exercises.map((x) => Object.assign({}, exById[x.id], x.sets ? { sets: x.sets, setsText: null } : {}))
   }));
   DAYS.forEach((d) => { routineById[d.id] = d; });
@@ -941,23 +941,28 @@
     const lastDone = lastDoneByGroup();
 
     // Plan: el siguiente es el que sigue al ultimo dia del plan que hiciste
+    // Los dias solo de cardio no tienen series con peso: no cuentan para saber cual sigue
+    const trainDays = DAYS.filter((d) => d.exercises.length);
     let lastDay = -1;
     const sorted = sortedSessions();
     for (let i = 0; i < sorted.length; i++) {
-      const k = DAYS.findIndex((d) => d.id === sorted[i].routineId);
+      const k = trainDays.findIndex((d) => d.id === sorted[i].routineId);
       if (k !== -1) { lastDay = k; break; }
     }
-    const nextDay = DAYS[(lastDay + 1) % DAYS.length];
+    const nextDay = trainDays[(lastDay + 1) % trainDays.length];
     root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
     const days = h('div', { class: 'days' });
     DAYS.forEach((d, i) => {
-      const today = todaySession(d.id, false);
+      const cardioOnly = !!d.cardio && !d.exercises.length;
+      const cDone = cardioOnly ? cardioToday(d) : [];
+      const today = cardioOnly ? (cDone.length ? cDone[0] : null) : todaySession(d.id, false);
       const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
-      const status = today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+      const status = cDone.length ? 'Hoy: ' + cDone.reduce((t, c) => t + c.min, 0) + ' min registrados'
+        : today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
         : d.cardio ? 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana'
         : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
       // Portada: una imagen por cada grupo principal del dia
-      const covers = [];
+      const covers = (d.covers || []).map((id) => [{ id: id }, 0]);
       d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0].muscle === e.muscle)) covers.push([e, 0]); });
       // Si el dia trabaja pocos musculos (p. ej. cardio + abdomen), completa con la foto final de otros ejercicios
       d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0] === e)) covers.push([e, 1]); });
@@ -1009,6 +1014,7 @@
         h('div', { class: 'muted small' }, r.focus ? r.focus : 'Hoy · ' + longDate(new Date())),
         today ? h('div', { class: 'muted small', id: 'elapsed' }, elapsedText(today)) : null)));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (r.cardio && !r.exercises.length) { root.append(cardioPlanCard(r)); return; }
     root.append(h('div', { class: 'progress-wrap' },
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
@@ -1016,7 +1022,7 @@
         : total + ' series planificadas · la fecha se guarda sola'),
       syncBadge()));
 
-    if (r.cardio) root.append(cardioPlanCard());
+    if (r.cardio) root.append(cardioPlanCard(r));
 
     const vol = weeklyVolume();
     const muscles = [];
@@ -1319,7 +1325,7 @@
 
   // ---------- cardio ----------
   const CARDIO_GOAL = 90; // minutos por semana en zona 2 (2-3 sesiones de 30-40 min)
-  const CARDIO_TYPES = [['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
+  const CARDIO_TYPES = [['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Intervalos', 8], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
   function cardioWeekMinutes() {
     return cardio.sessions.filter((c) => daysSince(c.date) >= 0 && daysSince(c.date) < 7).reduce((t, c) => t + (c.min || 0), 0);
   }
@@ -1338,27 +1344,75 @@
   }
   const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
 
-  // Plan de la sesion de cardio del dia 4, con el pulso objetivo si hay zonas calculadas
-  function cardioPlanCard() {
+  // Sesiones de cardio guardadas hoy desde un dia del plan
+  function cardioToday(day) { return cardio.sessions.filter((c) => c.date === todayISO() && c.dia === day.id); }
+
+  // Plan de la sesion de cardio de un dia del plan, con el pulso objetivo si hay zonas calculadas
+  // y un formulario para registrar la sesion ahi mismo.
+  function cardioPlanCard(day) {
     const zones = hrZones();
     const hr = (lo, hi) => (lo ? lo + '–' : 'hasta ') + hi + ' lpm';
-    const steps = [
-      ['1 · Calentamiento · 5 min', 'Bici o caminadora suave', zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10'],
+    const intervals = day.cardio === 'intervalos';
+    const calm = zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10';
+    const steps = intervals ? [
+      ['1 · Calentamiento · 8 min', 'Bici, elíptica o caminadora, subiendo poco a poco', calm],
+      ['2 · 8 rondas · 24 min', '', null],
+      ['   Fuerte · 1 min', 'Difícil hablar: 8 de 10. Misma intensidad en todas las rondas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10', true],
+      ['   Suave · 2 min', 'Recupera: el pulso baja a la zona 1 o 2', zones ? hr(0, zones.z[1].hi) : '3–4 de 10'],
+      ['3 · Vuelta a la calma · 5 min', 'Muy suave hasta bajar de 100 lpm y luego estira piernas', calm]
+    ] : [
+      ['1 · Calentamiento · 5 min', 'Bici o caminadora suave', calm],
       ['2 · Ritmo constante · 25 min', 'Bici, elíptica o caminadora inclinada (8–12 %)', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
       ['3 · Intervalos (opcional) · 10 min', '5 × 30 s fuerte + 90 s suave. Sáltalo si tienes las piernas cansadas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10'],
-      ['4 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10']
+      ['4 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', calm]
     ];
-    const min = cardioWeekMinutes();
-    return h('section', { class: 'card' },
-      h('div', { class: 'row between' }, h('strong', {}, '🏃 Cardio de hoy'), h('span', { class: 'muted small' }, min + ' de ' + CARDIO_GOAL + ' min esta semana')),
+    const card = h('section', { class: 'card' },
+      h('div', { class: 'row between' }, h('strong', {}, '🏃 Cardio de hoy'), h('span', { class: 'muted small' }, cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana')),
       h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, zones
         ? 'Pulso objetivo calculado con tu edad y pulso en reposo (' + zones.rest + ' lpm).'
-        : 'Debes poder hablar en frases completas en el bloque principal. Escribe tu edad en Cardio para ver tu pulso objetivo.'),
+        : 'Escribe tu edad en Cardio para ver tu pulso objetivo; mientras, guíate por la sensación (de 0 a 10).'),
       steps.map((st) => h('div', { class: 'zone-row' + (st[3] ? ' base' : ''), style: 'align-items:center;gap:10px' },
-        h('span', {}, st[0], h('div', { class: 'muted small', style: 'font-weight:400' }, st[1])),
-        h('b', { style: 'white-space:nowrap' }, st[2]))),
-      h('button', { class: 'btn primary full', type: 'button', style: 'margin-top:12px', onclick: () => go('#/cardio') }, 'Registrar mis minutos de cardio'),
-      h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen con la plataforma: registra las series abajo.'));
+        h('span', {}, st[0], st[1] ? h('div', { class: 'muted small', style: 'font-weight:400' }, st[1]) : null),
+        st[2] ? h('b', { style: 'white-space:nowrap' }, st[2]) : null)));
+    if (intervals) {
+      card.append(h('details', { style: 'margin-top:10px' },
+        h('summary', {}, h('strong', {}, 'Cómo progresar')),
+        h('ul', { class: 'plain small', style: 'margin:8px 0 0' },
+          h('li', {}, 'Semanas 1–2: 6 rondas de 30 s fuerte y 90 s suave (unos 12 min).'),
+          h('li', {}, 'Semanas 3–4: 8 rondas de 1 min fuerte y 2 min suave (este plan).'),
+          h('li', {}, 'Semana 5 en adelante: 8 rondas de 1 min fuerte y 90 s suave.'),
+          h('li', {}, 'Deja 48 horas entre este día y el de piernas. Si dormiste mal o tienes las piernas cargadas, haz ritmo constante en zona 2.'))));
+    }
+
+    // Registro de hoy
+    const done = cardioToday(day);
+    done.forEach((c) => card.append(h('div', { class: 'ctl-row cardio-row', style: 'margin-top:10px' },
+      h('div', {}, h('strong', {}, '✓ Registrado hoy'),
+        h('div', { class: 'muted small' }, c.tipo + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : ''))),
+      h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
+        if (!confirm('¿Eliminar esta sesión de cardio?')) return;
+        cardio.sessions = cardio.sessions.filter((x) => x.id !== c.id); saveCardio(); render();
+      } }, '✕'))));
+    const form = h('form', { class: 'body-form', autocomplete: 'off', style: 'margin-top:12px' });
+    const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : 'Bicicleta') }, t[0])));
+    form.append(h('strong', { class: 'full' }, done.length ? 'Registrar otra sesión' : 'Registrar la sesión de hoy'),
+      h('label', { class: 'full' }, 'Tipo', typeSel),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 35 })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
+      intervals ? h('label', { class: 'full' }, 'Rondas completadas (de 8)', h('input', { name: 'rondas', inputmode: 'numeric', value: 8 })) : null,
+      h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const m = parseNum(form.elements.min.value);
+      if (!m) { toast('Escribe los minutos.'); return; }
+      const rondas = intervals ? parseNum(form.elements.rondas.value) : null;
+      cardio.sessions.push({ id: uid(), date: todayISO(), tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: rondas || undefined, dia: day.id });
+      saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
+    });
+    card.append(form,
+      h('button', { class: 'btn small full', type: 'button', style: 'margin-top:8px', onclick: () => go('#/cardio') }, 'Ver historial y mis zonas de pulso'));
+    if (!intervals) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen con la plataforma: registra las series abajo.'));
+    return card;
   }
 
   function renderCardio(root) {
@@ -1425,7 +1479,7 @@
         const kcal = lb && lb.peso ? Math.round(met * lb.peso * c.min / 60) : null;
         const z = zoneOf(zones, c.hr);
         list.append(h('div', { class: 'ctl-row cardio-row' },
-          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')),
+          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')),
             z != null ? h('span', { class: 'sugg-tag' + (z === 2 ? '' : ' down') }, z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z) : null),
           h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
             if (!confirm('¿Eliminar esta sesión de cardio?')) return;
@@ -1549,7 +1603,9 @@
       root.append(h('section', { class: 'card' },
         h('div', { class: 'ex-name' }, d.name),
         h('div', { class: 'muted small' }, d.focus),
-        h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))));
+        d.exercises.length
+          ? h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))
+          : h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Solo cardio, sin series con peso. El plan está en la tarjeta del inicio.')));
     });
     root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
     root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Para un día en que quieras entrenar un solo grupo.'));
@@ -1575,7 +1631,7 @@
     root.append(h('div', { class: 'section-title' }, 'Tiempos de descanso'));
     root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Ajusta cuánto descansas entre series en cada ejercicio. El cronómetro automático usa este tiempo cuando marcas ✓.'));
     const restCard = h('section', { class: 'card' });
-    DAYS.forEach((d) => {
+    DAYS.filter((d) => d.exercises.length).forEach((d) => {
       restCard.append(h('div', { class: 'rest-day' }, d.name));
       d.exercises.forEach((ex) => restCard.append(h('div', { class: 'rest-row' }, h('span', { class: 'rest-name' }, ex.name), restPicker(ex))));
     });
