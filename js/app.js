@@ -16,7 +16,7 @@
   ROUTINES.forEach((r) => { routineById[r.id] = r; });
   // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
   const DAYS = PLAN.days.map((d) => ({
-    id: d.id, name: d.name, focus: d.focus, isDay: true,
+    id: d.id, name: d.name, focus: d.focus, isDay: true, cardio: !!d.cardio,
     exercises: d.exercises.map((x) => Object.assign({}, exById[x.id], x.sets ? { sets: x.sets, setsText: null } : {}))
   }));
   DAYS.forEach((d) => { routineById[d.id] = d; });
@@ -940,7 +940,7 @@
 
     const lastDone = lastDoneByGroup();
 
-    // Plan de 3 dias: el siguiente es el que sigue al ultimo dia del plan que hiciste
+    // Plan: el siguiente es el que sigue al ultimo dia del plan que hiciste
     let lastDay = -1;
     const sorted = sortedSessions();
     for (let i = 0; i < sorted.length; i++) {
@@ -954,13 +954,16 @@
       const today = todaySession(d.id, false);
       const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
       const status = today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+        : d.cardio ? 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana'
         : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
       // Portada: una imagen por cada grupo principal del dia
       const covers = [];
-      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c.muscle === e.muscle)) covers.push(e); });
+      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0].muscle === e.muscle)) covers.push([e, 0]); });
+      // Si el dia trabaja pocos musculos (p. ej. cardio + abdomen), completa con la foto final de otros ejercicios
+      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0] === e)) covers.push([e, 1]); });
       days.append(h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
         h('span', { class: 'day-cover' },
-          covers.map((e) => h('img', { src: imgSrc(e, 0), alt: '', loading: 'lazy' })),
+          covers.map((c) => h('img', { src: imgSrc(c[0], c[1]), alt: '', loading: 'lazy' })),
           today ? h('span', { class: 'pill live' }, 'Hoy')
             : d === nextDay ? h('span', { class: 'pill' }, 'Siguiente') : null),
         h('span', { class: 'day-body' },
@@ -1012,6 +1015,8 @@
         ? done + ' de ' + total + ' series' + (goalTotals.work ? ' · Metas: ' + goalTotals.hit + ' de ' + goalTotals.work : '') + (kcalEstimate(done) ? ' · ≈ ' + kcalEstimate(done).kcal + ' kcal' : '') + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
         : total + ' series planificadas · la fecha se guarda sola'),
       syncBadge()));
+
+    if (r.cardio) root.append(cardioPlanCard());
 
     const vol = weeklyVolume();
     const muscles = [];
@@ -1333,6 +1338,29 @@
   }
   const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
 
+  // Plan de la sesion de cardio del dia 4, con el pulso objetivo si hay zonas calculadas
+  function cardioPlanCard() {
+    const zones = hrZones();
+    const hr = (lo, hi) => (lo ? lo + '–' : 'hasta ') + hi + ' lpm';
+    const steps = [
+      ['1 · Calentamiento · 5 min', 'Bici o caminadora suave', zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10'],
+      ['2 · Ritmo constante · 25 min', 'Bici, elíptica o caminadora inclinada (8–12 %)', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
+      ['3 · Intervalos (opcional) · 10 min', '5 × 30 s fuerte + 90 s suave. Sáltalo si tienes las piernas cansadas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10'],
+      ['4 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10']
+    ];
+    const min = cardioWeekMinutes();
+    return h('section', { class: 'card' },
+      h('div', { class: 'row between' }, h('strong', {}, '🏃 Cardio de hoy'), h('span', { class: 'muted small' }, min + ' de ' + CARDIO_GOAL + ' min esta semana')),
+      h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, zones
+        ? 'Pulso objetivo calculado con tu edad y pulso en reposo (' + zones.rest + ' lpm).'
+        : 'Debes poder hablar en frases completas en el bloque principal. Escribe tu edad en Cardio para ver tu pulso objetivo.'),
+      steps.map((st) => h('div', { class: 'zone-row' + (st[3] ? ' base' : ''), style: 'align-items:center;gap:10px' },
+        h('span', {}, st[0], h('div', { class: 'muted small', style: 'font-weight:400' }, st[1])),
+        h('b', { style: 'white-space:nowrap' }, st[2]))),
+      h('button', { class: 'btn primary full', type: 'button', style: 'margin-top:12px', onclick: () => go('#/cardio') }, 'Registrar mis minutos de cardio'),
+      h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen con la plataforma: registra las series abajo.'));
+  }
+
   function renderCardio(root) {
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
@@ -1516,7 +1544,7 @@
   }
 
   function renderRutina(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu plan de 3 días y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu ' + PLAN.name.toLowerCase() + ' y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
     DAYS.forEach((d) => {
       root.append(h('section', { class: 'card' },
         h('div', { class: 'ex-name' }, d.name),

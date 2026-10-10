@@ -342,10 +342,10 @@ const CORE = {
   ]
 };
 
-/* Plan de 3 dias por semana (empuje / tiron / piernas). Cada dia junta ejercicios de varios grupos.
+/* Plan de 4 dias por semana (empuje / tiron / piernas / cardio). Cada dia junta ejercicios de varios grupos.
  * sets: series para ese dia (si se omite, usa las del ejercicio). */
 const PLAN = {
-  name: 'Plan de 3 días',
+  name: 'Plan de 4 días',
   days: [
     {
       id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
@@ -369,6 +369,13 @@ const PLAN = {
       exercises: [
         { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
         { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
+      ]
+    },
+    {
+      // cardio: true muestra el plan de cardio (zona 2) antes de los ejercicios
+      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen con plataforma', cardio: true,
+      exercises: [
+        { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
       ]
     }
   ]
