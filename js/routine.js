@@ -298,6 +298,12 @@ const CORE = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin balanceo; inclina la pelvis hacia arriba.'
     },
     {
+      id: 'rodillas-silla-romana', name: 'Elevación de rodillas en silla romana', muscle: 'abdomen',
+      sets: 3, repMin: 10, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Antebrazos en las almohadillas, espalda pegada al respaldo. Sube las rodillas al pecho redondeando la pelvis hacia arriba, sin balancearte; baja lento. Cuando sea fácil, sube las piernas estiradas.'
+    },
+    {
       id: 'crunch-polea', name: 'Crunch en polea alta', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'lb', step: 5, provisional: true,
