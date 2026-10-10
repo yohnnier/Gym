@@ -850,5 +850,43 @@
    }
   ],
   "updatedAt": 1791561738241
+ },
+ {
+  "id": "mv2nw4xr4clyp",
+  "date": "2026-10-10",
+  "createdAt": 1791652925439,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "pantorrillas",
+    "set": 1,
+    "weight": 30,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 2,
+    "weight": 30,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 3,
+    "weight": 30,
+    "reps": 16,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 4,
+    "weight": 30,
+    "reps": 13,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1791652933607
  }
 ]
