@@ -595,6 +595,115 @@
     });
   }
 
+  // ---------- banda de pulso (Bluetooth) ----------
+  // Lee cualquier sensor con el servicio estandar de frecuencia cardiaca de Bluetooth (Polar, Garmin, Wahoo,
+  // Coospo...) con Web Bluetooth: Chrome en Android o computador; en iPhone, el navegador Bluefy.
+  const hrm = { dev: null, bpm: null, at: 0, status: 'off', name: '', sum: 0, n: 0, max: 0, wanted: false, retry: 0 };
+  const hrmSupported = () => !!(navigator.bluetooth && navigator.bluetooth.requestDevice);
+  const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const hrmFresh = () => hrm.status === 'on' && !!hrm.bpm && Date.now() - hrm.at < 5000;
+  // Formato estandar: bit 0 de las banderas indica si el valor viene en 8 o 16 bits
+  function hrmParse(dv) { return dv.getUint8(0) & 1 ? dv.getUint16(1, true) : dv.getUint8(1); }
+  function hrmOnValue(e) {
+    const bpm = hrmParse(e.target.value);
+    if (!bpm) return; // 0 = la banda no tiene contacto con la piel
+    hrm.bpm = bpm; hrm.at = Date.now(); hrm.sum += bpm; hrm.n++; if (bpm > hrm.max) hrm.max = bpm;
+    hiitOnHr(bpm);
+    hrmPaint();
+  }
+  async function hrmConnect() {
+    if (!hrmSupported()) {
+      toast(isIOS() ? 'En iPhone abre la app en el navegador Bluefy para conectar la banda.' : 'Este navegador no permite Bluetooth. Abre la app en Chrome.');
+      return;
+    }
+    try {
+      const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
+      if (hrm.dev && hrm.dev !== dev) { hrm.wanted = false; try { hrm.dev.gatt.disconnect(); } catch (e) { /* ya desconectada */ } }
+      hrm.dev = dev; hrm.name = dev.name || 'Banda de pulso'; hrm.wanted = true; hrm.status = 'connecting'; hrmPaint();
+      dev.addEventListener('gattserverdisconnected', hrmLost);
+      await hrmAttach();
+      hrm.sum = 0; hrm.n = 0; hrm.max = 0;
+      toast('Banda conectada: ' + hrm.name);
+      hrmRefresh();
+    } catch (e) {
+      if (!(e && e.name === 'NotFoundError')) toast('No se pudo conectar la banda. Revisa que esté puesta y con Bluetooth activo.');
+      if (hrm.status === 'connecting') hrm.status = 'off';
+      hrmPaint();
+    }
+  }
+  async function hrmAttach() {
+    const server = await hrm.dev.gatt.connect();
+    const service = await server.getPrimaryService('heart_rate');
+    const ch = await service.getCharacteristic('heart_rate_measurement');
+    ch.addEventListener('characteristicvaluechanged', hrmOnValue);
+    await ch.startNotifications();
+    hrm.status = 'on'; hrm.retry = 0; hrmPaint();
+  }
+  // Si se corta (banda lejos, sin contacto), reintenta sola con espera creciente
+  function hrmLost() {
+    if (!hrm.wanted) { hrm.status = 'off'; hrmPaint(); return; }
+    hrm.status = 'reconnecting'; hrmPaint();
+    setTimeout(() => {
+      if (hrm.wanted && hrm.dev) hrmAttach().then(() => toast('Banda reconectada.')).catch(hrmLost);
+    }, Math.min(10000, 1000 * ++hrm.retry));
+  }
+  function hrmDisconnect() {
+    hrm.wanted = false; hrm.status = 'off'; hrm.bpm = null;
+    try { if (hrm.dev) hrm.dev.gatt.disconnect(); } catch (e) { /* ya desconectada */ }
+    hrmRefresh();
+  }
+  function hrmResetStats() { hrm.sum = 0; hrm.n = 0; hrm.max = 0; hrmPaint(); }
+  // Redibuja lo que depende de si hay banda conectada
+  function hrmRefresh() { if (hiit) hiitRender(); else render(); }
+  // Actualiza en el lugar los numeros en pantalla (sin redibujar todo)
+  function hrmPaint() {
+    const fresh = hrmFresh();
+    const z = fresh ? zoneOf(hrZones(), hrm.bpm) : null;
+    document.querySelectorAll('.hrm-bpm').forEach((el) => { el.textContent = fresh ? hrm.bpm : '--'; });
+    document.querySelectorAll('.hrm-zone').forEach((el) => {
+      el.textContent = z == null ? '' : z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z;
+    });
+    document.querySelectorAll('.hrm-live').forEach((el) => { el.dataset.z = z == null ? '' : z; });
+    document.querySelectorAll('.hrm-status').forEach((el) => {
+      el.textContent = hrm.status === 'reconnecting' ? 'Reconectando…' : hrm.status === 'connecting' ? 'Conectando…'
+        : fresh ? hrm.name : 'Sin señal: revisa que la banda esté húmeda y bien puesta';
+    });
+    document.querySelectorAll('.hrm-avg').forEach((el) => {
+      el.textContent = hrm.n ? 'Promedio ' + Math.round(hrm.sum / hrm.n) + ' lpm · máx ' + hrm.max + ' lpm' : 'Aún sin datos';
+    });
+  }
+  setInterval(() => { if (hrm.status !== 'off') hrmPaint(); }, 2000);
+
+  // Recuadro para conectar la banda o ver el pulso en vivo. withAvg: muestra promedio y boton para usarlo en el registro
+  function hrmWidget(withAvg) {
+    if (!hrmSupported()) {
+      return h('div', { class: 'hrm-box muted small' }, '❤️ Banda de pulso: ',
+        isIOS() ? 'en iPhone, abre esta app en el navegador Bluefy (gratis en la App Store) para conectarla.' : 'abre la app en Chrome para conectarla.');
+    }
+    if (hrm.status === 'off') {
+      return h('div', { class: 'hrm-box' },
+        h('button', { class: 'btn full', type: 'button', onclick: hrmConnect }, '❤️ Conectar banda de pulso'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Con una banda Bluetooth (Polar, Garmin, Coospo…) la app lee tu pulso real y lo anota sola.'));
+    }
+    const box = h('div', { class: 'hrm-box hrm-live' },
+      h('div', { class: 'row between', style: 'align-items:center' },
+        h('div', {}, h('span', { class: 'hrm-heart', 'aria-hidden': 'true' }, '❤️ '), h('b', { class: 'hrm-bpm' }, '--'), ' lpm ', h('span', { class: 'hrm-zone' })),
+        h('button', { class: 'btn small ghost', type: 'button', onclick: hrmDisconnect }, 'Desconectar')),
+      h('div', { class: 'muted small hrm-status' }));
+    if (withAvg) {
+      box.append(h('div', { class: 'small hrm-avg', style: 'margin-top:8px' }),
+        h('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px' },
+          h('button', { class: 'btn small', type: 'button', onclick: hrmResetStats }, 'Reiniciar'),
+          h('button', { class: 'btn small', type: 'button', onclick: () => {
+            const i = $('#cardio-hr');
+            if (!hrm.n || !i) { toast('Aún no hay datos de la banda.'); return; }
+            i.value = Math.round(hrm.sum / hrm.n); toast('Pulso promedio anotado.');
+          } }, 'Usar promedio en el registro')));
+    }
+    setTimeout(hrmPaint, 0);
+    return box;
+  }
+
   // ---------- sesion de intervalos guiada ----------
   // Paso a paso: calentamiento -> (intervalo fuerte -> recuperacion) x rondas -> vuelta a la calma.
   // Tu das "Iniciar" en cada intervalo; la app cuenta el tiempo, avisa con sonido y vibracion, te deja anotar
@@ -625,7 +734,8 @@
   function hiitPresetChoice() { try { return localStorage.getItem(HIIT_KEY + '.preset') || 'b'; } catch (e) { return 'b'; } }
   function hiitSetPresetChoice(id) { try { localStorage.setItem(HIIT_KEY + '.preset', id); } catch (e) { /* sin almacenamiento */ } }
   function hiitPersist() {
-    hiitStore({ preset: hiit.pr.id, step: hiit.step, r: hiit.r, phaseStart: hiit.phaseStart, pausedAcc: hiit.pausedAcc, pausedAt: hiit.pausedAt, active: hiit.active, rounds: hiit.rounds, startedAt: hiit.startedAt });
+    hiitStore({ preset: hiit.pr.id, step: hiit.step, r: hiit.r, phaseStart: hiit.phaseStart, pausedAcc: hiit.pausedAcc, pausedAt: hiit.pausedAt, active: hiit.active, rounds: hiit.rounds, startedAt: hiit.startedAt,
+      hrSum: hiit.hrSum, hrN: hiit.hrN, hrMax: hiit.hrMax });
   }
 
   const hiitRunning = () => HIIT_RUNNING.indexOf(hiit.step) !== -1;
@@ -647,6 +757,7 @@
       if (kind === 'hard') { if (navigator.vibrate) navigator.vibrate([400, 120, 400]); hiitTone(1046, 0, 0.18); hiitTone(1046, 0.26, 0.18); hiitTone(1318, 0.52, 0.3); }
       else if (kind === 'rec') { if (navigator.vibrate) navigator.vibrate([600]); hiitTone(587, 0, 0.5); }
       else if (kind === 'end') beep();
+      else if (kind === 'ok') { if (navigator.vibrate) navigator.vibrate([150, 80, 150]); hiitTone(660, 0, 0.15); hiitTone(880, 0.18, 0.25); }
       else { if (navigator.vibrate) navigator.vibrate([200]); hiitTone(784, 0, 0.2); } // cuenta regresiva
     } catch (e) { /* sin sonido */ }
   }
@@ -666,10 +777,11 @@
     } catch (e) { /* sin audio */ }
     hiitDoneSummary = null; hiitLastLeft = null;
     if (saved) {
-      hiit = { pr: hiitPreset(saved.preset), step: saved.step, r: saved.r, phaseStart: saved.phaseStart, pausedAcc: saved.pausedAcc || 0, pausedAt: saved.pausedAt || null, active: saved.active || 0, rounds: saved.rounds, startedAt: saved.startedAt };
+      hiit = { pr: hiitPreset(saved.preset), step: saved.step, r: saved.r, phaseStart: saved.phaseStart, pausedAcc: saved.pausedAcc || 0, pausedAt: saved.pausedAt || null, active: saved.active || 0, rounds: saved.rounds, startedAt: saved.startedAt,
+        hrSum: saved.hrSum || 0, hrN: saved.hrN || 0, hrMax: saved.hrMax || 0 };
     } else {
       const pr = hiitPreset(hiitPresetChoice());
-      hiit = { pr: pr, step: 'warm-ready', r: 1, phaseStart: 0, pausedAcc: 0, pausedAt: null, active: 0, startedAt: Date.now(),
+      hiit = { pr: pr, step: 'warm-ready', r: 1, phaseStart: 0, pausedAcc: 0, pausedAt: null, active: 0, startedAt: Date.now(), hrSum: 0, hrN: 0, hrMax: 0,
         rounds: pr.rounds ? Array.from({ length: pr.rounds }, () => ({ max: null, rec: null, done: false })) : [] };
       hiitPersist();
     }
@@ -688,6 +800,9 @@
     if (hiitRunning()) hiit.active += Math.min(hiitElapsed(), hiitSec(hiit.step, hiit.pr));
   }
   function hiitGo(step, r, startAt, cue) {
+    // Con banda: el pulso "al terminar" es el pico del intervalo (y de los primeros segundos de recuperacion)
+    if (step === 'rec' && hiit.step === 'hard' && hiit.peak) { const rd = hiit.rounds[(r || hiit.r) - 1]; if (!rd.max || hiit.peak > rd.max) rd.max = hiit.peak; }
+    if (step === 'hard') hiit.peak = 0;
     hiit.step = step; if (r) hiit.r = r;
     hiit.phaseStart = startAt || Date.now(); hiit.pausedAcc = 0; hiit.pausedAt = null; hiitLastLeft = null;
     hiitPersist(); hiitRender(); if (cue) hiitCue(cue);
@@ -701,7 +816,8 @@
     const rd = hiit.rounds.filter((x) => x.max);
     hiitDoneSummary = {
       early: early, rounds: hiitRoundsDone(), total: hiit.pr.rounds, min: Math.max(1, Math.round(hiit.active / 60)),
-      hr: rd.length ? Math.round(rd.reduce((t, x) => t + x.max, 0) / rd.length) : null, det: hiit.rounds.slice()
+      hr: hiit.hrN ? Math.round(hiit.hrSum / hiit.hrN) : rd.length ? Math.round(rd.reduce((t, x) => t + x.max, 0) / rd.length) : null,
+      hrMax: hiit.hrMax || null, fromBand: !!hiit.hrN, det: hiit.rounds.slice()
     };
     hiit.step = 'done';
     clearInterval(hiitHandle); hiitHandle = null; hiitStore(null); hiitWake(false);
@@ -754,9 +870,29 @@
       : { cls: 'warn', text: 'Aún alto' + (drop != null ? ' (bajó ' + Math.max(0, drop) + ' lpm)' : '') + ': espera un poco más o pedalea más suave. Meta: ' + tg.rec + '.' };
   }
 
+  // Cada lectura de la banda durante la sesion: promedio, pico del intervalo y pulso de recuperacion en vivo
+  function hiitOnHr(bpm) {
+    if (!hiit || hiit.step === 'done' || hiit.pausedAt || !hiitRunning()) return;
+    hiit.hrSum += bpm; hiit.hrN++; if (bpm > hiit.hrMax) hiit.hrMax = bpm;
+    if (hiit.step === 'hard') hiit.peak = Math.max(hiit.peak || 0, bpm);
+    if (hiit.step === 'rec') {
+      const rd = hiit.rounds[hiit.r - 1];
+      if (hiitElapsed() < 15 && bpm > (rd.max || 0)) rd.max = bpm; // el pulso sigue subiendo unos segundos al parar
+      rd.rec = bpm;
+      ['max', 'rec'].forEach((k) => { const i = $('#hiit-in-' + k); if (i && document.activeElement !== i) i.value = rd[k] || ''; });
+      const m = $('#hiit-recmsg'), msg = hiitRecMsg(rd);
+      if (m) { m.className = 'hiit-recmsg ' + msg.cls; m.textContent = msg.text; }
+      if (msg.cls === 'ok' && !rd.okCue && hiitElapsed() >= 15) { // aviso una vez por ronda: ya bajo lo suficiente
+        rd.okCue = true; hiitCue('ok');
+        const nb = $('#hiit-next'); if (nb) nb.classList.add('hiit-go');
+      }
+    }
+    if (hiit.hrN % 5 === 0) hiitPersist();
+  }
+
   const HIIT_LABEL = { warm: 'Calentamiento', hard: '¡FUERTE!', rec: 'Recupera', cool: 'Vuelta a la calma' };
   function hiitHrInput(rd, key, label) {
-    const input = h('input', { inputmode: 'numeric', value: rd[key] || '', 'aria-label': label });
+    const input = h('input', { id: 'hiit-in-' + key, inputmode: 'numeric', value: rd[key] || '', 'aria-label': label });
     input.addEventListener('input', () => {
       rd[key] = parseNum(input.value) || null; hiitPersist();
       const m = $('#hiit-recmsg'); if (m) { const r = hiitRecMsg(rd); m.className = 'hiit-recmsg ' + r.cls; m.textContent = r.text; }
@@ -794,6 +930,7 @@
         h('div', { class: 'hiit-end-ico', 'aria-hidden': 'true' }, d.early ? '⏹' : '🎉'),
         h('h2', {}, d.early ? 'Sesión terminada' : '¡Sesión completa!'),
         h('p', { class: 'hiit-sum' }, h('b', {}, d.rounds), ' de ' + d.total + ' rondas · ', h('b', {}, d.min), ' min activos'),
+        d.fromBand ? h('p', { class: 'muted small', style: 'text-align:center;margin:0' }, '❤️ Medido con la banda: promedio ' + d.hr + ' lpm · máximo ' + d.hrMax + ' lpm') : null,
         table, form));
       return;
     }
@@ -832,7 +969,7 @@
     } else if (step === 'rec') {
       const rd = hiit.rounds[r - 1], last = r >= pr.rounds, msg = hiitRecMsg(rd), over = hiitLeft() <= 0;
       body = [h('div', { class: 'hiit-round' }, 'Después del intervalo ' + r), h('div', { class: 'hiit-phase', id: 'hiit-ptitle' }, over ? '¡Recuperado el tiempo!' : HIIT_LABEL.rec), ...clock(),
-        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : 'Respira y baja la intensidad. El pulso debe bajar.'),
+        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : hrm.status === 'on' ? 'Respira y baja la intensidad. La banda anota tu pulso sola y te avisa cuando ya bajó.' : 'Respira y baja la intensidad. El pulso debe bajar.'),
         h('div', { class: 'body-form hiit-hr' }, hiitHrInput(rd, 'max', 'Pulso al terminar el intervalo'), hiitHrInput(rd, 'rec', 'Pulso ahora (recuperado)')),
         h('div', { class: 'hiit-recmsg ' + msg.cls, id: 'hiit-recmsg' }, msg.text),
         h('button', { id: 'hiit-next', class: 'btn primary big' + (over ? ' hiit-go' : ''), type: 'button',
@@ -847,8 +984,12 @@
         h('p', { class: 'hiit-help' }, 'Después estira cuádriceps, isquios, glúteos y pantorrillas, unos 30 s cada uno.')];
     }
     el.className = 'hiit ' + (step === 'hard' ? 'hard' : step === 'rec' ? 'easy' : '') + (paused ? ' paused' : '');
-    el.replaceChildren(h('div', { class: 'hiit-in' }, top, ...body, running || step === 'ready' ? [dotsRow, count] : null, step === 'warm-ready' ? null : endBtn));
+    const live = hrm.status !== 'off'
+      ? h('div', { class: 'hrm-live hiit-live' }, '❤️ ', h('b', { class: 'hrm-bpm' }, '--'), ' lpm ', h('span', { class: 'hrm-zone' }), h('div', { class: 'muted small hrm-status' }))
+      : hrmSupported() ? h('button', { class: 'btn small ghost', type: 'button', onclick: hrmConnect }, '❤️ Conectar banda de pulso') : null;
+    el.replaceChildren(h('div', { class: 'hiit-in' }, top, live, ...body, running || step === 'ready' ? [dotsRow, count] : null, step === 'warm-ready' ? null : endBtn));
     if (step === 'warm-ready') el.querySelector('.hiit-in').append(h('button', { class: 'btn ghost', type: 'button', onclick: hiitClose }, 'Cancelar'));
+    hrmPaint();
   }
 
   // ---------- cronometro libre ----------
@@ -1647,6 +1788,7 @@
           h('li', {}, 'Deja 48 horas entre este día y el de piernas. Si dormiste mal o tienes las piernas cargadas, haz ritmo constante en zona 2.'))));
     }
 
+    card.append(hrmWidget(!intervals));
     if (intervals) {
       // Sesion guiada con cronometro
       const saved = hiitSavedRun();
@@ -1686,7 +1828,7 @@
       h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
       h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 35 })),
-      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric' })),
       intervals ? h('label', { class: 'full' }, 'Rondas completadas (de 8)', h('input', { name: 'rondas', inputmode: 'numeric', value: 8 })) : null,
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
@@ -1740,6 +1882,7 @@
     } else zcard.append(h('p', { class: 'muted small' }, 'Escribe tu edad y tu pulso en reposo para calcular tus zonas.'));
     zcard.append(zform);
     root.append(zcard);
+    root.append(h('section', { class: 'card' }, h('strong', {}, 'Banda de pulso'), h('div', { style: 'margin-top:8px' }, hrmWidget(true))));
 
     // Nueva sesion
     const form = h('form', { class: 'body-form', autocomplete: 'off' });
@@ -1747,7 +1890,7 @@
     form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
       h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric' })),
-      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric' })),
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
