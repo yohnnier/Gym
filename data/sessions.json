@@ -1090,9 +1090,16 @@
     "set": 1,
     "weight": 45,
     "reps": 12,
-    "rpe": null
+    "rpe": 9
+   },
+   {
+    "exerciseId": "fondos-maquina",
+    "set": 2,
+    "weight": 45,
+    "reps": 12,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1791740072841
+  "updatedAt": 1791740374244
  }
 ]
