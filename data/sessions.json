@@ -902,5 +902,22 @@
    }
   ],
   "updatedAt": 1791670990798
+ },
+ {
+  "id": "mv419s3ul0gxi",
+  "date": "2026-10-11",
+  "createdAt": 1791735863178,
+  "routineId": "dia-empuje",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "press-inclinado",
+    "set": 1,
+    "weight": 15,
+    "reps": 11,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1791735868063
  }
 ]
