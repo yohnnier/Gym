@@ -280,6 +280,12 @@ const TRICEPS = {
       notes: 'Polea alta con manilla, palma hacia arriba. Codo pegado al costado: baja hasta estirar el brazo y sube controlado hasta la altura del pecho. Solo se mueve el antebrazo. Anota cada brazo si difieren.'
     },
     {
+      id: 'extension-polea-sobre-cabeza', name: 'Extensión en polea sobre la cabeza (cuerda)', muscle: 'triceps',
+      sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
+      unit: 'kg', step: 2.5,
+      notes: 'De espaldas a la polea alta, con cuerda, un pie adelante y el torso inclinado. Codos junto a la cabeza y quietos: estira los brazos hacia adelante y abre la cuerda al final. Vuelve lento hasta sentir el estiramiento detrás del brazo. Si molesta el hombro, acorta la bajada.'
+    },
+    {
       id: 'fondos-banco', name: 'Fondos en paralelas o banco', muscle: 'triceps', secondary: ['pecho', 'hombros'],
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg adicional', step: 2.5, provisional: true,
@@ -370,7 +376,7 @@ const PLAN = {
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea', sets: 4 }, { id: 'extension-polea-invertida', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
+        { id: 'extension-polea', sets: 4 }, { id: 'extension-polea-sobre-cabeza', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
       ]
     },
     {
