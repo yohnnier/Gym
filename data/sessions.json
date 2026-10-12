@@ -1157,8 +1157,36 @@
     "weight": null,
     "reps": 10,
     "rpe": 10
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 1,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 2,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 3,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 4,
+    "weight": null,
+    "reps": 25,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1791819964457
+  "updatedAt": 1791820192197
  }
 ]
