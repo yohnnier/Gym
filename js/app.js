@@ -716,7 +716,7 @@
     { id: 'c', name: 'Semana 5 en adelante', rounds: 8, hard: 60, easy: 90 }
   ];
   const HIIT_RUNNING = ['warm', 'hard', 'rec', 'cool'];
-  let hiit = null, hiitHandle = null, hiitLock = null, hiitLastLeft = null, hiitDoneSummary = null;
+  let hiit = null, hiitHandle = null, hiitLock = null, hiitLastLeft = null, hiitDoneSummary = null, hiitPulsesOpen = false;
   const hiitPreset = (id) => HIIT_PRESETS.find((x) => x.id === id) || HIIT_PRESETS[1];
   const hiitSec = (step, pr) => step === 'warm' ? HIIT_WARM : step === 'cool' ? HIIT_COOL : step === 'hard' ? pr.hard : step === 'rec' ? pr.easy : 0;
   const hiitTotalSec = (pr) => HIIT_WARM + pr.rounds * (pr.hard + pr.easy) + HIIT_COOL;
@@ -891,6 +891,22 @@
   }
 
   const HIIT_LABEL = { warm: 'Calentamiento', hard: '¡FUERTE!', rec: 'Recupera', cool: 'Vuelta a la calma' };
+  // Tabla editable con el pulso de cada ronda (al terminar el intervalo y recuperado), para anotar lo que se olvido
+  function hiitRoundsEditor(upto, onChange) {
+    const rows = [];
+    for (let i = 0; i < upto; i++) {
+      const rd = hiit.rounds[i];
+      const mk = (key, label) => {
+        const inp = h('input', { inputmode: 'numeric', value: rd[key] || '', 'aria-label': label + ' de la ronda ' + (i + 1) });
+        inp.addEventListener('input', () => { rd[key] = parseNum(inp.value) || null; if (hiit.step !== 'done') hiitPersist(); if (onChange) onChange(); });
+        return inp;
+      };
+      rows.push(h('div', { class: 'hiit-tr edit' }, h('span', {}, i + 1), mk('max', 'Pulso al terminar'), mk('rec', 'Pulso recuperado')));
+    }
+    return h('div', { class: 'hiit-table' },
+      h('div', { class: 'hiit-tr head' }, h('span', {}, 'Ronda'), h('span', {}, 'Al terminar (lpm)'), h('span', {}, 'Recuperado (lpm)')), rows);
+  }
+
   function hiitHrInput(rd, key, label) {
     const input = h('input', { id: 'hiit-in-' + key, inputmode: 'numeric', value: rd[key] || '', 'aria-label': label });
     input.addEventListener('input', () => {
@@ -922,9 +938,15 @@
           det: d.det.some((x) => x.max || x.rec) ? d.det.map((x) => [x.max || null, x.rec || null]) : undefined });
         saveCardio(); toast('Cardio guardado en este dispositivo.'); hiitClose();
       });
-      const table = d.det.some((x) => x.max || x.rec) ? h('div', { class: 'hiit-table' },
-        h('div', { class: 'hiit-tr head' }, h('span', {}, 'Ronda'), h('span', {}, 'Al terminar'), h('span', {}, 'Recuperado')),
-        d.det.map((x, i) => (x.done || x.max || x.rec) ? h('div', { class: 'hiit-tr' }, h('span', {}, i + 1), h('span', {}, x.max ? x.max + ' lpm' : '—'), h('span', {}, x.rec ? x.rec + ' lpm' : '—')) : null)) : null;
+      // Se pueden anotar o corregir los pulsos aqui; si no hay banda, el promedio se recalcula con ellos
+      let upto = 0; d.det.forEach((x, i) => { if (x.done || x.max || x.rec) upto = i + 1; });
+      const table = upto ? h('div', {},
+        h('p', { class: 'muted small', style: 'margin:0 0 6px' }, 'Puedes anotar o corregir el pulso de cada ronda.'),
+        hiitRoundsEditor(upto, () => {
+          if (d.fromBand) return;
+          const mx = d.det.filter((x) => x.max);
+          form.elements.hr.value = mx.length ? Math.round(mx.reduce((t, x) => t + x.max, 0) / mx.length) : '';
+        })) : null;
       el.className = 'hiit end';
       el.replaceChildren(h('div', { class: 'hiit-in' },
         h('div', { class: 'hiit-end-ico', 'aria-hidden': 'true' }, d.early ? '⏹' : '🎉'),
@@ -983,11 +1005,20 @@
         h('div', { class: 'hiit-actions' }, pauseBtn, h('button', { class: 'btn big', type: 'button', onclick: () => hiitFinish(false) }, 'Terminar ›')),
         h('p', { class: 'hiit-help' }, 'Después estira cuádriceps, isquios, glúteos y pantorrillas, unos 30 s cada uno.')];
     }
+    // Pulsos de rondas anteriores: se pueden anotar o corregir desde cualquier pantalla de la sesion
+    const upto = step === 'cool' ? pr.rounds : Math.max(0, r - 1);
+    let pulses = null;
+    if (upto > 0 && step !== 'warm-ready' && step !== 'warm') {
+      pulses = h('details', { class: 'hiit-pulses', open: hiitPulsesOpen },
+        h('summary', {}, '❤️ Anotar o corregir pulsos de rondas anteriores'),
+        hiitRoundsEditor(upto));
+      pulses.addEventListener('toggle', () => { hiitPulsesOpen = pulses.open; });
+    }
     el.className = 'hiit ' + (step === 'hard' ? 'hard' : step === 'rec' ? 'easy' : '') + (paused ? ' paused' : '');
     const live = hrm.status !== 'off'
       ? h('div', { class: 'hrm-live hiit-live' }, '❤️ ', h('b', { class: 'hrm-bpm' }, '--'), ' lpm ', h('span', { class: 'hrm-zone' }), h('div', { class: 'muted small hrm-status' }))
       : hrmSupported() ? h('button', { class: 'btn small ghost', type: 'button', onclick: hrmConnect }, '❤️ Conectar banda de pulso') : null;
-    el.replaceChildren(h('div', { class: 'hiit-in' }, top, live, ...body, running || step === 'ready' ? [dotsRow, count] : null, step === 'warm-ready' ? null : endBtn));
+    el.replaceChildren(h('div', { class: 'hiit-in' }, top, live, ...body, running || step === 'ready' ? [dotsRow, count] : null, pulses, step === 'warm-ready' ? null : endBtn));
     if (step === 'warm-ready') el.querySelector('.hiit-in').append(h('button', { class: 'btn ghost', type: 'button', onclick: hiitClose }, 'Cancelar'));
     hrmPaint();
   }
