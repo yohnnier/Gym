@@ -322,10 +322,10 @@ const CORE = {
       notes: 'Antebrazos en las almohadillas, espalda pegada al respaldo. Sube las rodillas al pecho redondeando la pelvis hacia arriba, sin balancearte; baja lento. Cuando sea fácil, sube las piernas estiradas.'
     },
     {
-      id: 'crunch-polea', name: 'Crunch en polea alta', muscle: 'abdomen',
+      id: 'crunch-polea', name: 'Crunch en polea de rodillas (cuerda)', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'lb', step: 5, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Caderas fijas, flexiona el tronco.'
+      notes: 'De rodillas frente a la polea alta, cuerda junto a la cabeza. Cadera quieta: redondea la columna llevando el pecho hacia las rodillas y exhala. No jales con los brazos ni te sientes sobre los talones, ni muevas la cadera arriba y abajo (el error más común). Si lo sientes en los brazos o la espalda, baja el peso.'
     },
     {
       id: 'rotacion-polea', name: 'Rotación en polea (leñador)', muscle: 'abdomen', secondary: ['hombros'],
@@ -398,7 +398,7 @@ const PLAN = {
     {
       id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
       exercises: [
-        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
+        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'crunch-polea' }, { id: 'tuck-oblicuo-rodante' }
       ]
     },
     {
