@@ -1624,8 +1624,8 @@
 
   // ---------- mi cuerpo ----------
   const BODY_FIELDS = [
-    ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
-    ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'], ['tmb', 'Metabolismo basal', 'kcal'],
+    ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['tmb', 'Calorías basales', 'kcal'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
+    ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'],
     ['edadCorporal', 'Edad corporal', 'años'], ['puntuacion', 'Puntuación corporal', '/100'], ['agua', 'Agua', 'kg'], ['proteina', 'Proteína', 'kg'],
     ['osea', 'Masa ósea', 'kg'], ['whr', 'Relación cintura-cadera', ''], ['pulsoReposo', 'Pulso en reposo', 'lpm']
   ];
@@ -1640,12 +1640,49 @@
       BODY_FIELDS.forEach((f) => { if (c[f[0]] != null && !isNaN(+c[f[0]])) ctl[f[0]] = +c[f[0]]; });
       if (c.altura) body.profile.altura = +c.altura;
       if (c.edad) body.profile.edad = +c.edad;
+      if (c.sexo === 'h' || c.sexo === 'm') body.profile.sexo = c.sexo;
       if (c.pulsoReposo) body.profile.pulsoReposo = +c.pulsoReposo;
       body.controls = body.controls.filter((x) => x.date !== ctl.date); // un control por fecha
       body.controls.push(ctl); added++;
     });
     if (!added) { toast('No encontré controles en el texto.'); return; }
     saveBody(); toast(added + ' control' + (added > 1 ? 'es' : '') + ' guardado' + (added > 1 ? 's' : '') + ' en este dispositivo.'); render();
+  }
+
+  // Calorias basales: la medida por tu bascula (ultimo control que la tenga) o, si no, la estimada (Mifflin-St Jeor)
+  function bmrInfo() {
+    const measured = bodySorted().filter((c) => c.tmb).pop();
+    if (measured) return { kcal: Math.round(measured.tmb), measured: true, date: measured.date };
+    const lb = lastBody(), p = body.profile;
+    if (lb && lb.peso && p.altura && p.edad && p.sexo) {
+      return { kcal: Math.round(10 * lb.peso + 6.25 * p.altura - 5 * p.edad + (p.sexo === 'h' ? 5 : -161)), measured: false };
+    }
+    return null;
+  }
+  const round10 = (n) => Math.round(n / 10) * 10;
+
+  // Tarjeta de calorias: basales y gasto diario estimado con tu plan (pesas + cardio, 5 dias por semana)
+  function caloriesCard() {
+    const b = bmrInfo();
+    if (!b) {
+      return h('section', { class: 'card' }, h('strong', {}, '🔥 Calorías basales'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Escribe tu sexo, edad y altura abajo (y guarda un control con tu peso) para estimarlas, o anota la TMB que te da tu báscula.'));
+    }
+    const train = b.kcal * 1.55, rest = b.kcal * 1.3;
+    const row = (label, kcal, note) => h('div', { class: 'ctl-row' }, h('span', {}, label, note ? h('div', { class: 'muted small' }, note) : null), h('b', {}, fmt(round10(kcal)) + ' kcal'));
+    return h('section', { class: 'card' },
+      h('strong', {}, '🔥 Calorías basales'),
+      h('div', { class: 'goal-top', style: 'margin-top:6px' }, h('span', { class: 'goal-num' }, h('b', {}, fmt(b.kcal)), ' kcal al día')),
+      h('p', { class: 'muted small', style: 'margin:2px 0 10px' }, b.measured
+        ? 'Medidas por tu báscula en el control del ' + fmtDate(b.date) + '. Es lo que gastas en reposo total.'
+        : 'Estimadas con tu peso, altura, edad y sexo (fórmula de Mifflin-St Jeor). Si anotas la TMB de tu báscula, la app usa esa.'),
+      row('Día de descanso', rest, 'basales × 1,3'),
+      row('Día de entreno', train, 'pesas + cardio · basales × 1,55'),
+      h('div', { class: 'section-title', style: 'margin:12px 0 4px' }, 'Según tu objetivo, en días de entreno'),
+      row('Perder grasa', train * 0.85, '15 % menos'),
+      row('Mantener peso', train),
+      row('Ganar músculo', train * 1.1, '10 % más'),
+      h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Son estimaciones. Pésate cada semana y ajusta unas 100–150 kcal si en 2–3 semanas no ves el cambio que buscas.'));
   }
 
   function renderCuerpo(root) {
@@ -1659,7 +1696,7 @@
     const last = ctrls[ctrls.length - 1], prev = ctrls[ctrls.length - 2];
     if (last) {
       const stats = h('div', { class: 'stats' });
-      [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg']].forEach((k) => {
+      [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg'], ['tmb', 'kcal']].forEach((k) => {
         if (last[k[0]] == null) return;
         const d = prev && prev[k[0]] != null ? last[k[0]] - prev[k[0]] : null;
         const f = BODY_FIELDS.find((x) => x[0] === k[0]);
@@ -1667,9 +1704,9 @@
           h('span', {}, f[1] + ' (' + k[1] + ')' + (d != null ? ' · ' + (d > 0 ? '+' : '') + fmt(Math.round(d * 10) / 10) : ''))));
       });
       root.append(h('div', { class: 'section-title' }, 'Último control · ' + fmtDate(last.date)), stats);
-      if (last.tmb) root.append(h('p', { class: 'muted small', style: 'margin:8px 4px' }, 'Metabolismo basal: ' + fmt(last.tmb) + ' kcal · gasto en días de entreno aprox. ' + fmt(Math.round(last.tmb * 1.4 / 10) * 10) + ' kcal.'));
     }
-    ['peso', 'grasa', 'musculo', 'pulsoReposo'].forEach((key) => {
+    root.append(h('div', { class: 'section-title' }, 'Calorías'), caloriesCard());
+    ['peso', 'grasa', 'musculo', 'tmb', 'pulsoReposo'].forEach((key) => {
       const pts = ctrls.filter((c) => c[key] != null);
       if (!pts.length) return;
       const f = BODY_FIELDS.find((x) => x[0] === key);
@@ -1680,10 +1717,29 @@
         progressChart(pts.map((c) => ({ date: c.date, weight: c[key] })), f[2], { noReps: true, nextLabel: 'Próximo', label: f[1] })));
     });
 
+    // Mis datos: sirven para estimar las calorias basales y las zonas de pulso
+    const pf = h('form', { class: 'body-form', autocomplete: 'off' },
+      h('label', {}, 'Sexo', h('select', { name: 'sexo' },
+        h('option', { value: '' }, 'Elegir'), h('option', { value: 'h', selected: body.profile.sexo === 'h' }, 'Hombre'), h('option', { value: 'm', selected: body.profile.sexo === 'm' }, 'Mujer'))),
+      h('label', {}, 'Edad', h('input', { name: 'edad', inputmode: 'numeric', value: body.profile.edad || '' })),
+      h('label', { class: 'full' }, 'Altura (cm)', h('input', { name: 'altura', inputmode: 'decimal', value: body.profile.altura || '' })),
+      h('button', { class: 'btn full', type: 'submit' }, 'Guardar mis datos'));
+    pf.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const e = parseNum(pf.elements.edad.value), a = parseNum(pf.elements.altura.value), sx = pf.elements.sexo.value;
+      if (sx) body.profile.sexo = sx; else delete body.profile.sexo;
+      if (e) body.profile.edad = e; else delete body.profile.edad;
+      if (a) body.profile.altura = a; else delete body.profile.altura;
+      saveBody(); toast('Datos guardados en este dispositivo.'); render();
+    });
+    root.append(h('div', { class: 'section-title' }, 'Mis datos'), h('section', { class: 'card' }, pf));
+
     // Nuevo control
     const form = h('form', { class: 'body-form', autocomplete: 'off' });
     form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })));
-    BODY_FIELDS.forEach((f) => form.append(h('label', {}, f[1] + (f[2] ? ' (' + f[2] + ')' : ''), h('input', { name: f[0], inputmode: 'decimal' }))));
+    const est = bmrInfo();
+    BODY_FIELDS.forEach((f) => form.append(h('label', {}, f[1] + (f[2] ? ' (' + f[2] + ')' : ''),
+      h('input', { name: f[0], inputmode: 'decimal', placeholder: f[0] === 'tmb' && est && !est.measured ? 'estimada ' + est.kcal : '' }))));
     form.append(h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar control'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
