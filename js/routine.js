@@ -366,10 +366,12 @@ const CORE = {
   ]
 };
 
-/* Plan de 5 dias por semana (empuje / tiron / piernas / cardio constante / cardio intervalos). Cada dia junta ejercicios de varios grupos.
- * sets: series para ese dia (si se omite, usa las del ejercicio). */
+/* Plan de 6 dias: pesas y cardio intercalados (dia de por medio).
+ * Cada dia junta ejercicios de varios grupos. sets: series para ese dia (si se omite, usa las del ejercicio).
+ * cardio: 'constante' | 'intervalos' | 'suave' muestra el plan de cardio; los dias sin ejercicios son solo de cardio
+ * (covers: imagenes img/ex/<id>-0.jpg para la portada). */
 const PLAN = {
-  name: 'Plan de 5 días',
+  name: 'Plan de 6 días',
   days: [
     {
       id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
@@ -380,7 +382,12 @@ const PLAN = {
       ]
     },
     {
-      id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
+      id: 'dia-cardio-2', name: 'Día 2 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave', cardio: 'intervalos',
+      covers: ['cardio-bici', 'cardio-eliptica', 'cardio-caminadora'],
+      exercises: []
+    },
+    {
+      id: 'dia-tiron', name: 'Día 3 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
       exercises: [
         { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal' }, { id: 'remo-maquina' },
         { id: 'face-pull' }, { id: 'pajaros-polea' },
@@ -389,23 +396,21 @@ const PLAN = {
       ]
     },
     {
-      id: 'dia-piernas', name: 'Día 3 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
-      exercises: [
-        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
-        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
-      ]
-    },
-    {
-      // cardio: 'constante' | 'intervalos' muestra el plan de cardio antes de los ejercicios
       id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
       exercises: [
         { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'pike-rodante' }, { id: 'tuck-oblicuo-rodante' }
       ]
     },
     {
-      // Dia solo de cardio (sin series con peso): covers son imagenes img/ex/<id>-0.jpg para la portada
-      id: 'dia-cardio-2', name: 'Día 5 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave', cardio: 'intervalos',
-      covers: ['cardio-bici', 'cardio-eliptica', 'cardio-caminadora'],
+      id: 'dia-piernas', name: 'Día 5 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
+      exercises: [
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
+        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
+      ]
+    },
+    {
+      id: 'dia-cardio-3', name: 'Día 6 · Cardio suave', focus: 'Zona 2 · Recuperación después de piernas', cardio: 'suave',
+      covers: ['cardio-eliptica', 'cardio-bici', 'cardio-caminadora'],
       exercises: []
     }
   ]

@@ -1299,6 +1299,14 @@
     const want = c.tipo === 'Intervalos' ? 'dia-cardio-2' : 'dia-cardio';
     return DAYS.some((d) => d.id === want) ? want : null;
   }
+  // Siguiente dia del plan: el que sigue al ultimo que hiciste (cuenta pesas y cardio); como el plan intercala
+  // pesas y cardio, asi te toca un dia de cada uno. Si dos dias caen en la misma fecha, vale el de mas adelante.
+  function planNext() {
+    const ld = lastDoneByGroup();
+    let best = -1, bestDate = '';
+    DAYS.forEach((d, i) => { const dt = ld[d.id]; if (dt && dt >= bestDate) { bestDate = dt; best = i; } });
+    return DAYS[(best + 1) % DAYS.length];
+  }
   function lastDoneByGroup() {
     const out = {};
     sortedSessions().forEach((x) => { const id = x.routineId || 'piernas'; if (!out[id]) out[id] = x.date; });
@@ -1344,10 +1352,7 @@
 
     const lastDone = lastDoneByGroup();
 
-    // Plan: el siguiente es el primer dia que no hiciste en los ultimos 7 dias (cuenta tambien el cardio);
-    // si ya hiciste todos esta semana, el que hiciste hace mas tiempo
-    const pending = (d) => !lastDone[d.id] || daysSince(lastDone[d.id]) >= 7;
-    const nextDay = DAYS.find(pending) || DAYS.slice().sort((x, y) => (lastDone[x.id] < lastDone[y.id] ? -1 : 1))[0];
+    const nextDay = planNext();
     root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
     const days = h('div', { class: 'days' });
     DAYS.forEach((d, i) => {
@@ -1838,7 +1843,12 @@
     const hr = (lo, hi) => (lo ? lo + '–' : 'hasta ') + hi + ' lpm';
     const intervals = day.cardio === 'intervalos';
     const calm = zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10';
-    const steps = intervals ? [
+    const gentle = day.cardio === 'suave';
+    const steps = gentle ? [
+      ['1 · Calentamiento · 5 min', 'Bici, elíptica o caminadora muy suave', calm],
+      ['2 · Ritmo constante · 30 min', 'Después de piernas: suave y sin cargar. Debes poder conversar', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
+      ['3 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', calm]
+    ] : intervals ? [
       ['1 · Calentamiento · 8 min', 'Bici, elíptica o caminadora, subiendo poco a poco', calm],
       ['2 · 8 rondas · 24 min', '', null],
       ['   Fuerte · 1 min', 'Difícil hablar: 8 de 10. Misma intensidad en todas las rondas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10', true],
@@ -1904,11 +1914,11 @@
         cardio.sessions = cardio.sessions.filter((x) => x.id !== c.id); saveCardio(); render();
       } }, '✕'))));
     const form = h('form', { class: 'body-form', autocomplete: 'off', style: 'margin-top:12px' });
-    const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : 'Bicicleta') }, t[0])));
+    const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : gentle ? 'Elíptica' : 'Bicicleta') }, t[0])));
     form.append(h('strong', { class: 'full' }, intervals ? 'O registrarla a mano' : (done.length ? 'Registrar otra sesión' : 'Registrar la sesión')),
       h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
-      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 35 })),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: intervals ? 37 : 40 })),
       h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric' })),
       intervals ? h('label', { class: 'full' }, 'Rondas completadas (de 8)', h('input', { name: 'rondas', inputmode: 'numeric', value: 8 })) : null,
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
@@ -1922,7 +1932,7 @@
     });
     card.append(form,
       h('button', { class: 'btn small full', type: 'button', style: 'margin-top:8px', onclick: () => go('#/cardio') }, 'Ver historial y mis zonas de pulso'));
-    if (!intervals) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen: silla romana y plataforma. Registra las series abajo.'));
+    if (!intervals && day.exercises.length) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen: silla romana y plataforma. Registra las series abajo.'));
     return card;
   }
 
@@ -1977,7 +1987,8 @@
       ev.preventDefault();
       const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
       if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
-      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value) });
+      const nx = planNext();
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), dia: form.elements.tipo.value === 'Intervalos' ? 'dia-cardio-2' : (nx && nx.cardio && nx.cardio !== 'intervalos' ? nx.id : undefined) });
       saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
     });
     root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));
