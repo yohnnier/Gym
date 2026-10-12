@@ -1108,5 +1108,36 @@
    }
   ],
   "updatedAt": 1791740590899
+ },
+ {
+  "id": "mv5fbsbklfr3x",
+  "date": "2026-10-12",
+  "createdAt": 1791819937568,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "crunch-polea",
+    "set": 1,
+    "weight": 106,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 2,
+    "weight": 106,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 3,
+    "weight": 106,
+    "reps": 13,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1791819945398
  }
 ]
