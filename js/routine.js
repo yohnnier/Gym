@@ -346,10 +346,10 @@ const CORE = {
       notes: 'Arrodíllate con las manos o antebrazos en la plataforma y rueda hacia adelante lo que controles; frena y vuelve con el abdomen. La espalda baja NUNCA se arquea: mete el ombligo y aprieta los glúteos. Empieza con poco recorrido.'
     },
     {
-      id: 'plancha-rodante', name: 'Plancha con pies en plataforma (segundos)', muscle: 'abdomen', secondary: ['hombros'],
-      sets: 3, repMin: 30, repMax: 45, rest: 60, restText: '60 s',
+      id: 'crunch-colchoneta', name: 'Abdominales básicos en colchoneta (crunch)', muscle: 'abdomen',
+      sets: 3, repMin: 15, repMax: 20, rest: 45, restText: '45 s',
       unit: 'kg adicional', step: 0, provisional: true,
-      notes: 'Plancha con los pies sobre la plataforma, cuerpo recto, sin levantar la cadera. Las "repeticiones" son segundos de mantención.'
+      notes: 'Boca arriba, rodillas dobladas y pies en el suelo, manos junto a las sienes sin tirar del cuello. Sube solo los hombros redondeando la columna, exhala al contraer y baja lento sin apoyar la cabeza. Sin impulso. Cuando te sobren repeticiones, sostén 1 s arriba.'
     },
     {
       id: 'pike-rodante', name: 'Encogimiento / pike en plataforma', muscle: 'abdomen', secondary: ['hombros'],
@@ -398,7 +398,7 @@ const PLAN = {
     {
       id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
       exercises: [
-        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'plancha-rodante' }, { id: 'crunch-polea' }, { id: 'tuck-oblicuo-rodante' }
+        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'crunch-colchoneta' }, { id: 'crunch-polea' }, { id: 'tuck-oblicuo-rodante' }
       ]
     },
     {
