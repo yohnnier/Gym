@@ -1694,6 +1694,11 @@
 
     const ctrls = bodySorted();
     const last = ctrls[ctrls.length - 1], prev = ctrls[ctrls.length - 2];
+    if (!ctrls.length) {
+      root.append(h('section', { class: 'card', style: 'border-color:var(--warm)' },
+        h('strong', {}, 'Aún no hay controles guardados aquí'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Tus controles se guardan solo en el navegador del celular donde los anotas. Si ya subiste uno y no aparece, puede estar en otro navegador (Chrome, la app instalada, Bluefy…) o se borró al limpiar los datos del navegador. Vuelve a cargarlo en "Importar controles", más abajo, o anótalo en "Nuevo control".')));
+    }
     if (last) {
       const stats = h('div', { class: 'stats' });
       [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg'], ['tmb', 'kcal']].forEach((k) => {
@@ -1759,6 +1764,26 @@
       h('section', { class: 'card' },
         h('p', { class: 'muted small', style: 'margin-top:0' }, 'Pega aquí el texto que te dé el asistente para cargar un control de una vez.'),
         ta, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => { importBody(ta.value.trim()); } }, 'Importar')));
+
+    // Copia de seguridad de los controles (mismo formato que Importar)
+    if (ctrls.length) {
+      const backup = () => JSON.stringify(ctrls.map((c, i) => {
+        const o = { fecha: c.date };
+        BODY_FIELDS.forEach((f) => { if (c[f[0]] != null) o[f[0]] = c[f[0]]; });
+        if (i === ctrls.length - 1) ['altura', 'edad', 'sexo'].forEach((k) => { if (body.profile[k]) o[k] = body.profile[k]; });
+        return o;
+      }), null, 1);
+      root.append(h('div', { class: 'section-title' }, 'Copia de seguridad'),
+        h('section', { class: 'card' },
+          h('p', { class: 'muted small', style: 'margin:0 0 8px' }, 'Guarda una copia de tus controles por si cambias de celular o borras los datos del navegador. Para recuperarlos, pega el texto en "Importar controles".'),
+          h('div', { class: 'hiit-actions' },
+            h('button', { class: 'btn', type: 'button', onclick: () => {
+              const t = backup();
+              if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado. Pégalo en un lugar seguro.'), () => toast('No se pudo copiar.'));
+              else toast('Tu navegador no permite copiar. Usa Descargar.');
+            } }, 'Copiar texto'),
+            h('button', { class: 'btn', type: 'button', onclick: () => download('mis-controles.json', backup(), 'application/json') }, 'Descargar'))));
+    }
 
     // Historial de controles
     if (ctrls.length) {
@@ -2165,6 +2190,8 @@
 
   save();
   render();
+  // Pide al navegador que no borre los datos de la app (controles, cardio) si falta espacio
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* sin soporte */ }
 
   if (ghToken) {
     runSync();
