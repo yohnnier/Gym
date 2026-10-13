@@ -1251,8 +1251,15 @@
     "weight": 75,
     "reps": 10,
     "rpe": 9
+   },
+   {
+    "exerciseId": "remo-maquina",
+    "set": 3,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1791923124868
+  "updatedAt": 1791923275488
  }
 ]
