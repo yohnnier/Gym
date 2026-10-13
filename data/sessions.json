@@ -1265,8 +1265,15 @@
     "weight": 30,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "face-pull",
+    "set": 2,
+    "weight": 30,
+    "reps": 14,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1791923636529
+  "updatedAt": 1791923748099
  }
 ]
