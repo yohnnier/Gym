@@ -1415,8 +1415,15 @@
     "weight": null,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 2,
+    "weight": null,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792010014353
+  "updatedAt": 1792010156449
  }
 ]
