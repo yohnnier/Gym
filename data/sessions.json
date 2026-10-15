@@ -1627,9 +1627,9 @@
     "set": 4,
     "weight": 30,
     "reps": 10,
-    "rpe": null
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792082856385
+  "updatedAt": 1792083107461
  }
 ]
