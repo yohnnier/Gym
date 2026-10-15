@@ -1565,8 +1565,15 @@
     "weight": 10,
     "reps": 17,
     "rpe": 9
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 3,
+    "weight": 10,
+    "reps": 17,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1792079842259
+  "updatedAt": 1792080073050
  }
 ]
