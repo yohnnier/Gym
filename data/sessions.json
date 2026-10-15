@@ -1504,13 +1504,13 @@
     "rpe": 10
    },
    {
-    "exerciseId": "hip-thrust",
+    "exerciseId": "curl-femoral",
     "set": 1,
-    "weight": 20,
-    "reps": 12,
+    "weight": 65,
+    "reps": 14,
     "rpe": null
    }
   ],
-  "updatedAt": 1792077602877
+  "updatedAt": 1792077683936
  }
 ]
