@@ -10,10 +10,12 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 - **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
   - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango. Si el salto supera el 15 % del peso (p. ej. mancuernas ligeras), primero pide 3 repeticiones más.
   - **Estancamiento**: 3 sesiones sin superar la anterior → **descarga** (~90 % del peso, 3–4 reps en reserva).
-  - Bajo el mínimo **dos sesiones seguidas**: **baja el peso**. Si fue una sola, mantiene el peso.
+  - Bajo el mínimo del rango (meta de peso no lograda): **baja el peso desde la siguiente sesión** al valor con el que, según tu fuerza estimada, volverías al rango de hipertrofia.
+  - Una serie con **más peso que la meta** cuenta como lograda si llegas al mínimo del rango de repeticiones.
   - En otro caso: **mantén el peso y suma +1 repetición** por serie.
   - Las filas vienen prellenadas con el peso y las repeticiones sugeridas; durante la sesión se ajustan según la serie anterior.
 - **Imágenes de las máquinas**: toca la imagen para verla grande (inicio y final del movimiento) o **cambiarla por una foto de tu gimnasio** (queda guardada en el dispositivo).
+- **Cardio** (Progreso → Cardio): reloj de sesión con dos modos, *intervalos* (trabajo/suave con aviso sonoro y vibración en cada cambio) y *tiempo continuo*; al terminar precarga el formulario.
 - **Cronómetro** en la cabecera (libre, para planchas o tiempo total) con **descansos rápidos** de 45 s a 3 min. El descanso también arranca solo al registrar cada serie, con aviso sonoro y vibración.
 - **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
 - **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.

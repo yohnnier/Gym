@@ -281,7 +281,7 @@
   //  1. Subir peso cuando completas el tope del rango en todas las series (o te sobraban, dificultad <= 7).
   //     Si el salto de peso es grande para ese ejercicio (> 15 %), primero se piden mas repeticiones.
   //  2. Estancamiento: 3 sesiones sin superar la de antes -> descarga (~90 % del peso, mas reps en reserva).
-  //  3. Bajar peso solo si quedaste bajo el minimo dos sesiones seguidas; si fue una, se mantiene.
+  //  3. Si quedaste bajo el minimo del rango (meta de peso no lograda), baja el peso ya la proxima vez.
   //  4. Si no, mantener el peso y sumar +1 repeticion por serie.
   const BIG_JUMP = 0.15;
   const EXTRA_REPS = 3;
@@ -340,18 +340,14 @@
       }
     }
 
-    // 3. Bajo el minimo
+    // 3. Bajo el minimo: la carga es demasiado alta para hipertrofia -> bajar ya la proxima vez
+    //    al peso con el que, segun tu fuerza estimada, alcanzarias el minimo del rango.
     if (last.avgReps < ex.repMin) {
-      const prev = sums[1];
-      if (prev && prev.avgReps < ex.repMin && prev.W <= W) {
-        const nw = Math.max(0, W - ex.step);
-        return { weight: nw, reps: reps(ex.repMin), trend: 'down',
-          title: 'Baja a ' + fmt(nw) + ' ' + ex.unit,
-          text: 'Dos sesiones seguidas bajo ' + ex.repMin + ' reps. Un poco menos de peso te devuelve al rango de hipertrofia (' + range + ').' };
-      }
-      return { weight: W, reps: reps(ex.repMin), trend: 'same',
-        title: 'Mantén ' + fmt(W) + ' ' + ex.unit,
-        text: 'La última vez quedaste bajo ' + ex.repMin + ' reps' + (last.avgRpe != null && last.avgRpe >= 9.5 ? ' y al límite (dificultad ' + fmt(last.avgRpe) + ')' : '') + '. Un día flojo no define tu progreso: intenta llegar a ' + ex.repMin + ', con 1 repetición en reserva en la primera serie. Si vuelve a pasar, bajamos el peso.' };
+      const est = last.e1rm / (1 + ex.repMin / 30);
+      const nw = Math.max(0, Math.min(W - ex.step, Math.floor(est / ex.step) * ex.step));
+      return { weight: nw, reps: reps(ex.repMin), trend: 'down',
+        title: 'Baja a ' + fmt(nw) + ' ' + ex.unit,
+        text: 'No llegaste a ' + ex.repMin + ' reps con ' + fmt(W) + (last.avgRpe != null && last.avgRpe >= 9.5 ? ' (dificultad ' + fmt(last.avgRpe) + ')' : '') + '. Con ' + fmt(nw) + ' vuelves al rango de hipertrofia (' + range + ') y luego subes de nuevo.' };
     }
 
     // 4. Mantener y sumar repeticiones
@@ -386,8 +382,11 @@
       const work = p.weight == null || (e.weight != null && e.weight >= 0.85 * p.weight);
       const tr = p.reps[Math.min(wi, p.reps.length - 1)];
       if (work) wi++;
-      const hit = work && e.reps >= tr && (p.weight == null || e.weight == null || e.weight >= p.weight);
-      return { work: work, hit: hit, target: tr };
+      // Hipertrofia: la carga manda mientras la serie siga dentro del rango de repeticiones.
+      // Con mas peso que la meta basta llegar al minimo del rango; con el peso de la meta hay que igualar las reps.
+      const heavier = work && p.weight != null && e.weight != null && e.weight > p.weight;
+      const hit = work && (heavier ? e.reps >= ex.repMin : e.reps >= tr && (p.weight == null || e.weight == null || e.weight >= p.weight));
+      return { work: work, hit: hit, up: hit && heavier && e.reps < tr, target: tr };
     });
     return { rows: rows, work: rows.filter((x) => x.work).length, hit: rows.filter((x) => x.hit).length, plan: p };
   }
@@ -538,12 +537,16 @@
   // ---------- temporizador ----------
   let timerEnd = 0, timerTotal = 0, timerHandle = null, audioCtx = null, hideToken = 0;
 
-  function startTimer(sec) {
+  function ensureAudio() {
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (AC && !audioCtx) audioCtx = new AC();
       if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     } catch (e) { /* sin audio */ }
+  }
+
+  function startTimer(sec) {
+    ensureAudio();
     hideToken++;
     timerTotal = sec;
     timerEnd = Date.now() + sec * 1000;
@@ -594,12 +597,36 @@
     if (big) big.textContent = swText();
     const el = $('#elapsed');
     if (el) { const r = route(); const s = r.group && todaySession(r.group.id, false); if (s) el.textContent = elapsedText(s); }
+    cardioClockUpdate();
   }
-  function swToggle() {
+  function swToggle() { swFlip(); openStopwatch(); }
+  function swFlip() {
+    ensureAudio();
     if (swStart) { swAcc += Date.now() - swStart; swStart = null; } else swStart = Date.now();
-    swUpdate(); openStopwatch();
+    ivLast = null;
+    swUpdate();
   }
-  function swReset() { swAcc = 0; swStart = null; swUpdate(); openStopwatch(); }
+  function swReset() { swAcc = 0; swStart = null; ivLast = null; swUpdate(); openStopwatch(); }
+
+  // Reloj de la sesion de cardio (usa el mismo cronometro): tiempo continuo o intervalos trabajo/descanso con aviso en cada cambio
+  const cardioLive = { mode: 'intervalos', work: 60, rest: 60 };
+  let ivLast = null;
+  function cardioClockUpdate() {
+    const clock = $('#cardio-clock');
+    if (!clock) return;
+    clock.textContent = swText();
+    const ph = $('#cardio-phase');
+    if (!ph) return;
+    if (cardioLive.mode !== 'intervalos') { ph.textContent = swStart ? 'En marcha · tiempo continuo' : (swAcc ? 'En pausa' : 'Toca Iniciar para empezar'); ph.className = 'cardio-phase'; return; }
+    const cyc = cardioLive.work + cardioLive.rest;
+    const t = Math.floor(swMs() / 1000), pos = t % cyc, working = pos < cardioLive.work;
+    const left = working ? cardioLive.work - pos : cyc - pos;
+    if (!swStart) { ph.textContent = swAcc ? 'En pausa · ronda ' + (Math.floor(t / cyc) + 1) : 'Toca Iniciar: ' + cardioLive.work + ' s fuerte / ' + cardioLive.rest + ' s suave'; ph.className = 'cardio-phase'; return; }
+    ph.textContent = (working ? 'Trabajo' : 'Suave') + ' · ' + mmss(left) + ' · ronda ' + (Math.floor(t / cyc) + 1);
+    ph.className = 'cardio-phase ' + (working ? 'work' : 'rest');
+    if (ivLast !== null && ivLast !== working) beep();
+    ivLast = working;
+  }
 
   function openStopwatch() {
     const sheet = $('#sheet');
@@ -1095,12 +1122,14 @@
         carry = adjustAfter(ex, entry, carry);
         const gr = gs.rows[i];
         const gcls = !gr || !gr.work ? '' : gr.hit ? ' hit' : ' miss';
+        const upNote = gr && gr.up ? h('div', { class: 'goal-up' }, '↑ Más peso que la meta: cuenta como logro') : null;
         table.append(h('div', { class: 'log-row done' + gcls },
           h('span', { class: 'n' }, i + 1),
           h('span', { class: 'prev' }, prev ? setStr(prev) : '—'),
           h('span', { class: 'val' }, fmt(entry.weight)),
           h('span', { class: 'val' }, entry.reps),
           h('button', { class: 'tick on', type: 'button', 'aria-label': 'Deshacer serie ' + (i + 1), onclick: () => unlogSet(entry, r.id) }, '✓')));
+        if (upNote) table.append(upNote);
         if (gr && gr.work && !gr.hit) table.append(h('div', { class: 'goal-miss' }, 'Meta: ' + (p.weight != null ? fmt(p.weight) + ' × ' : '') + gr.target + ' reps'));
         if (entry.rpe == null && i === logged.length - 1) {
           const chips = h('div', { class: 'rpe-ask' }, h('span', { class: 'muted small' }, '¿Qué tan difícil fue?'));
@@ -1302,7 +1331,7 @@
 
   // ---------- cardio ----------
   const CARDIO_GOAL = 90; // minutos por semana en zona 2 (2-3 sesiones de 30-40 min)
-  const CARDIO_TYPES = [['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
+  const CARDIO_TYPES = [['Intervalos', 8], ['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
   function cardioWeekMinutes() {
     return cardio.sessions.filter((c) => daysSince(c.date) >= 0 && daysSince(c.date) < 7).reduce((t, c) => t + (c.min || 0), 0);
   }
@@ -1321,6 +1350,7 @@
   }
   const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
 
+  let fillMin = null, fillTipo = null; // datos del reloj para precargar el formulario
   function renderCardio(root) {
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
@@ -1359,12 +1389,36 @@
     zcard.append(zform);
     root.append(zcard);
 
+    // Sesion en vivo: el mismo reloj para el dia de intervalos y el de tiempo continuo
+    const live = h('section', { class: 'card' });
+    const seg = (mode, label) => h('button', { class: 'btn' + (cardioLive.mode === mode ? ' primary' : ''), type: 'button',
+      onclick: () => { cardioLive.mode = mode; ivLast = null; render(); } }, label);
+    const numIn = (key, lbl) => h('label', {}, lbl, h('input', { inputmode: 'numeric', value: cardioLive[key], onchange: (ev) => {
+      const v = Math.round(parseNum(ev.target.value)); cardioLive[key] = v >= 5 && v <= 600 ? v : cardioLive[key]; ev.target.value = cardioLive[key]; ivLast = null; cardioClockUpdate(); } }));
+    live.append(h('strong', {}, 'Sesión en vivo'),
+      h('div', { class: 'sw-actions', style: 'margin-top:8px' }, seg('intervalos', 'Intervalos'), seg('continuo', 'Tiempo continuo')),
+      h('div', { class: 'sw-big', id: 'cardio-clock' }, swText()),
+      h('div', { class: 'cardio-phase', id: 'cardio-phase' }),
+      cardioLive.mode === 'intervalos' ? h('div', { class: 'body-form' }, numIn('work', 'Trabajo (s)'), numIn('rest', 'Suave (s)')) : null,
+      h('div', { class: 'sw-actions', style: 'margin-top:10px' },
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => { swFlip(); render(); } }, swStart ? 'Pausar' : (swAcc ? 'Continuar' : 'Iniciar')),
+        h('button', { class: 'btn big', type: 'button', disabled: !swStart && !swAcc, onclick: () => {
+          if (swStart) { swAcc += Date.now() - swStart; swStart = null; }
+          const mins = Math.max(1, Math.round(swAcc / 60000));
+          swAcc = 0; ivLast = null; swUpdate();
+          fillMin = mins; fillTipo = cardioLive.mode === 'intervalos' ? 'Intervalos' : null; render();
+          toast(mins + ' min listos: revisa y guarda la sesión.');
+        } }, 'Terminar')));
+    root.append(live);
+
     // Nueva sesion
     const form = h('form', { class: 'body-form', autocomplete: 'off' });
     const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0] }, t[0])));
+    if (fillTipo) typeSel.value = fillTipo;
+    const prefilled = fillMin != null, minFill = fillMin; fillMin = null; fillTipo = null;
     form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
-      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric' })),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: minFill != null ? minFill : '' })),
       h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
@@ -1375,6 +1429,7 @@
       saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
     });
     root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));
+    if (prefilled) setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
 
     // Historial
     const lb = lastBody();
