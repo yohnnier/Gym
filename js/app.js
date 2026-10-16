@@ -1822,6 +1822,38 @@
     } finally { await w.terminate(); }
   }
 
+  // Meta de grasa: etapas de % de grasa manteniendo tu masa sin grasa del ultimo control
+  const FAT_STAGES = [[20, 'Meta 1'], [17, 'Meta 2'], [15, 'Meta final']];
+  const FAT_PACE = 0.45; // kg de grasa por semana, ritmo sano que protege el musculo
+  const fatKg = (c) => c && c.peso && (c.masaGrasa != null ? c.masaGrasa : c.grasa != null ? c.peso * c.grasa / 100 : null);
+  function fatGoalCard(ctrls) {
+    const withFat = ctrls.filter((c) => c.peso && fatKg(c) != null);
+    if (!withFat.length) return null;
+    const last = withFat[withFat.length - 1], first = withFat[0];
+    const fat = fatKg(last), lean = last.peso - fat, pct = 100 * fat / last.peso;
+    const r1 = (x) => Math.round(x * 10) / 10;
+    const card = h('section', { class: 'card' },
+      h('div', { class: 'row between' }, h('strong', {}, 'Meta de grasa'), h('span', { class: 'muted small' }, fmt(r1(pct)) + ' % hoy')),
+      h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'Calculado con tu masa sin grasa (' + fmt(r1(lean)) + ' kg) del control del ' + fmtDate(last.date) + ', suponiendo que mantienes tu músculo. Ritmo sano: unos ' + fmt(FAT_PACE) + ' kg de grasa por semana.'));
+    FAT_STAGES.forEach((st) => {
+      const f = st[0] / 100, targetFat = lean * f / (1 - f), targetW = lean + targetFat, toLose = fat - targetFat;
+      const done = pct <= st[0];
+      card.append(h('div', { class: 'zone-row' + (done ? ' base' : ''), style: 'align-items:center;gap:10px' },
+        h('span', {}, (done ? '✓ ' : '') + st[1] + ' · ' + st[0] + ' %',
+          h('div', { class: 'muted small', style: 'font-weight:400' }, done ? '¡Lograda!' : 'peso ≈ ' + fmt(r1(targetW)) + ' kg · unas ' + Math.ceil(toLose / FAT_PACE) + ' semanas')),
+        h('b', { style: 'white-space:nowrap' }, done ? '' : '−' + fmt(r1(toLose)) + ' kg grasa')));
+    });
+    const fin = FAT_STAGES[FAT_STAGES.length - 1][0] / 100, finFat = lean * fin / (1 - fin);
+    const f0 = fatKg(first);
+    if (withFat.length > 1 && f0 > finFat) {
+      const prog = Math.max(0, Math.min(100, Math.round(100 * (f0 - fat) / (f0 - finFat))));
+      card.append(h('div', { class: 'goal-bar', style: 'margin-top:10px' }, h('i', { style: 'width:' + prog + '%' })),
+        h('div', { class: 'goal-msg' }, 'Desde ' + fmtDate(first.date) + ' has bajado ' + fmt(r1(Math.max(0, f0 - fat))) + ' kg de grasa (' + prog + ' % del camino a la meta final).'));
+    }
+    card.append(h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'La báscula estima la grasa y varía unos 2–3 puntos con la hidratación: mídete siempre en las mismas condiciones y mira la tendencia de varias semanas.'));
+    return card;
+  }
+
   function renderCuerpo(root) {
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
@@ -1847,6 +1879,8 @@
       });
       root.append(h('div', { class: 'section-title' }, 'Último control · ' + fmtDate(last.date)), stats);
     }
+    const fg = fatGoalCard(ctrls);
+    if (fg) root.append(h('div', { class: 'section-title' }, 'Meta de grasa'), fg);
     root.append(h('div', { class: 'section-title' }, 'Calorías'), caloriesCard());
     ['peso', 'grasa', 'musculo', 'tmb', 'pulsoReposo'].forEach((key) => {
       const pts = ctrls.filter((c) => c[key] != null);
