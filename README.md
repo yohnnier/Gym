@@ -23,6 +23,8 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 - **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
 - **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.
 
+- **Mi cuerpo → Subir informe de la báscula**: lee una foto o captura del informe Fitdays en el propio celular (OCR; la primera vez descarga el lector y necesita internet) y rellena el control para que lo revises antes de guardar. Las imágenes no se suben a ningún lado.
+
 ## Guardado en la nube (GitHub)
 
 En **Rutinas → Guardado en la nube** se conecta la app al repositorio con una llave de acceso de GitHub (token *fine-grained* con permiso **Contents: Read and write** solo para este repositorio). Desde entonces cada serie registrada se guarda sola en `data/sessions.json`, se ve en todos los dispositivos conectados y no se pierde al borrar el navegador. La llave se guarda solo en el dispositivo.

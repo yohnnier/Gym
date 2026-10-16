@@ -1746,6 +1746,57 @@
       h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Son estimaciones. Pésate cada semana y ajusta unas 100–150 kcal si en 2–3 semanas no ves el cambio que buscas.'));
   }
 
+
+  // ---------- leer el informe de la bascula (foto o captura del informe Fitdays) ----------
+  // Lee el texto de la imagen en el propio celular (OCR, se descarga la primera vez) y rellena el formulario para que lo revises.
+  function parseFitdays(text) {
+    const num = (x) => parseFloat(String(x).replace(',', '.'));
+    const out = {};
+    const put = (k, v, lo, hi) => { if (v != null && !isNaN(v) && v >= lo && v <= hi && out[k] == null) out[k] = v; };
+    let m = text.match(/prueba:?\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/i);
+    if (m) out.fecha = m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+    m = text.match(/Edad:\s*(\d{2})/i); if (m) out.edad = +m[1];
+    m = text.match(/Alto:\s*(\d{3})/i); if (m && +m[1] >= 120 && +m[1] <= 230) out.altura = +m[1];
+    if (/G[eé]nero:\s*Hombre/i.test(text)) out.sexo = 'h'; else if (/G[eé]nero:\s*Mujer/i.test(text)) out.sexo = 'm';
+    // Tabla principal: peso, grasa, masa osea, proteina, agua, masa muscular, musculo esqueletico (en ese orden)
+    const rows = [];
+    text.split('\n').forEach((ln) => { const r = ln.match(/(\d{1,3}[.,]\d)\s*\(([^)]*)\)\s*(\d{1,3}[.,]\d)/); if (r) rows.push([num(r[1]), num(r[3])]); });
+    if (rows.length >= 7) {
+      put('peso', rows[0][0], 20, 300); put('masaGrasa', rows[1][0], 1, 150); put('grasa', rows[1][1], 2, 70);
+      put('osea', rows[2][0], 0.5, 10); put('proteina', rows[3][0], 2, 40); put('agua', rows[4][0], 10, 120);
+      put('musculo', rows[5][0], 10, 150); put('esqueletico', rows[6][0], 5, 100);
+    } else {
+      m = text.match(/^\s*Peso\s+(\d{2,3}[.,]\d)\s*\(/mi); if (m) put('peso', num(m[1]), 20, 300);
+      m = text.match(/Masa muscular\s+(\d{2,3}[.,]\d)/i); if (m) put('musculo', num(m[1]), 10, 150);
+      m = text.match(/esquel[eé]tico\s+(\d{2,3}[.,]\d)\s*\(/i); if (m) put('esqueletico', num(m[1]), 5, 100);
+      m = text.match(/prote[ií]na\s+(\d{1,2}[.,]\d)/i); if (m) put('proteina', num(m[1]), 2, 40);
+      m = text.match(/agua\s+(\d{2,3}[.,]\d)/i); if (m) put('agua', num(m[1]), 10, 120);
+    }
+    m = text.match(/IMC\s*\(kg[^)]*\)[^\d\n]*(\d{2}[.,]\d)/i); if (m) put('imc', num(m[1]), 10, 60);
+    m = text.match(/grasa visceral\s+(\d{1,2})\b/i); if (m) put('visceral', +m[1], 1, 30);
+    m = text.match(/metab[oó]lica basal\s+(\d{3,4})/i); if (m) put('tmb', +m[1], 800, 4000);
+    m = text.match(/Edad corporal\s+(\d{2})\b/i); if (m) put('edadCorporal', +m[1], 15, 90);
+    m = text.match(/(\d{1,3})\s*\/\s*100/); if (m) put('puntuacion', +m[1], 1, 150);
+    m = text.match(/WHR\s+(\d[.,]\d{2})/i); if (m) put('whr', num(m[1]), 0.5, 1.5);
+    return out;
+  }
+  let ocrLoading = null;
+  function loadOcr() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (!ocrLoading) ocrLoading = new Promise((ok, fail) => {
+      const sc = document.createElement('script');
+      sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+      sc.onload = () => ok(window.Tesseract); sc.onerror = () => { ocrLoading = null; fail(new Error('sin conexión')); };
+      document.head.appendChild(sc);
+    });
+    return ocrLoading;
+  }
+  async function readReport(file) {
+    const T = await loadOcr();
+    const w = await T.createWorker('spa');
+    try { return (await w.recognize(file)).data.text; } finally { await w.terminate(); }
+  }
+
   function renderCuerpo(root) {
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
@@ -1817,7 +1868,29 @@
       body.controls = body.controls.filter((x) => x.date !== date); body.controls.push(c);
       saveBody(); toast('Control guardado en este dispositivo.'); render();
     });
-    root.append(h('div', { class: 'section-title' }, 'Nuevo control'), h('section', { class: 'card' }, form));
+    // Subir el informe de la bascula: lee la imagen y rellena el formulario para revisarlo
+    const upStatus = h('p', { class: 'muted small', style: 'margin:8px 0 0' });
+    const upInput = h('input', { type: 'file', accept: 'image/*', hidden: true, onchange: async (ev) => {
+      const file = ev.target.files && ev.target.files[0]; ev.target.value = '';
+      if (!file) return;
+      upStatus.textContent = '⏳ Leyendo el informe… la primera vez descarga el lector (necesita internet) y puede tardar un minuto.';
+      try {
+        const d = parseFitdays(await readReport(file));
+        const keys = BODY_FIELDS.map((f) => f[0]).filter((k) => d[k] != null);
+        if (!keys.length) { upStatus.textContent = 'No pude leer valores en esa imagen. Prueba con una captura más nítida o escríbelos a mano.'; return; }
+        keys.forEach((k) => { form.elements[k].value = d[k]; });
+        if (d.fecha) form.elements.fecha.value = d.fecha;
+        if (d.sexo && !body.profile.sexo) body.profile.sexo = d.sexo;
+        if (d.edad && !body.profile.edad) body.profile.edad = d.edad;
+        if (d.altura && !body.profile.altura) body.profile.altura = d.altura;
+        saveBody();
+        upStatus.textContent = '✓ Leí ' + keys.length + ' valores' + (d.fecha ? ' del ' + fmtDate(d.fecha) : '') + '. Revísalos con el informe (la lectura puede equivocarse) y toca "Guardar control".';
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) { upStatus.textContent = 'No se pudo leer el informe: ' + (e && e.message ? e.message : 'error') + '. Revisa tu conexión e intenta de nuevo.'; }
+    } });
+    root.append(h('div', { class: 'section-title' }, 'Nuevo control'), h('section', { class: 'card' },
+      h('button', { class: 'btn full', type: 'button', style: 'margin-bottom:12px', onclick: () => upInput.click() }, '📷 Subir informe de la báscula (foto o captura)'),
+      upInput, upStatus, form));
 
     // Importar desde texto
     const ta = h('textarea', { class: 'body-paste', rows: '3', placeholder: '{"fecha":"2026-08-05","peso":…}', 'aria-label': 'Texto de controles para importar' });
