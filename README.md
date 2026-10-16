@@ -4,8 +4,12 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
 
 ## Funciones
 
-- **Plan de 3 días** (empuje / tirón + abdomen / piernas), con tres tarjetas en el inicio, editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día según el último que hiciste.
-- **Inicio**: saludo, resumen, el plan de 3 días, **meta de la semana**: cuántas series lleva cada músculo de las 10 recomendadas y cuántas le faltan . Los grupos musculares sueltos están en la pestaña Rutinas.
+- **Plan de 6 días**: pesas y cardio **intercalados, día de por medio** (empuje / cardio intervalos / tirón / cardio + abdomen / piernas / cardio suave), con seis tarjetas en el inicio, editable en `js/routine.js` (`PLAN`). El inicio marca el **siguiente** día: el que sigue al último que hiciste, contando también el cardio.
+- **Inicio**: saludo, resumen, el plan de 6 días, **meta de la semana**: cuántas series lleva cada músculo de las 10 recomendadas y cuántas le faltan . Los grupos musculares sueltos están en la pestaña Rutinas.
+- **Día 4 · Cardio** (y **Día 6 · Cardio suave**, 30 min en zona 2 después de piernas): plan de la sesión (calentamiento, 25 min en zona 2, intervalos opcionales y vuelta a la calma) con tu pulso objetivo, botón para registrar los minutos y los ejercicios de abdomen con plataforma rodante.
+- **Día 2 · Cardio intervalos**: 8 rondas de 1 min fuerte y 2 min suave, con pulso objetivo, progresión por semanas y registro de minutos, pulso y rondas en la misma página.
+- **Banda de pulso Bluetooth**: en los días de cardio, la página Cardio y los intervalos guiados se puede conectar cualquier banda con el perfil estándar de frecuencia cardíaca (Polar, Garmin, Wahoo, Coospo…). Muestra el pulso en vivo y la zona, anota solo el pulso al terminar cada intervalo y al recuperarse, avisa cuando ya se recuperó y calcula el promedio y el máximo. Funciona en Chrome (Android o computador); en iPhone, con el navegador Bluefy.
+- **Mi cuerpo · calorías basales**: anota tus controles (peso, grasa, TMB de tu báscula…); si no tienes la TMB, la app la estima con tu sexo, edad, altura y peso (Mifflin-St Jeor) y calcula tu gasto en días de descanso y de entreno, y calorías según tu objetivo (perder grasa, mantener o ganar músculo). La TMB tiene su gráfico de evolución.
 - **Página por grupo** (piernas, pecho, espalda, hombros, bíceps, tríceps y abdomen): cada ejercicio muestra su imagen, tu **último registro** y, al lado, las filas para registrar **hoy**. La fecha se guarda sola.
 - **Sugerencia por ejercicio** (doble progresión orientada a hipertrofia):
   - Si completaste el tope de repeticiones en todas las series (o te sobraban, dificultad ≤ 7): **sube el peso** y vuelve al mínimo del rango. Si el salto supera el 15 % del peso (p. ej. mancuernas ligeras), primero pide 3 repeticiones más.
@@ -15,7 +19,6 @@ Web app instalable (PWA) para registrar tus rutinas del gimnasio por grupo muscu
   - En otro caso: **mantén el peso y suma +1 repetición** por serie.
   - Las filas vienen prellenadas con el peso y las repeticiones sugeridas; durante la sesión se ajustan según la serie anterior.
 - **Imágenes de las máquinas**: toca la imagen para verla grande (inicio y final del movimiento) o **cambiarla por una foto de tu gimnasio** (queda guardada en el dispositivo).
-- **Cardio** (Progreso → Cardio): reloj de sesión con dos modos, *intervalos* (trabajo/suave con aviso sonoro y vibración en cada cambio) y *tiempo continuo*; al terminar precarga el formulario.
 - **Cronómetro** en la cabecera (libre, para planchas o tiempo total) con **descansos rápidos** de 45 s a 3 min. El descanso también arranca solo al registrar cada serie, con aviso sonoro y vibración.
 - **Progreso** por ejercicio e **Historial** de sesiones, con exportación a Markdown y copia de seguridad en JSON.
 - **Funciona sin conexión** una vez abierta (service worker) y se adapta a modo claro u oscuro.

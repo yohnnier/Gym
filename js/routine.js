@@ -268,6 +268,24 @@ const TRICEPS = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Gran estiramiento de la cabeza larga.'
     },
     {
+      id: 'patada-triceps', name: 'Patada de tríceps con mancuerna', muscle: 'triceps',
+      sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg', step: 1, perLeg: true,
+      notes: 'Apoya una mano y una rodilla en el banco, espalda recta. Codo pegado al cuerpo y a la altura del torso; estira el brazo hacia atrás y aprieta 1 s arriba. Solo se mueve el antebrazo. Anota cada brazo si difieren.'
+    },
+    {
+      id: 'extension-polea-invertida', name: 'Extensión en polea agarre invertido', muscle: 'triceps',
+      sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg', step: 2.5, perLeg: true,
+      notes: 'Polea alta con manilla, palma hacia arriba. Codo pegado al costado: baja hasta estirar el brazo y sube controlado hasta la altura del pecho. Solo se mueve el antebrazo. Anota cada brazo si difieren.'
+    },
+    {
+      id: 'extension-polea-sobre-cabeza', name: 'Extensión en polea sobre la cabeza (cuerda)', muscle: 'triceps',
+      sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
+      unit: 'kg', step: 2.5,
+      notes: 'De espaldas a la polea alta, con cuerda, un pie adelante y el torso inclinado. Codos junto a la cabeza y quietos: estira los brazos hacia adelante y abre la cuerda al final. Vuelve lento hasta sentir el estiramiento detrás del brazo. Si molesta el hombro, acorta la bajada.'
+    },
+    {
       id: 'fondos-banco', name: 'Fondos en paralelas o banco', muscle: 'triceps', secondary: ['pecho', 'hombros'],
       sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg adicional', step: 2.5, provisional: true,
@@ -298,10 +316,16 @@ const CORE = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin balanceo; inclina la pelvis hacia arriba.'
     },
     {
-      id: 'crunch-polea', name: 'Crunch en polea alta', muscle: 'abdomen',
+      id: 'rodillas-silla-romana', name: 'Elevación de rodillas en silla romana', muscle: 'abdomen',
+      sets: 3, repMin: 10, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Antebrazos en las almohadillas, espalda pegada al respaldo. Sube las rodillas al pecho redondeando la pelvis hacia arriba, sin balancearte; baja lento. Cuando sea fácil, sube las piernas estiradas.'
+    },
+    {
+      id: 'crunch-polea', name: 'Crunch en polea de rodillas (cuerda)', muscle: 'abdomen',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
       unit: 'lb', step: 5, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Caderas fijas, flexiona el tronco.'
+      notes: 'De rodillas frente a la polea alta, cuerda junto a la cabeza. Cadera quieta: redondea la columna llevando el pecho hacia las rodillas y exhala. No jales con los brazos ni te sientes sobre los talones, ni muevas la cadera arriba y abajo (el error más común). Si lo sientes en los brazos o la espalda, baja el peso.'
     },
     {
       id: 'rotacion-polea', name: 'Rotación en polea (leñador)', muscle: 'abdomen', secondary: ['hombros'],
@@ -314,25 +338,56 @@ const CORE = {
       sets: 3, repMin: 30, repMax: 60, rest: 60, restText: '60 s',
       unit: 'kg adicional', step: 0, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Las "repeticiones" son segundos de mantención.'
+    },
+    {
+      id: 'rollout-rodante', name: 'Rollout de rodillas (plataforma rodante)', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 8, repMax: 12, rest: 90, restText: '90 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Arrodíllate con las manos o antebrazos en la plataforma y rueda hacia adelante lo que controles; frena y vuelve con el abdomen. La espalda baja NUNCA se arquea: mete el ombligo y aprieta los glúteos. Empieza con poco recorrido.'
+    },
+    {
+      id: 'crunch-colchoneta', name: 'Abdominales básicos en colchoneta (crunch)', muscle: 'abdomen',
+      sets: 3, repMin: 15, repMax: 20, rest: 45, restText: '45 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Boca arriba, rodillas dobladas y pies en el suelo, manos junto a las sienes sin tirar del cuello. Sube solo los hombros redondeando la columna, exhala al contraer y baja lento sin apoyar la cabeza. Sin impulso. Cuando te sobren repeticiones, sostén 1 s arriba.'
+    },
+    {
+      id: 'pike-rodante', name: 'Encogimiento / pike en plataforma', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 10, repMax: 15, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Desde plancha con pies en la plataforma, acerca las rodillas al pecho (encogimiento) o sube la cadera con piernas rectas (pike). Vuelve despacio con control.'
+    },
+    {
+      id: 'tuck-oblicuo-rodante', name: 'Encogimiento oblicuo en plataforma', muscle: 'abdomen', secondary: ['hombros'],
+      sets: 3, repMin: 8, repMax: 12, perLeg: true, rest: 60, restText: '60 s',
+      unit: 'kg adicional', step: 0, provisional: true,
+      notes: 'Plancha con pies en la plataforma; lleva las dos rodillas juntas hacia un codo, vuelve y alterna al otro lado. Cuenta las repeticiones por lado. Cadera estable, sin girar los hombros.'
     }
   ]
 };
 
-/* Plan de 3 dias por semana (empuje / tiron / piernas). Cada dia junta ejercicios de varios grupos.
- * sets: series para ese dia (si se omite, usa las del ejercicio). */
+/* Plan de 6 dias: pesas y cardio intercalados (dia de por medio).
+ * Cada dia junta ejercicios de varios grupos. sets: series para ese dia (si se omite, usa las del ejercicio).
+ * cardio: 'constante' | 'intervalos' | 'suave' muestra el plan de cardio; los dias sin ejercicios son solo de cardio
+ * (covers: imagenes img/ex/<id>-0.jpg para la portada). */
 const PLAN = {
-  name: 'Plan de 3 días',
+  name: 'Plan de 6 días',
   days: [
     {
       id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea', sets: 4 }, { id: 'extension-sobre-cabeza', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
+        { id: 'extension-polea', sets: 4 }, { id: 'extension-polea-sobre-cabeza', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
       ]
     },
     {
-      id: 'dia-tiron', name: 'Día 2 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
+      id: 'dia-cardio-2', name: 'Día 2 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave', cardio: 'intervalos',
+      covers: ['cardio-bici', 'cardio-eliptica', 'cardio-caminadora'],
+      exercises: []
+    },
+    {
+      id: 'dia-tiron', name: 'Día 3 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
       exercises: [
         { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal' }, { id: 'remo-maquina' },
         { id: 'face-pull' }, { id: 'pajaros-polea' },
@@ -341,11 +396,22 @@ const PLAN = {
       ]
     },
     {
-      id: 'dia-piernas', name: 'Día 3 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
+      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
+      exercises: [
+        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'crunch-colchoneta' }, { id: 'tuck-oblicuo-rodante' }
+      ]
+    },
+    {
+      id: 'dia-piernas', name: 'Día 5 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
         { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
         { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
       ]
+    },
+    {
+      id: 'dia-cardio-3', name: 'Día 6 · Cardio suave', focus: 'Zona 2 · Recuperación después de piernas', cardio: 'suave',
+      covers: ['cardio-eliptica', 'cardio-bici', 'cardio-caminadora'],
+      exercises: []
     }
   ]
 };

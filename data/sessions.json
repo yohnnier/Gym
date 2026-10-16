@@ -578,5 +578,1058 @@
    }
   ],
   "updatedAt": 1791389110038
+ },
+ {
+  "id": "mv0y6f1tcpvc9",
+  "date": "2026-10-09",
+  "createdAt": 1791549268914,
+  "routineId": "core",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "plancha-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 30,
+    "rpe": null
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 1,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 2,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha",
+    "set": 3,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 2,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 3,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1791549318213
+ },
+ {
+  "id": "mv10ap0hugnbz",
+  "date": "2026-10-09",
+  "createdAt": 1791552827681,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "prensa",
+    "set": 1,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 2,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 3,
+    "weight": 75,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 4,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 1,
+    "weight": 45,
+    "reps": 6,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 2,
+    "weight": 40,
+    "reps": 9,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 3,
+    "weight": 40,
+    "reps": 9,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 1,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 2,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 3,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 1,
+    "weight": 65,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 2,
+    "weight": 65,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 3,
+    "weight": 65,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 4,
+    "weight": 65,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 1,
+    "weight": 15,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 2,
+    "weight": 15,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 3,
+    "weight": 15,
+    "reps": 15,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 1,
+    "weight": 20,
+    "reps": 12,
+    "rpe": 7
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 2,
+    "weight": 25,
+    "reps": 12,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 4,
+    "weight": 55,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 3,
+    "weight": 30,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 4,
+    "weight": 25,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 1,
+    "weight": 30,
+    "reps": 16,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 2,
+    "weight": 30,
+    "reps": 16,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 3,
+    "weight": 30,
+    "reps": 15,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 4,
+    "weight": 30,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 1,
+    "weight": 5,
+    "reps": 15,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 2,
+    "weight": 5,
+    "reps": 16,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 3,
+    "weight": 5,
+    "reps": 16,
+    "rpe": 8
+   }
+  ],
+  "updatedAt": 1791561738241
+ },
+ {
+  "id": "mv2ylnzshve8n",
+  "date": "2026-10-10",
+  "createdAt": 1791670912696,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 1,
+    "weight": null,
+    "reps": 20,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 2,
+    "weight": null,
+    "reps": 20,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 3,
+    "weight": null,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha-rodante",
+    "set": 2,
+    "weight": null,
+    "reps": 30,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "plancha-rodante",
+    "set": 3,
+    "weight": null,
+    "reps": 30,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1791670990798
+ },
+ {
+  "id": "mv419s3ul0gxi",
+  "date": "2026-10-11",
+  "createdAt": 1791735863178,
+  "routineId": "dia-empuje",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "press-inclinado",
+    "set": 1,
+    "weight": 15,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 2,
+    "weight": 15,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 3,
+    "weight": 15,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 1,
+    "weight": 40,
+    "reps": 10,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 2,
+    "weight": 40,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 3,
+    "weight": 60,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 4,
+    "weight": 60,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 1,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 2,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 3,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 1,
+    "weight": 20,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 2,
+    "weight": 20,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 3,
+    "weight": 20,
+    "reps": 8,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "elevaciones-laterales",
+    "set": 1,
+    "weight": 5,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "elevaciones-laterales",
+    "set": 2,
+    "weight": 7.5,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "elevaciones-laterales",
+    "set": 3,
+    "weight": 7.5,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "elevaciones-laterales",
+    "set": 4,
+    "weight": 7.5,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 1,
+    "weight": 80,
+    "reps": 11,
+    "rpe": 7
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 2,
+    "weight": 90,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 3,
+    "weight": 100,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 4,
+    "weight": 100,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea-sobre-cabeza",
+    "set": 1,
+    "weight": 90,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea-sobre-cabeza",
+    "set": 2,
+    "weight": 90,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea-sobre-cabeza",
+    "set": 3,
+    "weight": 90,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-polea-sobre-cabeza",
+    "set": 4,
+    "weight": 90,
+    "reps": 8,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "fondos-maquina",
+    "set": 1,
+    "weight": 45,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "fondos-maquina",
+    "set": 2,
+    "weight": 45,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "fondos-maquina",
+    "set": 3,
+    "weight": 45,
+    "reps": 12,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1791740590899
+ },
+ {
+  "id": "mv5fbsbklfr3x",
+  "date": "2026-10-12",
+  "createdAt": 1791819937568,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "crunch-polea",
+    "set": 1,
+    "weight": 106,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 2,
+    "weight": 106,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 3,
+    "weight": 106,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 2,
+    "weight": null,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 3,
+    "weight": null,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 1,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 2,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 3,
+    "weight": null,
+    "reps": 25,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 4,
+    "weight": null,
+    "reps": 25,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1791820192197
+ },
+ {
+  "id": "mv73jtnvkmtl2",
+  "date": "2026-10-13",
+  "createdAt": 1791921089515,
+  "routineId": "dia-tiron",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 1,
+    "weight": 40,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 2,
+    "weight": 40,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 3,
+    "weight": 40,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 4,
+    "weight": 40,
+    "reps": 9,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 1,
+    "weight": 40,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 2,
+    "weight": 40,
+    "reps": 10,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "remo-maquina",
+    "set": 1,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "remo-maquina",
+    "set": 2,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "remo-maquina",
+    "set": 3,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "face-pull",
+    "set": 1,
+    "weight": 30,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "face-pull",
+    "set": 2,
+    "weight": 30,
+    "reps": 14,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "face-pull",
+    "set": 3,
+    "weight": 30,
+    "reps": 19,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "pajaros-polea",
+    "set": 1,
+    "weight": 60,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pajaros-polea",
+    "set": 2,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "pajaros-polea",
+    "set": 3,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 1,
+    "weight": 60,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 2,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 3,
+    "weight": 60,
+    "reps": 16,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 4,
+    "weight": 60,
+    "reps": 16,
+    "rpe": null
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 1,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 2,
+    "weight": 80,
+    "reps": 11,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 3,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 4,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 1,
+    "weight": 106,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 2,
+    "weight": 106,
+    "reps": 14,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 3,
+    "weight": 106,
+    "reps": 14,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1791925655173
+ },
+ {
+  "id": "mv8k9i20bywx1",
+  "date": "2026-10-14",
+  "createdAt": 1792009627560,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 1,
+    "weight": null,
+    "reps": 20,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 2,
+    "weight": 7.5,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 3,
+    "weight": 7.5,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 1,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-colchoneta",
+    "set": 2,
+    "weight": null,
+    "reps": 15,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1792010156449
+ },
+ {
+  "id": "mv9mn3dgvcgcz",
+  "date": "2026-10-15",
+  "createdAt": 1792074087124,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 1,
+    "weight": 25,
+    "reps": 8,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 2,
+    "weight": 50,
+    "reps": 6,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 3,
+    "weight": 40,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 1,
+    "weight": 75,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 2,
+    "weight": 75,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 3,
+    "weight": 75,
+    "reps": 10,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 1,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 2,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 3,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 4,
+    "weight": 55,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 1,
+    "weight": 65,
+    "reps": 14,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 2,
+    "weight": 65,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 3,
+    "weight": 65,
+    "reps": 13,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 4,
+    "weight": 65,
+    "reps": 11,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 1,
+    "weight": 15,
+    "reps": 16,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 2,
+    "weight": 15,
+    "reps": 16,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 3,
+    "weight": 15,
+    "reps": 21,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 1,
+    "weight": 10,
+    "reps": 15,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 2,
+    "weight": 10,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "patada-gluteo",
+    "set": 3,
+    "weight": 10,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 1,
+    "weight": 20,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 2,
+    "weight": 30,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 1,
+    "weight": 30,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 2,
+    "weight": 30,
+    "reps": 17,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 3,
+    "weight": 30,
+    "reps": 16,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas",
+    "set": 4,
+    "weight": 30,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 3,
+    "weight": 30,
+    "reps": 12,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 4,
+    "weight": 30,
+    "reps": 10,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1792083107461
  }
 ]

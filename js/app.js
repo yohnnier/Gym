@@ -16,7 +16,7 @@
   ROUTINES.forEach((r) => { routineById[r.id] = r; });
   // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
   const DAYS = PLAN.days.map((d) => ({
-    id: d.id, name: d.name, focus: d.focus, isDay: true,
+    id: d.id, name: d.name, focus: d.focus, isDay: true, cardio: d.cardio || null, covers: d.covers || null,
     exercises: d.exercises.map((x) => Object.assign({}, exById[x.id], x.sets ? { sets: x.sets, setsText: null } : {}))
   }));
   DAYS.forEach((d) => { routineById[d.id] = d; });
@@ -486,6 +486,18 @@
 
   // ---------- imagenes ----------
   function imgSrc(ex, i) { return (i === 0 && customImg[ex.id]) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
+  // Respaldo: si un ejercicio aun no tiene foto, evita la imagen rota con un marcador neutro.
+  const IMG_PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">' +
+    '<rect width="200" height="200" fill="#e9eef5"/>' +
+    '<path d="M100 66a22 22 0 1 0 0 44 22 22 0 0 0 0-44zm-52 86c0-23 23-36 52-36s52 13 52 36v6H48z" fill="#b9c4d4"/>' +
+    '</svg>');
+  document.addEventListener('error', (e) => {
+    const t = e.target;
+    if (t && t.tagName === 'IMG' && t.src.indexOf('img/ex/') !== -1 && t.src !== IMG_PLACEHOLDER) {
+      t.src = IMG_PLACEHOLDER;
+    }
+  }, true);
 
   function resizeImage(file, max) {
     return new Promise((resolve, reject) => {
@@ -598,6 +610,434 @@
     });
   }
 
+  // ---------- banda de pulso (Bluetooth) ----------
+  // Lee cualquier sensor con el servicio estandar de frecuencia cardiaca de Bluetooth (Polar, Garmin, Wahoo,
+  // Coospo...) con Web Bluetooth: Chrome en Android o computador; en iPhone, el navegador Bluefy.
+  const hrm = { dev: null, bpm: null, at: 0, status: 'off', name: '', sum: 0, n: 0, max: 0, wanted: false, retry: 0 };
+  const hrmSupported = () => !!(navigator.bluetooth && navigator.bluetooth.requestDevice);
+  const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const hrmFresh = () => hrm.status === 'on' && !!hrm.bpm && Date.now() - hrm.at < 5000;
+  // Formato estandar: bit 0 de las banderas indica si el valor viene en 8 o 16 bits
+  function hrmParse(dv) { return dv.getUint8(0) & 1 ? dv.getUint16(1, true) : dv.getUint8(1); }
+  function hrmOnValue(e) {
+    const bpm = hrmParse(e.target.value);
+    if (!bpm) return; // 0 = la banda no tiene contacto con la piel
+    hrm.bpm = bpm; hrm.at = Date.now(); hrm.sum += bpm; hrm.n++; if (bpm > hrm.max) hrm.max = bpm;
+    hiitOnHr(bpm);
+    hrmPaint();
+  }
+  async function hrmConnect() {
+    if (!hrmSupported()) {
+      toast(isIOS() ? 'En iPhone abre la app en el navegador Bluefy para conectar la banda.' : 'Este navegador no permite Bluetooth. Abre la app en Chrome.');
+      return;
+    }
+    try {
+      const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
+      if (hrm.dev && hrm.dev !== dev) { hrm.wanted = false; try { hrm.dev.gatt.disconnect(); } catch (e) { /* ya desconectada */ } }
+      hrm.dev = dev; hrm.name = dev.name || 'Banda de pulso'; hrm.wanted = true; hrm.status = 'connecting'; hrmPaint();
+      dev.addEventListener('gattserverdisconnected', hrmLost);
+      await hrmAttach();
+      hrm.sum = 0; hrm.n = 0; hrm.max = 0;
+      toast('Banda conectada: ' + hrm.name);
+      hrmRefresh();
+    } catch (e) {
+      if (!(e && e.name === 'NotFoundError')) toast('No se pudo conectar la banda. Revisa que esté puesta y con Bluetooth activo.');
+      if (hrm.status === 'connecting') hrm.status = 'off';
+      hrmPaint();
+    }
+  }
+  async function hrmAttach() {
+    const server = await hrm.dev.gatt.connect();
+    const service = await server.getPrimaryService('heart_rate');
+    const ch = await service.getCharacteristic('heart_rate_measurement');
+    ch.addEventListener('characteristicvaluechanged', hrmOnValue);
+    await ch.startNotifications();
+    hrm.status = 'on'; hrm.retry = 0; hrmPaint();
+  }
+  // Si se corta (banda lejos, sin contacto), reintenta sola con espera creciente
+  function hrmLost() {
+    if (!hrm.wanted) { hrm.status = 'off'; hrmPaint(); return; }
+    hrm.status = 'reconnecting'; hrmPaint();
+    setTimeout(() => {
+      if (hrm.wanted && hrm.dev) hrmAttach().then(() => toast('Banda reconectada.')).catch(hrmLost);
+    }, Math.min(10000, 1000 * ++hrm.retry));
+  }
+  function hrmDisconnect() {
+    hrm.wanted = false; hrm.status = 'off'; hrm.bpm = null;
+    try { if (hrm.dev) hrm.dev.gatt.disconnect(); } catch (e) { /* ya desconectada */ }
+    hrmRefresh();
+  }
+  function hrmResetStats() { hrm.sum = 0; hrm.n = 0; hrm.max = 0; hrmPaint(); }
+  // Redibuja lo que depende de si hay banda conectada
+  function hrmRefresh() { if (hiit) hiitRender(); else render(); }
+  // Actualiza en el lugar los numeros en pantalla (sin redibujar todo)
+  function hrmPaint() {
+    const fresh = hrmFresh();
+    const z = fresh ? zoneOf(hrZones(), hrm.bpm) : null;
+    document.querySelectorAll('.hrm-bpm').forEach((el) => { el.textContent = fresh ? hrm.bpm : '--'; });
+    document.querySelectorAll('.hrm-zone').forEach((el) => {
+      el.textContent = z == null ? '' : z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z;
+    });
+    document.querySelectorAll('.hrm-live').forEach((el) => { el.dataset.z = z == null ? '' : z; });
+    document.querySelectorAll('.hrm-status').forEach((el) => {
+      el.textContent = hrm.status === 'reconnecting' ? 'Reconectando…' : hrm.status === 'connecting' ? 'Conectando…'
+        : fresh ? hrm.name : 'Sin señal: revisa que la banda esté húmeda y bien puesta';
+    });
+    document.querySelectorAll('.hrm-avg').forEach((el) => {
+      el.textContent = hrm.n ? 'Promedio ' + Math.round(hrm.sum / hrm.n) + ' lpm · máx ' + hrm.max + ' lpm' : 'Aún sin datos';
+    });
+  }
+  setInterval(() => { if (hrm.status !== 'off') hrmPaint(); }, 2000);
+
+  // Recuadro para conectar la banda o ver el pulso en vivo. withAvg: muestra promedio y boton para usarlo en el registro
+  function hrmWidget(withAvg) {
+    if (!hrmSupported()) {
+      return h('div', { class: 'hrm-box muted small' }, '❤️ Banda de pulso: ',
+        isIOS() ? 'en iPhone, abre esta app en el navegador Bluefy (gratis en la App Store) para conectarla.' : 'abre la app en Chrome para conectarla.');
+    }
+    if (hrm.status === 'off') {
+      return h('div', { class: 'hrm-box' },
+        h('button', { class: 'btn full', type: 'button', onclick: hrmConnect }, '❤️ Conectar banda de pulso'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Con una banda Bluetooth (Polar, Garmin, Coospo…) la app lee tu pulso real y lo anota sola.'));
+    }
+    const box = h('div', { class: 'hrm-box hrm-live' },
+      h('div', { class: 'row between', style: 'align-items:center' },
+        h('div', {}, h('span', { class: 'hrm-heart', 'aria-hidden': 'true' }, '❤️ '), h('b', { class: 'hrm-bpm' }, '--'), ' lpm ', h('span', { class: 'hrm-zone' })),
+        h('button', { class: 'btn small ghost', type: 'button', onclick: hrmDisconnect }, 'Desconectar')),
+      h('div', { class: 'muted small hrm-status' }));
+    if (withAvg) {
+      box.append(h('div', { class: 'small hrm-avg', style: 'margin-top:8px' }),
+        h('div', { style: 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px' },
+          h('button', { class: 'btn small', type: 'button', onclick: hrmResetStats }, 'Reiniciar'),
+          h('button', { class: 'btn small', type: 'button', onclick: () => {
+            const i = $('#cardio-hr');
+            if (!hrm.n || !i) { toast('Aún no hay datos de la banda.'); return; }
+            i.value = Math.round(hrm.sum / hrm.n); toast('Pulso promedio anotado.');
+          } }, 'Usar promedio en el registro')));
+    }
+    setTimeout(hrmPaint, 0);
+    return box;
+  }
+
+  // ---------- sesion de intervalos guiada ----------
+  // Paso a paso: calentamiento -> (intervalo fuerte -> recuperacion) x rondas -> vuelta a la calma.
+  // Tu das "Iniciar" en cada intervalo; la app cuenta el tiempo, avisa con sonido y vibracion, te deja anotar
+  // el pulso al terminar el intervalo y al recuperarte, y al final suma los minutos activos.
+  const HIIT_KEY = 'rutinas.hiit.v1';
+  const HIIT_WARM = 480, HIIT_COOL = 300;
+  const HIIT_PRESETS = [
+    { id: 'a', name: 'Semanas 1–2', rounds: 6, hard: 30, easy: 90 },
+    { id: 'b', name: 'Semanas 3–4', rounds: 8, hard: 60, easy: 120 },
+    { id: 'c', name: 'Semana 5 en adelante', rounds: 8, hard: 60, easy: 90 }
+  ];
+  const HIIT_RUNNING = ['warm', 'hard', 'rec', 'cool'];
+  let hiit = null, hiitHandle = null, hiitLock = null, hiitLastLeft = null, hiitDoneSummary = null, hiitPulsesOpen = false;
+  const hiitPreset = (id) => HIIT_PRESETS.find((x) => x.id === id) || HIIT_PRESETS[1];
+  const hiitSec = (step, pr) => step === 'warm' ? HIIT_WARM : step === 'cool' ? HIIT_COOL : step === 'hard' ? pr.hard : step === 'rec' ? pr.easy : 0;
+  const hiitTotalSec = (pr) => HIIT_WARM + pr.rounds * (pr.hard + pr.easy) + HIIT_COOL;
+  const secText = (n) => n < 60 ? n + ' s' : (n % 60 ? mmss(n) + ' min' : n / 60 + ' min');
+  function hiitStore(v) {
+    try { if (v) localStorage.setItem(HIIT_KEY, JSON.stringify(v)); else localStorage.removeItem(HIIT_KEY); } catch (e) { /* sin almacenamiento */ }
+  }
+  function hiitSavedRun() {
+    try {
+      const v = JSON.parse(localStorage.getItem(HIIT_KEY));
+      if (v && v.startedAt && v.preset && v.step && Date.now() - v.startedAt < 3 * 3600 * 1000) return v;
+    } catch (e) { /* sin datos */ }
+    return null;
+  }
+  function hiitPresetChoice() { try { return localStorage.getItem(HIIT_KEY + '.preset') || 'b'; } catch (e) { return 'b'; } }
+  function hiitSetPresetChoice(id) { try { localStorage.setItem(HIIT_KEY + '.preset', id); } catch (e) { /* sin almacenamiento */ } }
+  function hiitPersist() {
+    hiitStore({ preset: hiit.pr.id, step: hiit.step, r: hiit.r, phaseStart: hiit.phaseStart, pausedAcc: hiit.pausedAcc, pausedAt: hiit.pausedAt, active: hiit.active, rounds: hiit.rounds, startedAt: hiit.startedAt,
+      hrSum: hiit.hrSum, hrN: hiit.hrN, hrMax: hiit.hrMax });
+  }
+
+  const hiitRunning = () => HIIT_RUNNING.indexOf(hiit.step) !== -1;
+  const hiitElapsed = () => Math.max(0, ((hiit.pausedAt || Date.now()) - hiit.phaseStart - hiit.pausedAcc) / 1000);
+  const hiitLeft = () => hiitSec(hiit.step, hiit.pr) - hiitElapsed();
+  // Segundos activos acumulados, incluida la fase en curso
+  const hiitActive = () => hiit.active + (hiitRunning() ? Math.min(hiitElapsed(), hiitSec(hiit.step, hiit.pr)) : 0);
+  const hiitRoundsDone = () => hiit.rounds.filter((x) => x.done).length;
+
+  function hiitTone(freq, at, dur) {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq; g.gain.value = 0.18;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime + at); o.stop(audioCtx.currentTime + at + dur);
+  }
+  function hiitCue(kind) {
+    try {
+      if (kind === 'hard') { if (navigator.vibrate) navigator.vibrate([400, 120, 400]); hiitTone(1046, 0, 0.18); hiitTone(1046, 0.26, 0.18); hiitTone(1318, 0.52, 0.3); }
+      else if (kind === 'rec') { if (navigator.vibrate) navigator.vibrate([600]); hiitTone(587, 0, 0.5); }
+      else if (kind === 'end') beep();
+      else if (kind === 'ok') { if (navigator.vibrate) navigator.vibrate([150, 80, 150]); hiitTone(660, 0, 0.15); hiitTone(880, 0.18, 0.25); }
+      else { if (navigator.vibrate) navigator.vibrate([200]); hiitTone(784, 0, 0.2); } // cuenta regresiva
+    } catch (e) { /* sin sonido */ }
+  }
+  async function hiitWake(on) {
+    try {
+      if (on && 'wakeLock' in navigator && !hiitLock) hiitLock = await navigator.wakeLock.request('screen');
+      else if (!on && hiitLock) { await hiitLock.release(); hiitLock = null; }
+    } catch (e) { hiitLock = null; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && hiit && !hiitDoneSummary) { hiitLock = null; hiitWake(true); hiitTick(); } });
+
+  function hiitOpen(saved) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC && !audioCtx) audioCtx = new AC();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { /* sin audio */ }
+    hiitDoneSummary = null; hiitLastLeft = null;
+    if (saved) {
+      hiit = { pr: hiitPreset(saved.preset), step: saved.step, r: saved.r, phaseStart: saved.phaseStart, pausedAcc: saved.pausedAcc || 0, pausedAt: saved.pausedAt || null, active: saved.active || 0, rounds: saved.rounds, startedAt: saved.startedAt,
+        hrSum: saved.hrSum || 0, hrN: saved.hrN || 0, hrMax: saved.hrMax || 0 };
+    } else {
+      const pr = hiitPreset(hiitPresetChoice());
+      hiit = { pr: pr, step: 'warm-ready', r: 1, phaseStart: 0, pausedAcc: 0, pausedAt: null, active: 0, startedAt: Date.now(), hrSum: 0, hrN: 0, hrMax: 0,
+        rounds: pr.rounds ? Array.from({ length: pr.rounds }, () => ({ max: null, rec: null, done: false })) : [] };
+      hiitPersist();
+    }
+    hiitWake(true);
+    if (!hiitHandle) hiitHandle = setInterval(hiitTick, 250);
+    hiitRender();
+  }
+  function hiitClose() {
+    clearInterval(hiitHandle); hiitHandle = null; hiit = null; hiitDoneSummary = null; hiitLastLeft = null;
+    hiitStore(null); hiitWake(false);
+    const el = $('#hiit'); if (el) el.remove();
+    render();
+  }
+  // Cierra la fase en curso sumando su tiempo activo
+  function hiitLeave() {
+    if (hiitRunning()) hiit.active += Math.min(hiitElapsed(), hiitSec(hiit.step, hiit.pr));
+  }
+  function hiitGo(step, r, startAt, cue) {
+    // Con banda: el pulso "al terminar" es el pico del intervalo (y de los primeros segundos de recuperacion)
+    if (step === 'rec' && hiit.step === 'hard' && hiit.peak) { const rd = hiit.rounds[(r || hiit.r) - 1]; if (!rd.max || hiit.peak > rd.max) rd.max = hiit.peak; }
+    if (step === 'hard') hiit.peak = 0;
+    hiit.step = step; if (r) hiit.r = r;
+    hiit.phaseStart = startAt || Date.now(); hiit.pausedAcc = 0; hiit.pausedAt = null; hiitLastLeft = null;
+    hiitPersist(); hiitRender(); if (cue) hiitCue(cue);
+  }
+  function hiitTogglePause() {
+    if (hiit.pausedAt) { hiit.pausedAcc += Date.now() - hiit.pausedAt; hiit.pausedAt = null; } else hiit.pausedAt = Date.now();
+    hiitPersist(); hiitRender();
+  }
+  function hiitFinish(early) {
+    hiitLeave();
+    const rd = hiit.rounds.filter((x) => x.max);
+    hiitDoneSummary = {
+      early: early, rounds: hiitRoundsDone(), total: hiit.pr.rounds, min: Math.max(1, Math.round(hiit.active / 60)),
+      hr: hiit.hrN ? Math.round(hiit.hrSum / hiit.hrN) : rd.length ? Math.round(rd.reduce((t, x) => t + x.max, 0) / rd.length) : null,
+      hrMax: hiit.hrMax || null, fromBand: !!hiit.hrN, det: hiit.rounds.slice()
+    };
+    hiit.step = 'done';
+    clearInterval(hiitHandle); hiitHandle = null; hiitStore(null); hiitWake(false);
+    if (!early) hiitCue('end');
+    hiitRender();
+  }
+
+  // Avanza las fases que terminaron por tiempo y refresca solo los textos que cambian
+  function hiitTick() {
+    if (!hiit || hiit.step === 'done' || !hiitRunning() || hiit.pausedAt) return;
+    let left = hiitLeft();
+    const pr = hiit.pr;
+    if (left <= 0 && hiit.step === 'hard') {
+      hiit.rounds[hiit.r - 1].done = true; hiit.active += pr.hard;
+      hiitGo('rec', hiit.r, hiit.phaseStart + hiit.pausedAcc + pr.hard * 1000, 'rec'); return;
+    }
+    if (left <= 0 && hiit.step === 'warm') { hiit.active += HIIT_WARM; hiitGo('ready', 1, null, 'rec'); return; }
+    if (left <= 0 && hiit.step === 'cool') { hiitFinish(false); return; }
+    const sec = Math.ceil(Math.max(0, left));
+    if (hiitLastLeft != null && sec < hiitLastLeft) {
+      if (sec <= 3 && sec > 0) hiitCue('tick');
+      if (sec === 0 && hiit.step === 'rec') { // fin de la recuperacion: avisa y resalta el boton sin reconstruir la pantalla (no pierdes el teclado)
+        hiitCue('hard');
+        const nb = $('#hiit-next'); if (nb) { nb.classList.add('hiit-go'); nb.textContent = nb.dataset.over; }
+        const pt = $('#hiit-ptitle'); if (pt) pt.textContent = '¡Recuperado el tiempo!';
+      }
+    }
+    hiitLastLeft = sec;
+    const t = $('#hiit-time'); if (t) t.textContent = mmss(sec);
+    const bar = $('#hiit-bar'); if (bar) bar.style.width = Math.min(100, 100 * (1 - Math.max(0, left) / hiitSec(hiit.step, pr))) + '%';
+    const act = $('#hiit-active'); if (act) act.textContent = 'Activo ' + mmss(Math.floor(hiitActive()));
+  }
+
+  // Meta de pulso segun las zonas (si hay edad); si no, por sensacion
+  function hiitTargets() {
+    const z = hrZones();
+    return {
+      hard: z ? z.z[3].lo + '–' + z.z[3].hi + ' lpm' : 'esfuerzo de 8 de 10',
+      rec: z ? 'bajar de ' + z.z[1].hi + ' lpm' : 'bajar unos 25 lpm',
+      recMax: z ? z.z[1].hi : null
+    };
+  }
+  function hiitRecMsg(rd) {
+    const tg = hiitTargets();
+    if (!rd.rec) return { cls: '', text: 'Meta: ' + tg.rec + ' antes del siguiente intervalo.' };
+    const drop = rd.max ? rd.max - rd.rec : null;
+    const ok = tg.recMax ? rd.rec <= tg.recMax : (drop != null && drop >= 25);
+    return ok
+      ? { cls: 'ok', text: '✓ Recuperado' + (drop != null && drop > 0 ? ': bajó ' + drop + ' lpm' : '') + '. Listo para el siguiente.' }
+      : { cls: 'warn', text: 'Aún alto' + (drop != null ? ' (bajó ' + Math.max(0, drop) + ' lpm)' : '') + ': espera un poco más o pedalea más suave. Meta: ' + tg.rec + '.' };
+  }
+
+  // Cada lectura de la banda durante la sesion: promedio, pico del intervalo y pulso de recuperacion en vivo
+  function hiitOnHr(bpm) {
+    if (!hiit || hiit.step === 'done' || hiit.pausedAt || !hiitRunning()) return;
+    hiit.hrSum += bpm; hiit.hrN++; if (bpm > hiit.hrMax) hiit.hrMax = bpm;
+    if (hiit.step === 'hard') hiit.peak = Math.max(hiit.peak || 0, bpm);
+    if (hiit.step === 'rec') {
+      const rd = hiit.rounds[hiit.r - 1];
+      if (hiitElapsed() < 15 && bpm > (rd.max || 0)) rd.max = bpm; // el pulso sigue subiendo unos segundos al parar
+      rd.rec = bpm;
+      ['max', 'rec'].forEach((k) => { const i = $('#hiit-in-' + k); if (i && document.activeElement !== i) i.value = rd[k] || ''; });
+      const m = $('#hiit-recmsg'), msg = hiitRecMsg(rd);
+      if (m) { m.className = 'hiit-recmsg ' + msg.cls; m.textContent = msg.text; }
+      if (msg.cls === 'ok' && !rd.okCue && hiitElapsed() >= 15) { // aviso una vez por ronda: ya bajo lo suficiente
+        rd.okCue = true; hiitCue('ok');
+        const nb = $('#hiit-next'); if (nb) nb.classList.add('hiit-go');
+      }
+    }
+    if (hiit.hrN % 5 === 0) hiitPersist();
+  }
+
+  const HIIT_LABEL = { warm: 'Calentamiento', hard: '¡FUERTE!', rec: 'Recupera', cool: 'Vuelta a la calma' };
+  // Tabla editable con el pulso de cada ronda (al terminar el intervalo y recuperado), para anotar lo que se olvido
+  function hiitRoundsEditor(upto, onChange) {
+    const rows = [];
+    for (let i = 0; i < upto; i++) {
+      const rd = hiit.rounds[i];
+      const mk = (key, label) => {
+        const inp = h('input', { inputmode: 'numeric', value: rd[key] || '', 'aria-label': label + ' de la ronda ' + (i + 1) });
+        inp.addEventListener('input', () => { rd[key] = parseNum(inp.value) || null; if (hiit.step !== 'done') hiitPersist(); if (onChange) onChange(); });
+        return inp;
+      };
+      rows.push(h('div', { class: 'hiit-tr edit' }, h('span', {}, i + 1), mk('max', 'Pulso al terminar'), mk('rec', 'Pulso recuperado')));
+    }
+    return h('div', { class: 'hiit-table' },
+      h('div', { class: 'hiit-tr head' }, h('span', {}, 'Ronda'), h('span', {}, 'Al terminar (lpm)'), h('span', {}, 'Recuperado (lpm)')), rows);
+  }
+
+  function hiitHrInput(rd, key, label) {
+    const input = h('input', { id: 'hiit-in-' + key, inputmode: 'numeric', value: rd[key] || '', 'aria-label': label });
+    input.addEventListener('input', () => {
+      rd[key] = parseNum(input.value) || null; hiitPersist();
+      const m = $('#hiit-recmsg'); if (m) { const r = hiitRecMsg(rd); m.className = 'hiit-recmsg ' + r.cls; m.textContent = r.text; }
+    });
+    return h('label', {}, label, input);
+  }
+
+  function hiitRender() {
+    if (!hiit) return;
+    let el = $('#hiit');
+    if (!el) { el = h('div', { id: 'hiit', class: 'hiit', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Sesión de intervalos' }); document.body.append(el); }
+    const pr = hiit.pr, step = hiit.step, r = hiit.r, tg = hiitTargets(), paused = !!hiit.pausedAt;
+
+    if (step === 'done') {
+      const d = hiitDoneSummary;
+      const form = h('form', { class: 'body-form', autocomplete: 'off' },
+        h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: d.min })),
+        h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric', value: d.hr || '' })),
+        h('label', { class: 'full' }, 'Rondas completadas (de ' + d.total + ')', h('input', { name: 'rondas', inputmode: 'numeric', value: d.rounds })),
+        h('button', { class: 'btn primary big full', type: 'submit' }, 'Guardar sesión de cardio'),
+        h('button', { class: 'btn big full', type: 'button', onclick: hiitClose }, 'Descartar'));
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const m = parseNum(form.elements.min.value);
+        if (!m) { toast('Escribe los minutos.'); return; }
+        cardio.sessions.push({ id: uid(), date: todayISO(), tipo: 'Intervalos', min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: parseNum(form.elements.rondas.value) || undefined, dia: 'dia-cardio-2',
+          det: d.det.some((x) => x.max || x.rec) ? d.det.map((x) => [x.max || null, x.rec || null]) : undefined });
+        saveCardio(); toast('Cardio guardado en este dispositivo.'); hiitClose();
+      });
+      // Se pueden anotar o corregir los pulsos aqui; si no hay banda, el promedio se recalcula con ellos
+      let upto = 0; d.det.forEach((x, i) => { if (x.done || x.max || x.rec) upto = i + 1; });
+      const table = upto ? h('div', {},
+        h('p', { class: 'muted small', style: 'margin:0 0 6px' }, 'Puedes anotar o corregir el pulso de cada ronda.'),
+        hiitRoundsEditor(upto, () => {
+          if (d.fromBand) return;
+          const mx = d.det.filter((x) => x.max);
+          form.elements.hr.value = mx.length ? Math.round(mx.reduce((t, x) => t + x.max, 0) / mx.length) : '';
+        })) : null;
+      el.className = 'hiit end';
+      el.replaceChildren(h('div', { class: 'hiit-in' },
+        h('div', { class: 'hiit-end-ico', 'aria-hidden': 'true' }, d.early ? '⏹' : '🎉'),
+        h('h2', {}, d.early ? 'Sesión terminada' : '¡Sesión completa!'),
+        h('p', { class: 'hiit-sum' }, h('b', {}, d.rounds), ' de ' + d.total + ' rondas · ', h('b', {}, d.min), ' min activos'),
+        d.fromBand ? h('p', { class: 'muted small', style: 'text-align:center;margin:0' }, '❤️ Medido con la banda: promedio ' + d.hr + ' lpm · máximo ' + d.hrMax + ' lpm') : null,
+        table, form));
+      return;
+    }
+
+    const running = hiitRunning();
+    const dots = [];
+    for (let i = 1; i <= pr.rounds; i++) dots.push(h('i', { class: hiit.rounds[i - 1].done ? 'on' : (step === 'hard' && r === i ? 'cur' : '') }));
+    const top = h('div', { class: 'hiit-top' }, h('span', {}, 'Intervalos · ' + pr.name), h('span', { id: 'hiit-active' }, 'Activo ' + mmss(Math.floor(hiitActive()))));
+    const dotsRow = h('div', { class: 'hiit-dots', 'aria-label': hiitRoundsDone() + ' de ' + pr.rounds + ' rondas completadas' }, dots);
+    const count = h('div', { class: 'hiit-count' }, h('b', {}, hiitRoundsDone()), ' de ' + pr.rounds + ' rondas hechas');
+    const endBtn = h('button', { class: 'btn ghost', type: 'button', onclick: () => { if (confirm('¿Terminar la sesión ahora? Podrás guardar lo que llevas.')) hiitFinish(true); } }, 'Terminar y guardar');
+    const clock = () => [
+      h('div', { class: 'hiit-time', id: 'hiit-time' }, mmss(Math.ceil(Math.max(0, hiitLeft())))),
+      h('div', { class: 'hiit-bar' }, h('i', { id: 'hiit-bar', style: 'width:' + Math.min(100, 100 * (1 - Math.max(0, hiitLeft()) / hiitSec(step, pr))) + '%' }))];
+    const pauseBtn = h('button', { class: 'btn big', type: 'button', onclick: hiitTogglePause }, paused ? '▶ Continuar' : '⏸ Pausar');
+    let body;
+
+    if (step === 'warm-ready') {
+      body = [h('div', { class: 'hiit-phase' }, 'Calentamiento'), h('div', { class: 'hiit-round' }, secText(HIIT_WARM) + ' suave'),
+        h('p', { class: 'hiit-help' }, 'Bici, elíptica o caminadora. Sube poco a poco hasta sudar, sin cansarte.'),
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitGo('warm') }, '▶ Iniciar calentamiento'),
+        h('button', { class: 'btn big', type: 'button', onclick: () => hiitGo('ready', 1) }, 'Saltar al intervalo 1')];
+    } else if (step === 'warm') {
+      body = [h('div', { class: 'hiit-phase' }, 'Calentamiento'), h('div', { class: 'hiit-round' }, paused ? 'En pausa' : 'Suave, subiendo poco a poco'), ...clock(),
+        h('div', { class: 'hiit-actions' }, pauseBtn, h('button', { class: 'btn big', type: 'button', onclick: () => { hiitLeave(); hiitGo('ready', 1); } }, 'Saltar ›'))];
+    } else if (step === 'ready') {
+      body = [h('div', { class: 'hiit-round' }, 'Prepárate'), h('div', { class: 'hiit-phase' }, 'Intervalo ' + r + ' de ' + pr.rounds),
+        h('div', { class: 'hiit-bigline' }, secText(pr.hard) + ' fuerte'),
+        h('p', { class: 'hiit-help' }, 'Pulso objetivo: ' + tg.hard + '. Después recuperas ' + secText(pr.easy) + '.'),
+        h('button', { class: 'btn primary big hiit-go', type: 'button', onclick: () => hiitGo('hard', r, null, 'hard') }, '▶ Iniciar intervalo ' + r)];
+    } else if (step === 'hard') {
+      body = [h('div', { class: 'hiit-round' }, 'Intervalo ' + r + ' de ' + pr.rounds), h('div', { class: 'hiit-phase' }, HIIT_LABEL.hard), ...clock(),
+        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : 'Pulso objetivo: ' + tg.hard + '. Misma intensidad en todas las rondas.'),
+        h('div', { class: 'hiit-actions' }, pauseBtn,
+          h('button', { class: 'btn big', type: 'button', onclick: () => { hiitLeave(); const e = hiit.rounds[r - 1]; if (hiitElapsed() >= pr.hard * 0.8) e.done = true; hiitGo('rec', r, null, 'rec'); } }, 'Parar ›'))];
+    } else if (step === 'rec') {
+      const rd = hiit.rounds[r - 1], last = r >= pr.rounds, msg = hiitRecMsg(rd), over = hiitLeft() <= 0;
+      body = [h('div', { class: 'hiit-round' }, 'Después del intervalo ' + r), h('div', { class: 'hiit-phase', id: 'hiit-ptitle' }, over ? '¡Recuperado el tiempo!' : HIIT_LABEL.rec), ...clock(),
+        h('p', { class: 'hiit-help' }, paused ? 'En pausa' : hrm.status === 'on' ? 'Respira y baja la intensidad. La banda anota tu pulso sola y te avisa cuando ya bajó.' : 'Respira y baja la intensidad. El pulso debe bajar.'),
+        h('div', { class: 'body-form hiit-hr' }, hiitHrInput(rd, 'max', 'Pulso al terminar el intervalo'), hiitHrInput(rd, 'rec', 'Pulso ahora (recuperado)')),
+        h('div', { class: 'hiit-recmsg ' + msg.cls, id: 'hiit-recmsg' }, msg.text),
+        h('button', { id: 'hiit-next', class: 'btn primary big' + (over ? ' hiit-go' : ''), type: 'button',
+          'data-over': last ? '▶ Vuelta a la calma · ' + secText(HIIT_COOL) : '▶ Iniciar intervalo ' + (r + 1),
+          onclick: () => { hiitLeave(); if (last) hiitGo('cool'); else hiitGo('hard', r + 1, null, 'hard'); } },
+          over ? (last ? '▶ Vuelta a la calma · ' + secText(HIIT_COOL) : '▶ Iniciar intervalo ' + (r + 1))
+            : (last ? 'Ya recuperé · Vuelta a la calma' : 'Ya me recuperé · Iniciar intervalo ' + (r + 1))),
+        pauseBtn];
+    } else { // cool
+      body = [h('div', { class: 'hiit-phase' }, HIIT_LABEL.cool), h('div', { class: 'hiit-round' }, paused ? 'En pausa' : 'Muy suave hasta bajar de 100 lpm'), ...clock(),
+        h('div', { class: 'hiit-actions' }, pauseBtn, h('button', { class: 'btn big', type: 'button', onclick: () => hiitFinish(false) }, 'Terminar ›')),
+        h('p', { class: 'hiit-help' }, 'Después estira cuádriceps, isquios, glúteos y pantorrillas, unos 30 s cada uno.')];
+    }
+    // Pulsos de rondas anteriores: se pueden anotar o corregir desde cualquier pantalla de la sesion
+    const upto = step === 'cool' ? pr.rounds : Math.max(0, r - 1);
+    let pulses = null;
+    if (upto > 0 && step !== 'warm-ready' && step !== 'warm') {
+      pulses = h('details', { class: 'hiit-pulses', open: hiitPulsesOpen },
+        h('summary', {}, '❤️ Anotar o corregir pulsos de rondas anteriores'),
+        hiitRoundsEditor(upto));
+      pulses.addEventListener('toggle', () => { hiitPulsesOpen = pulses.open; });
+    }
+    el.className = 'hiit ' + (step === 'hard' ? 'hard' : step === 'rec' ? 'easy' : '') + (paused ? ' paused' : '');
+    const live = hrm.status !== 'off'
+      ? h('div', { class: 'hrm-live hiit-live' }, '❤️ ', h('b', { class: 'hrm-bpm' }, '--'), ' lpm ', h('span', { class: 'hrm-zone' }), h('div', { class: 'muted small hrm-status' }))
+      : hrmSupported() ? h('button', { class: 'btn small ghost', type: 'button', onclick: hrmConnect }, '❤️ Conectar banda de pulso') : null;
+    el.replaceChildren(h('div', { class: 'hiit-in' }, top, live, ...body, running || step === 'ready' ? [dotsRow, count] : null, pulses, step === 'warm-ready' ? null : endBtn));
+    if (step === 'warm-ready') el.querySelector('.hiit-in').append(h('button', { class: 'btn ghost', type: 'button', onclick: hiitClose }, 'Cancelar'));
+    hrmPaint();
+  }
+
   // ---------- cronometro libre ----------
   let swAcc = 0, swStart = null, swHandle = null;
   const swMs = () => swAcc + (swStart ? Date.now() - swStart : 0);
@@ -609,36 +1049,12 @@
     if (big) big.textContent = swText();
     const el = $('#elapsed');
     if (el) { const r = route(); const s = r.group && todaySession(r.group.id, false); if (s) el.textContent = elapsedText(s); }
-    cardioClockUpdate();
   }
-  function swToggle() { swFlip(); openStopwatch(); }
-  function swFlip() {
-    ensureAudio();
+  function swToggle() {
     if (swStart) { swAcc += Date.now() - swStart; swStart = null; } else swStart = Date.now();
-    ivLast = null;
-    swUpdate();
+    swUpdate(); openStopwatch();
   }
-  function swReset() { swAcc = 0; swStart = null; ivLast = null; swUpdate(); openStopwatch(); }
-
-  // Reloj de la sesion de cardio (usa el mismo cronometro): tiempo continuo o intervalos trabajo/descanso con aviso en cada cambio
-  const cardioLive = { mode: 'intervalos', work: 60, rest: 60 };
-  let ivLast = null;
-  function cardioClockUpdate() {
-    const clock = $('#cardio-clock');
-    if (!clock) return;
-    clock.textContent = swText();
-    const ph = $('#cardio-phase');
-    if (!ph) return;
-    if (cardioLive.mode !== 'intervalos') { ph.textContent = swStart ? 'En marcha · tiempo continuo' : (swAcc ? 'En pausa' : 'Toca Iniciar para empezar'); ph.className = 'cardio-phase'; return; }
-    const cyc = cardioLive.work + cardioLive.rest;
-    const t = Math.floor(swMs() / 1000), pos = t % cyc, working = pos < cardioLive.work;
-    const left = working ? cardioLive.work - pos : cyc - pos;
-    if (!swStart) { ph.textContent = swAcc ? 'En pausa · ronda ' + (Math.floor(t / cyc) + 1) : 'Toca Iniciar: ' + cardioLive.work + ' s fuerte / ' + cardioLive.rest + ' s suave'; ph.className = 'cardio-phase'; return; }
-    ph.textContent = (working ? 'Trabajo' : 'Suave') + ' · ' + mmss(left) + ' · ronda ' + (Math.floor(t / cyc) + 1);
-    ph.className = 'cardio-phase ' + (working ? 'work' : 'rest');
-    if (ivLast !== null && ivLast !== working) beep();
-    ivLast = working;
-  }
+  function swReset() { swAcc = 0; swStart = null; swUpdate(); openStopwatch(); }
 
   function openStopwatch() {
     const sheet = $('#sheet');
@@ -923,9 +1339,24 @@
     return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + (customRest[ex.id] ? restTxt(customRest[ex.id]) : ex.restText);
   }
 
+  // A que dia del plan cuenta una sesion de cardio: la guardada desde el dia, o por su tipo si vino de la pagina Cardio
+  function cardioDayOf(c) {
+    if (c.dia) return c.dia;
+    const want = c.tipo === 'Intervalos' ? 'dia-cardio-2' : 'dia-cardio';
+    return DAYS.some((d) => d.id === want) ? want : null;
+  }
+  // Siguiente dia del plan: el que sigue al ultimo que hiciste (cuenta pesas y cardio); como el plan intercala
+  // pesas y cardio, asi te toca un dia de cada uno. Si dos dias caen en la misma fecha, vale el de mas adelante.
+  function planNext() {
+    const ld = lastDoneByGroup();
+    let best = -1, bestDate = '';
+    DAYS.forEach((d, i) => { const dt = ld[d.id]; if (dt && dt >= bestDate) { bestDate = dt; best = i; } });
+    return DAYS[(best + 1) % DAYS.length];
+  }
   function lastDoneByGroup() {
     const out = {};
     sortedSessions().forEach((x) => { const id = x.routineId || 'piernas'; if (!out[id]) out[id] = x.date; });
+    cardio.sessions.forEach((c) => { const id = cardioDayOf(c); if (id && (!out[id] || c.date > out[id])) out[id] = c.date; });
     return out;
   }
 
@@ -967,27 +1398,26 @@
 
     const lastDone = lastDoneByGroup();
 
-    // Plan de 3 dias: el siguiente es el que sigue al ultimo dia del plan que hiciste
-    let lastDay = -1;
-    const sorted = sortedSessions();
-    for (let i = 0; i < sorted.length; i++) {
-      const k = DAYS.findIndex((d) => d.id === sorted[i].routineId);
-      if (k !== -1) { lastDay = k; break; }
-    }
-    const nextDay = DAYS[(lastDay + 1) % DAYS.length];
+    const nextDay = planNext();
     root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
     const days = h('div', { class: 'days' });
     DAYS.forEach((d, i) => {
-      const today = todaySession(d.id, false);
+      const cardioOnly = !!d.cardio && !d.exercises.length;
+      const cDone = cardioOnly ? cardioToday(d) : [];
+      const today = cardioOnly ? (cDone.length ? cDone[0] : null) : todaySession(d.id, false);
       const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
-      const status = today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+      const status = cDone.length ? 'Hoy: ' + cDone.reduce((t, c) => t + c.min, 0) + ' min registrados'
+        : today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+        : d.cardio ? (lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) + ' · ' : '') + 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en 7 días'
         : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
       // Portada: una imagen por cada grupo principal del dia
-      const covers = [];
-      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c.muscle === e.muscle)) covers.push(e); });
+      const covers = (d.covers || []).map((id) => [{ id: id }, 0]);
+      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0].muscle === e.muscle)) covers.push([e, 0]); });
+      // Si el dia trabaja pocos musculos (p. ej. cardio + abdomen), completa con la foto final de otros ejercicios
+      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0] === e)) covers.push([e, 1]); });
       days.append(h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
         h('span', { class: 'day-cover' },
-          covers.map((e) => h('img', { src: imgSrc(e, 0), alt: '', loading: 'lazy' })),
+          covers.map((c) => h('img', { src: imgSrc(c[0], c[1]), alt: '', loading: 'lazy' })),
           today ? h('span', { class: 'pill live' }, 'Hoy')
             : d === nextDay ? h('span', { class: 'pill' }, 'Siguiente') : null),
         h('span', { class: 'day-body' },
@@ -1033,12 +1463,15 @@
         h('div', { class: 'muted small' }, r.focus ? r.focus : 'Hoy · ' + longDate(new Date())),
         today ? h('div', { class: 'muted small', id: 'elapsed' }, elapsedText(today)) : null)));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (r.cardio && !r.exercises.length) { root.append(cardioPlanCard(r)); return; }
     root.append(h('div', { class: 'progress-wrap' },
       h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'progress-label' }, done
         ? done + ' de ' + total + ' series' + (goalTotals.work ? ' · Metas: ' + goalTotals.hit + ' de ' + goalTotals.work : '') + (kcalEstimate(done) ? ' · ≈ ' + kcalEstimate(done).kcal + ' kcal' : '') + (pct >= 100 ? ' · ¡Rutina completa! 💪' : pct >= 50 ? ' · Ya pasaste la mitad' : '')
         : total + ' series planificadas · la fecha se guarda sola'),
       syncBadge()));
+
+    if (r.cardio) root.append(cardioPlanCard(r));
 
     const vol = weeklyVolume();
     const muscles = [];
@@ -1252,8 +1685,8 @@
 
   // ---------- mi cuerpo ----------
   const BODY_FIELDS = [
-    ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
-    ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'], ['tmb', 'Metabolismo basal', 'kcal'],
+    ['peso', 'Peso', 'kg'], ['grasa', 'Grasa corporal', '%'], ['tmb', 'Calorías basales', 'kcal'], ['masaGrasa', 'Masa grasa', 'kg'], ['musculo', 'Masa muscular', 'kg'],
+    ['esqueletico', 'Músculo esquelético', 'kg'], ['imc', 'IMC', ''], ['visceral', 'Grasa visceral', 'grado'],
     ['edadCorporal', 'Edad corporal', 'años'], ['puntuacion', 'Puntuación corporal', '/100'], ['agua', 'Agua', 'kg'], ['proteina', 'Proteína', 'kg'],
     ['osea', 'Masa ósea', 'kg'], ['whr', 'Relación cintura-cadera', ''], ['pulsoReposo', 'Pulso en reposo', 'lpm']
   ];
@@ -1268,12 +1701,49 @@
       BODY_FIELDS.forEach((f) => { if (c[f[0]] != null && !isNaN(+c[f[0]])) ctl[f[0]] = +c[f[0]]; });
       if (c.altura) body.profile.altura = +c.altura;
       if (c.edad) body.profile.edad = +c.edad;
+      if (c.sexo === 'h' || c.sexo === 'm') body.profile.sexo = c.sexo;
       if (c.pulsoReposo) body.profile.pulsoReposo = +c.pulsoReposo;
       body.controls = body.controls.filter((x) => x.date !== ctl.date); // un control por fecha
       body.controls.push(ctl); added++;
     });
     if (!added) { toast('No encontré controles en el texto.'); return; }
     saveBody(); toast(added + ' control' + (added > 1 ? 'es' : '') + ' guardado' + (added > 1 ? 's' : '') + ' en este dispositivo.'); render();
+  }
+
+  // Calorias basales: la medida por tu bascula (ultimo control que la tenga) o, si no, la estimada (Mifflin-St Jeor)
+  function bmrInfo() {
+    const measured = bodySorted().filter((c) => c.tmb).pop();
+    if (measured) return { kcal: Math.round(measured.tmb), measured: true, date: measured.date };
+    const lb = lastBody(), p = body.profile;
+    if (lb && lb.peso && p.altura && p.edad && p.sexo) {
+      return { kcal: Math.round(10 * lb.peso + 6.25 * p.altura - 5 * p.edad + (p.sexo === 'h' ? 5 : -161)), measured: false };
+    }
+    return null;
+  }
+  const round10 = (n) => Math.round(n / 10) * 10;
+
+  // Tarjeta de calorias: basales y gasto diario estimado con tu plan (pesas + cardio, 5 dias por semana)
+  function caloriesCard() {
+    const b = bmrInfo();
+    if (!b) {
+      return h('section', { class: 'card' }, h('strong', {}, '🔥 Calorías basales'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Escribe tu sexo, edad y altura abajo (y guarda un control con tu peso) para estimarlas, o anota la TMB que te da tu báscula.'));
+    }
+    const train = b.kcal * 1.55, rest = b.kcal * 1.3;
+    const row = (label, kcal, note) => h('div', { class: 'ctl-row' }, h('span', {}, label, note ? h('div', { class: 'muted small' }, note) : null), h('b', {}, fmt(round10(kcal)) + ' kcal'));
+    return h('section', { class: 'card' },
+      h('strong', {}, '🔥 Calorías basales'),
+      h('div', { class: 'goal-top', style: 'margin-top:6px' }, h('span', { class: 'goal-num' }, h('b', {}, fmt(b.kcal)), ' kcal al día')),
+      h('p', { class: 'muted small', style: 'margin:2px 0 10px' }, b.measured
+        ? 'Medidas por tu báscula en el control del ' + fmtDate(b.date) + '. Es lo que gastas en reposo total.'
+        : 'Estimadas con tu peso, altura, edad y sexo (fórmula de Mifflin-St Jeor). Si anotas la TMB de tu báscula, la app usa esa.'),
+      row('Día de descanso', rest, 'basales × 1,3'),
+      row('Día de entreno', train, 'pesas + cardio · basales × 1,55'),
+      h('div', { class: 'section-title', style: 'margin:12px 0 4px' }, 'Según tu objetivo, en días de entreno'),
+      row('Perder grasa', train * 0.85, '15 % menos'),
+      row('Mantener peso', train),
+      row('Ganar músculo', train * 1.1, '10 % más'),
+      h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Son estimaciones. Pésate cada semana y ajusta unas 100–150 kcal si en 2–3 semanas no ves el cambio que buscas.'));
   }
 
   function renderCuerpo(root) {
@@ -1285,9 +1755,14 @@
 
     const ctrls = bodySorted();
     const last = ctrls[ctrls.length - 1], prev = ctrls[ctrls.length - 2];
+    if (!ctrls.length) {
+      root.append(h('section', { class: 'card', style: 'border-color:var(--warm)' },
+        h('strong', {}, 'Aún no hay controles guardados aquí'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Tus controles se guardan solo en el navegador del celular donde los anotas. Si ya subiste uno y no aparece, puede estar en otro navegador (Chrome, la app instalada, Bluefy…) o se borró al limpiar los datos del navegador. Vuelve a cargarlo en "Importar controles", más abajo, o anótalo en "Nuevo control".')));
+    }
     if (last) {
       const stats = h('div', { class: 'stats' });
-      [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg']].forEach((k) => {
+      [['peso', 'kg'], ['grasa', '%'], ['musculo', 'kg'], ['tmb', 'kcal']].forEach((k) => {
         if (last[k[0]] == null) return;
         const d = prev && prev[k[0]] != null ? last[k[0]] - prev[k[0]] : null;
         const f = BODY_FIELDS.find((x) => x[0] === k[0]);
@@ -1295,9 +1770,9 @@
           h('span', {}, f[1] + ' (' + k[1] + ')' + (d != null ? ' · ' + (d > 0 ? '+' : '') + fmt(Math.round(d * 10) / 10) : ''))));
       });
       root.append(h('div', { class: 'section-title' }, 'Último control · ' + fmtDate(last.date)), stats);
-      if (last.tmb) root.append(h('p', { class: 'muted small', style: 'margin:8px 4px' }, 'Metabolismo basal: ' + fmt(last.tmb) + ' kcal · gasto en días de entreno aprox. ' + fmt(Math.round(last.tmb * 1.4 / 10) * 10) + ' kcal.'));
     }
-    ['peso', 'grasa', 'musculo', 'pulsoReposo'].forEach((key) => {
+    root.append(h('div', { class: 'section-title' }, 'Calorías'), caloriesCard());
+    ['peso', 'grasa', 'musculo', 'tmb', 'pulsoReposo'].forEach((key) => {
       const pts = ctrls.filter((c) => c[key] != null);
       if (!pts.length) return;
       const f = BODY_FIELDS.find((x) => x[0] === key);
@@ -1308,10 +1783,29 @@
         progressChart(pts.map((c) => ({ date: c.date, weight: c[key] })), f[2], { noReps: true, nextLabel: 'Próximo', label: f[1] })));
     });
 
+    // Mis datos: sirven para estimar las calorias basales y las zonas de pulso
+    const pf = h('form', { class: 'body-form', autocomplete: 'off' },
+      h('label', {}, 'Sexo', h('select', { name: 'sexo' },
+        h('option', { value: '' }, 'Elegir'), h('option', { value: 'h', selected: body.profile.sexo === 'h' }, 'Hombre'), h('option', { value: 'm', selected: body.profile.sexo === 'm' }, 'Mujer'))),
+      h('label', {}, 'Edad', h('input', { name: 'edad', inputmode: 'numeric', value: body.profile.edad || '' })),
+      h('label', { class: 'full' }, 'Altura (cm)', h('input', { name: 'altura', inputmode: 'decimal', value: body.profile.altura || '' })),
+      h('button', { class: 'btn full', type: 'submit' }, 'Guardar mis datos'));
+    pf.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const e = parseNum(pf.elements.edad.value), a = parseNum(pf.elements.altura.value), sx = pf.elements.sexo.value;
+      if (sx) body.profile.sexo = sx; else delete body.profile.sexo;
+      if (e) body.profile.edad = e; else delete body.profile.edad;
+      if (a) body.profile.altura = a; else delete body.profile.altura;
+      saveBody(); toast('Datos guardados en este dispositivo.'); render();
+    });
+    root.append(h('div', { class: 'section-title' }, 'Mis datos'), h('section', { class: 'card' }, pf));
+
     // Nuevo control
     const form = h('form', { class: 'body-form', autocomplete: 'off' });
     form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })));
-    BODY_FIELDS.forEach((f) => form.append(h('label', {}, f[1] + (f[2] ? ' (' + f[2] + ')' : ''), h('input', { name: f[0], inputmode: 'decimal' }))));
+    const est = bmrInfo();
+    BODY_FIELDS.forEach((f) => form.append(h('label', {}, f[1] + (f[2] ? ' (' + f[2] + ')' : ''),
+      h('input', { name: f[0], inputmode: 'decimal', placeholder: f[0] === 'tmb' && est && !est.measured ? 'estimada ' + est.kcal : '' }))));
     form.append(h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar control'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
@@ -1332,6 +1826,26 @@
         h('p', { class: 'muted small', style: 'margin-top:0' }, 'Pega aquí el texto que te dé el asistente para cargar un control de una vez.'),
         ta, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => { importBody(ta.value.trim()); } }, 'Importar')));
 
+    // Copia de seguridad de los controles (mismo formato que Importar)
+    if (ctrls.length) {
+      const backup = () => JSON.stringify(ctrls.map((c, i) => {
+        const o = { fecha: c.date };
+        BODY_FIELDS.forEach((f) => { if (c[f[0]] != null) o[f[0]] = c[f[0]]; });
+        if (i === ctrls.length - 1) ['altura', 'edad', 'sexo'].forEach((k) => { if (body.profile[k]) o[k] = body.profile[k]; });
+        return o;
+      }), null, 1);
+      root.append(h('div', { class: 'section-title' }, 'Copia de seguridad'),
+        h('section', { class: 'card' },
+          h('p', { class: 'muted small', style: 'margin:0 0 8px' }, 'Guarda una copia de tus controles por si cambias de celular o borras los datos del navegador. Para recuperarlos, pega el texto en "Importar controles".'),
+          h('div', { class: 'hiit-actions' },
+            h('button', { class: 'btn', type: 'button', onclick: () => {
+              const t = backup();
+              if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado. Pégalo en un lugar seguro.'), () => toast('No se pudo copiar.'));
+              else toast('Tu navegador no permite copiar. Usa Descargar.');
+            } }, 'Copiar texto'),
+            h('button', { class: 'btn', type: 'button', onclick: () => download('mis-controles.json', backup(), 'application/json') }, 'Descargar'))));
+    }
+
     // Historial de controles
     if (ctrls.length) {
       const list = h('section', { class: 'card' });
@@ -1351,7 +1865,7 @@
 
   // ---------- cardio ----------
   const CARDIO_GOAL = 90; // minutos por semana en zona 2 (2-3 sesiones de 30-40 min)
-  const CARDIO_TYPES = [['Intervalos', 8], ['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
+  const CARDIO_TYPES = [['Caminata rápida', 4.5], ['Trote suave', 7], ['Bicicleta', 6], ['Elíptica', 5], ['Intervalos', 8], ['Escaleras', 6.5], ['Natación', 6], ['Otro', 5]];
   function cardioWeekMinutes() {
     return cardio.sessions.filter((c) => daysSince(c.date) >= 0 && daysSince(c.date) < 7).reduce((t, c) => t + (c.min || 0), 0);
   }
@@ -1370,7 +1884,151 @@
   }
   const zoneOf = (zones, hr) => !zones || !hr ? null : hr < zones.z[0].lo ? 0 : (zones.z.find((z) => hr <= z.hi) || { n: 5 }).n;
 
-  let fillMin = null, fillTipo = null; // datos del reloj para precargar el formulario
+  // Pulsos de cada ronda de una sesion de intervalos: al terminar / recuperado
+  function detLine(c) {
+    if (!c.det || !c.det.some((x) => x && (x[0] || x[1]))) return null;
+    return h('div', { class: 'muted small' }, 'Pulsos: ' + c.det.map((x, i) => (i + 1) + ') ' + (x[0] || '—') + (x[1] ? '→' + x[1] : '')).join(' · '));
+  }
+  // Sesiones de cardio guardadas hoy desde un dia del plan
+  function cardioToday(day) { return cardio.sessions.filter((c) => c.date === todayISO() && c.dia === day.id); }
+
+  // Cronometro de la sesion de cardio a ritmo constante (los dias de intervalos usan la sesion guiada)
+  const STEADY_KEY = 'rutinas.steady.v1';
+  let steady = (function () {
+    try { const v = JSON.parse(localStorage.getItem(STEADY_KEY)); if (v && typeof v.acc === 'number') return v; } catch (e) { /* sin datos */ }
+    return { acc: 0, start: null };
+  })();
+  let steadyFill = null; // minutos y pulso medio del cronometro, para precargar el formulario
+  function steadyPersist() { try { localStorage.setItem(STEADY_KEY, JSON.stringify(steady)); } catch (e) { /* sin almacenamiento */ } }
+  const steadyMs = () => steady.acc + (steady.start ? Date.now() - steady.start : 0);
+  const steadyText = () => mmss(Math.floor(steadyMs() / 1000));
+  setInterval(() => { const el = $('#steady-clock'); if (el) el.textContent = steadyText(); }, 500);
+  function steadyStop() { if (steady.start) { steady.acc += Date.now() - steady.start; steady.start = null; } }
+  function steadyBlock() {
+    const running = !!steady.start, has = running || steady.acc > 0;
+    return h('div', { class: 'hiit-launch' },
+      h('strong', {}, '⏱ Sesión con cronómetro'),
+      h('div', { class: 'sw-big', id: 'steady-clock' }, steadyText()),
+      h('div', { class: 'row between', style: 'margin-bottom:8px' },
+        h('span', { class: 'muted small' }, 'Pulso ahora'),
+        h('b', {}, h('span', { class: 'hrm-bpm' }, hrmFresh() ? hrm.bpm : '--'), ' lpm')),
+      h('div', { class: 'hiit-actions' },
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => {
+          if (running) steadyStop(); else steady.start = Date.now();
+          steadyPersist(); render();
+        } }, running ? '⏸ Pausar' : (has ? '▶ Continuar' : '▶ Iniciar')),
+        h('button', { class: 'btn big', type: 'button', disabled: !has, onclick: () => {
+          steadyStop();
+          const mins = Math.max(1, Math.round(steady.acc / 60000));
+          steadyFill = { min: mins, hr: hrm.n ? Math.round(hrm.sum / hrm.n) : null };
+          steady = { acc: 0, start: null }; steadyPersist();
+          toast(mins + ' min listos: revisa y guarda la sesión.'); render();
+        } }, 'Terminar y registrar')),
+      h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Toca Iniciar cuando empieces; el tiempo sigue contando aunque bloquees el celular. Con la banda de pulso conectada se guarda tu pulso medio; sin banda, anótalo al final.'));
+  }
+
+  // Plan de la sesion de cardio de un dia del plan, con el pulso objetivo si hay zonas calculadas
+  // y un formulario para registrar la sesion ahi mismo.
+  function cardioPlanCard(day) {
+    const zones = hrZones();
+    const hr = (lo, hi) => (lo ? lo + '–' : 'hasta ') + hi + ' lpm';
+    const intervals = day.cardio === 'intervalos';
+    const calm = zones ? hr(0, zones.z[0].hi) : 'suave · 3 de 10';
+    const gentle = day.cardio === 'suave';
+    const steps = gentle ? [
+      ['1 · Calentamiento · 5 min', 'Bici, elíptica o caminadora muy suave', calm],
+      ['2 · Ritmo constante · 30 min', 'Después de piernas: suave y sin cargar. Debes poder conversar', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
+      ['3 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', calm]
+    ] : intervals ? [
+      ['1 · Calentamiento · 8 min', 'Bici, elíptica o caminadora, subiendo poco a poco', calm],
+      ['2 · 8 rondas · 24 min', '', null],
+      ['   Fuerte · 1 min', 'Difícil hablar: 8 de 10. Misma intensidad en todas las rondas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10', true],
+      ['   Suave · 2 min', 'Recupera: el pulso baja a la zona 1 o 2', zones ? hr(0, zones.z[1].hi) : '3–4 de 10'],
+      ['3 · Vuelta a la calma · 5 min', 'Muy suave hasta bajar de 100 lpm y luego estira piernas', calm]
+    ] : [
+      ['1 · Calentamiento · 5 min', 'Bici o caminadora suave', calm],
+      ['2 · Ritmo constante · 25 min', 'Bici, elíptica o caminadora inclinada (8–12 %)', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
+      ['3 · Intervalos (opcional) · 10 min', '5 × 30 s fuerte + 90 s suave. Sáltalo si tienes las piernas cansadas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10'],
+      ['4 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', calm]
+    ];
+    const card = h('section', { class: 'card' },
+      h('div', { class: 'row between' }, h('strong', {}, '🏃 Cardio de hoy'), h('span', { class: 'muted small' }, cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana')),
+      h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, zones
+        ? 'Pulso objetivo calculado con tu edad y pulso en reposo (' + zones.rest + ' lpm).'
+        : 'Escribe tu edad en Cardio para ver tu pulso objetivo; mientras, guíate por la sensación (de 0 a 10).'),
+      lastDoneByGroup()[day.id] ? h('p', { class: 'small', style: 'margin:0 0 8px' }, 'Última vez que lo hiciste: ' + agoText(lastDoneByGroup()[day.id]) + '.') : null,
+      steps.map((st) => h('div', { class: 'zone-row' + (st[3] ? ' base' : ''), style: 'align-items:center;gap:10px' },
+        h('span', {}, st[0], st[1] ? h('div', { class: 'muted small', style: 'font-weight:400' }, st[1]) : null),
+        st[2] ? h('b', { style: 'white-space:nowrap' }, st[2]) : null)));
+    if (intervals) {
+      card.append(h('details', { style: 'margin-top:10px' },
+        h('summary', {}, h('strong', {}, 'Cómo progresar')),
+        h('ul', { class: 'plain small', style: 'margin:8px 0 0' },
+          h('li', {}, 'Semanas 1–2: 6 rondas de 30 s fuerte y 90 s suave (unos 12 min).'),
+          h('li', {}, 'Semanas 3–4: 8 rondas de 1 min fuerte y 2 min suave (este plan).'),
+          h('li', {}, 'Semana 5 en adelante: 8 rondas de 1 min fuerte y 90 s suave.'),
+          h('li', {}, 'Deja 48 horas entre este día y el de piernas. Si dormiste mal o tienes las piernas cargadas, haz ritmo constante en zona 2.'))));
+    }
+
+    card.append(hrmWidget(!intervals));
+    if (!intervals) card.append(steadyBlock());
+    if (intervals) {
+      // Sesion guiada con cronometro
+      const saved = hiitSavedRun();
+      let chosen = hiitPresetChoice();
+      const info = h('div', { class: 'muted small', style: 'margin:6px 0 10px' });
+      const refresh = () => {
+        const pr = hiitPreset(chosen);
+        info.textContent = pr.rounds + ' rondas · ' + secText(pr.hard) + ' fuerte + ' + secText(pr.easy) + ' de recuperación · unos ' + Math.round(hiitTotalSec(pr) / 60) + ' min con calentamiento y vuelta a la calma';
+      };
+      const sel = h('select', { 'aria-label': 'Semana del plan', onchange: (e) => { chosen = e.target.value; hiitSetPresetChoice(chosen); refresh(); } },
+        HIIT_PRESETS.map((x) => h('option', { value: x.id, selected: x.id === chosen }, x.name)));
+      refresh();
+      card.append(h('div', { class: 'hiit-launch' },
+        h('strong', {}, '⏱ Sesión guiada con cronómetro'),
+        h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'Te dice cada intervalo, tú das Iniciar y la app cuenta el tiempo. Al terminar anotas tu pulso, te indica cuánto recuperar y pasas al siguiente. Al final suma tus minutos. Mantén la pantalla encendida.'),
+        saved ? null : h('label', { class: 'full' }, 'Semana del plan', sel), saved ? null : info,
+        saved
+          ? h('div', { class: 'hiit-actions' },
+              h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitOpen(saved) }, '▶ Continuar sesión en curso'),
+              h('button', { class: 'btn big', type: 'button', onclick: () => { hiitStore(null); render(); } }, 'Descartarla'))
+          : h('button', { class: 'btn primary big', type: 'button', onclick: () => hiitOpen(null) }, '▶ Empezar intervalos')));
+    }
+
+    // Registro de hoy
+    const done = cardioToday(day);
+    done.forEach((c) => card.append(h('div', { class: 'ctl-row cardio-row', style: 'margin-top:10px' },
+      h('div', {}, h('strong', {}, '✓ Registrado hoy'),
+        h('div', { class: 'muted small' }, c.tipo + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '')),
+        detLine(c)),
+      h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
+        if (!confirm('¿Eliminar esta sesión de cardio?')) return;
+        cardio.sessions = cardio.sessions.filter((x) => x.id !== c.id); saveCardio(); render();
+      } }, '✕'))));
+    const form = h('form', { class: 'body-form', autocomplete: 'off', style: 'margin-top:12px' });
+    const fillNow = steadyFill; steadyFill = null;
+    const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0], selected: t[0] === (intervals ? 'Intervalos' : gentle ? 'Elíptica' : 'Bicicleta') }, t[0])));
+    form.append(h('strong', { class: 'full' }, intervals ? 'O registrarla a mano' : (done.length ? 'Registrar otra sesión' : 'Registrar la sesión')),
+      h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
+      h('label', { class: 'full' }, 'Tipo', typeSel),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: fillNow ? fillNow.min : intervals ? 37 : 40 })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric', value: fillNow && fillNow.hr ? fillNow.hr : '' })),
+      intervals ? h('label', { class: 'full' }, 'Rondas completadas (de 8)', h('input', { name: 'rondas', inputmode: 'numeric', value: 8 })) : null,
+      h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
+    form.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
+      if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
+      const rondas = intervals ? parseNum(form.elements.rondas.value) : null;
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), rondas: rondas || undefined, dia: day.id });
+      saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
+    });
+    card.append(form,
+      h('button', { class: 'btn small full', type: 'button', style: 'margin-top:8px', onclick: () => go('#/cardio') }, 'Ver historial y mis zonas de pulso'));
+    if (!intervals && day.exercises.length) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen: silla romana, rollout, colchoneta y oblicuos. Registra las series abajo.'));
+    return card;
+  }
+
   function renderCardio(root) {
     root.append(h('div', { class: 'group-head' },
       h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
@@ -1408,48 +2066,25 @@
     } else zcard.append(h('p', { class: 'muted small' }, 'Escribe tu edad y tu pulso en reposo para calcular tus zonas.'));
     zcard.append(zform);
     root.append(zcard);
-
-    // Sesion en vivo: el mismo reloj para el dia de intervalos y el de tiempo continuo
-    const live = h('section', { class: 'card' });
-    const seg = (mode, label) => h('button', { class: 'btn' + (cardioLive.mode === mode ? ' primary' : ''), type: 'button',
-      onclick: () => { cardioLive.mode = mode; ivLast = null; render(); } }, label);
-    const numIn = (key, lbl) => h('label', {}, lbl, h('input', { inputmode: 'numeric', value: cardioLive[key], onchange: (ev) => {
-      const v = Math.round(parseNum(ev.target.value)); cardioLive[key] = v >= 5 && v <= 600 ? v : cardioLive[key]; ev.target.value = cardioLive[key]; ivLast = null; cardioClockUpdate(); } }));
-    live.append(h('strong', {}, 'Sesión en vivo'),
-      h('div', { class: 'sw-actions', style: 'margin-top:8px' }, seg('intervalos', 'Intervalos'), seg('continuo', 'Tiempo continuo')),
-      h('div', { class: 'sw-big', id: 'cardio-clock' }, swText()),
-      h('div', { class: 'cardio-phase', id: 'cardio-phase' }),
-      cardioLive.mode === 'intervalos' ? h('div', { class: 'body-form' }, numIn('work', 'Trabajo (s)'), numIn('rest', 'Suave (s)')) : null,
-      h('div', { class: 'sw-actions', style: 'margin-top:10px' },
-        h('button', { class: 'btn primary big', type: 'button', onclick: () => { swFlip(); render(); } }, swStart ? 'Pausar' : (swAcc ? 'Continuar' : 'Iniciar')),
-        h('button', { class: 'btn big', type: 'button', disabled: !swStart && !swAcc, onclick: () => {
-          if (swStart) { swAcc += Date.now() - swStart; swStart = null; }
-          const mins = Math.max(1, Math.round(swAcc / 60000));
-          swAcc = 0; ivLast = null; swUpdate();
-          fillMin = mins; fillTipo = cardioLive.mode === 'intervalos' ? 'Intervalos' : null; render();
-          toast(mins + ' min listos: revisa y guarda la sesión.');
-        } }, 'Terminar')));
-    root.append(live);
+    root.append(h('section', { class: 'card' }, h('strong', {}, 'Banda de pulso'), h('div', { style: 'margin-top:8px' }, hrmWidget(true))));
 
     // Nueva sesion
     const form = h('form', { class: 'body-form', autocomplete: 'off' });
     const typeSel = h('select', { name: 'tipo' }, CARDIO_TYPES.map((t) => h('option', { value: t[0] }, t[0])));
-    if (fillTipo) typeSel.value = fillTipo;
-    const prefilled = fillMin != null, minFill = fillMin; fillMin = null; fillTipo = null;
     form.append(h('label', { class: 'full' }, 'Fecha', h('input', { name: 'fecha', type: 'date', value: todayISO() })),
       h('label', { class: 'full' }, 'Tipo', typeSel),
-      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric', value: minFill != null ? minFill : '' })),
-      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', inputmode: 'numeric' })),
+      h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric' })),
+      h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric' })),
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
       if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
-      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value) });
+      const nx = planNext();
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), dia: form.elements.tipo.value === 'Intervalos' ? 'dia-cardio-2' : (nx && nx.cardio && nx.cardio !== 'intervalos' ? nx.id : undefined) });
       saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
     });
     root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));
-    if (prefilled) setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
 
     // Historial
     const lb = lastBody();
@@ -1460,7 +2095,7 @@
         const kcal = lb && lb.peso ? Math.round(met * lb.peso * c.min / 60) : null;
         const z = zoneOf(zones, c.hr);
         list.append(h('div', { class: 'ctl-row cardio-row' },
-          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')),
+          h('div', {}, h('strong', {}, c.tipo), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')), detLine(c),
             z != null ? h('span', { class: 'sugg-tag' + (z === 2 ? '' : ' down') }, z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z) : null),
           h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
             if (!confirm('¿Eliminar esta sesión de cardio?')) return;
@@ -1579,12 +2214,14 @@
   }
 
   function renderRutina(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu plan de 3 días y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu ' + PLAN.name.toLowerCase() + ' y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
     DAYS.forEach((d) => {
       root.append(h('section', { class: 'card' },
         h('div', { class: 'ex-name' }, d.name),
         h('div', { class: 'muted small' }, d.focus),
-        h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))));
+        d.exercises.length
+          ? h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))
+          : h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Solo cardio, sin series con peso. El plan está en la tarjeta del inicio.')));
     });
     root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
     root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Para un día en que quieras entrenar un solo grupo.'));
@@ -1610,7 +2247,7 @@
     root.append(h('div', { class: 'section-title' }, 'Tiempos de descanso'));
     root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Ajusta cuánto descansas entre series en cada ejercicio. El cronómetro automático usa este tiempo cuando marcas ✓.'));
     const restCard = h('section', { class: 'card' });
-    DAYS.forEach((d) => {
+    DAYS.filter((d) => d.exercises.length).forEach((d) => {
       restCard.append(h('div', { class: 'rest-day' }, d.name));
       d.exercises.forEach((ex) => restCard.append(h('div', { class: 'rest-row' }, h('span', { class: 'rest-name' }, ex.name), restPicker(ex))));
     });
@@ -1657,6 +2294,8 @@
 
   save();
   render();
+  // Pide al navegador que no borre los datos de la app (controles, cardio) si falta espacio
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* sin soporte */ }
 
   if (ghToken) {
     runSync();
