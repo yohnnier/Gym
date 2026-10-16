@@ -413,6 +413,8 @@
   // ---------- volumen semanal ----------
   // Series directas por musculo en los ultimos 7 dias. Referencia para hipertrofia: 10–20 por semana.
   const VOL_MIN = 10, VOL_MAX = 20;
+  const VOL_MIN_BY = { isquios: 8 }; // meta propia: los isquiotibiales tambien trabajan en prensa e hip thrust
+  const volMin = (k) => VOL_MIN_BY[k] || VOL_MIN;
   function weeklyVolume() {
     const out = {};
     Object.keys(MUSCLES).forEach((k) => { out[k] = 0; });
@@ -423,26 +425,26 @@
     return out;
   }
   // Mensaje en palabras simples para cada musculo
-  function volStatus(n) {
-    const left = VOL_MIN - n;
-    if (n === 0) return { cls: 'low', text: 'Sin series esta semana. Meta: ' + VOL_MIN + '.' };
+  function volStatus(n, key) {
+    const min = volMin(key), left = min - n;
+    if (n === 0) return { cls: 'low', text: 'Sin series esta semana. Meta: ' + min + '.' };
     if (left > 0) return { cls: 'low', text: 'Te ' + (left === 1 ? 'falta 1 serie' : 'faltan ' + left + ' series') + ' para la meta.' };
     if (n > VOL_MAX) return { cls: 'high', text: 'Más de ' + VOL_MAX + ': es suficiente, prioriza recuperar.' };
     return { cls: 'ok', text: '¡Meta cumplida!' };
   }
   function volumeMeter(key, n) {
-    const st = volStatus(n);
-    const pct = Math.min(100, 100 * n / VOL_MIN);
+    const st = volStatus(n, key), min = volMin(key);
+    const pct = Math.min(100, 100 * n / min);
     return h('div', { class: 'goal ' + st.cls },
       h('div', { class: 'goal-top' },
         h('span', { class: 'goal-name' }, MUSCLES[key]),
-        h('span', { class: 'goal-num' }, h('b', {}, n), ' de ' + VOL_MIN + ' series')),
-      h('div', { class: 'goal-bar', role: 'progressbar', 'aria-label': MUSCLES[key], 'aria-valuenow': n, 'aria-valuemin': 0, 'aria-valuemax': VOL_MIN },
+        h('span', { class: 'goal-num' }, h('b', {}, n), ' de ' + min + ' series')),
+      h('div', { class: 'goal-bar', role: 'progressbar', 'aria-label': MUSCLES[key], 'aria-valuenow': n, 'aria-valuemin': 0, 'aria-valuemax': min },
         h('i', { style: 'width:' + pct + '%' })),
       h('div', { class: 'goal-msg' }, (st.cls === 'ok' ? '✓ ' : st.cls === 'high' ? '! ' : '') + st.text));
   }
   function volumeIntro(list, vol) {
-    const done = list.filter((k) => vol[k] >= VOL_MIN).length;
+    const done = list.filter((k) => vol[k] >= volMin(k)).length;
     return h('div', { class: 'goal-intro' },
       h('div', { class: 'goal-score' }, h('b', {}, done), ' de ' + list.length + ' músculos cumplen la meta'),
       h('p', { class: 'muted small' }, 'Para ganar músculo, cada uno necesita al menos ' + VOL_MIN + ' series por semana. Aquí se cuentan las que hiciste en los últimos 7 días, incluido hoy.'));
@@ -1476,7 +1478,7 @@
     const vol = weeklyVolume();
     const muscles = [];
     r.exercises.forEach((e) => { if (muscles.indexOf(e.muscle) === -1) muscles.push(e.muscle); });
-    const doneM = muscles.filter((m) => vol[m] >= VOL_MIN).length;
+    const doneM = muscles.filter((m) => vol[m] >= volMin(m)).length;
     root.append(h('details', { class: 'card vol compact' },
       h('summary', {},
         h('strong', {}, 'Meta de la semana: ' + doneM + ' de ' + muscles.length + ' músculos'),
