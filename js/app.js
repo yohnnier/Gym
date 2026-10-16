@@ -1772,7 +1772,7 @@
       m = text.match(/prote[ií]na\s+(\d{1,2}[.,]\d)/i); if (m) put('proteina', num(m[1]), 2, 40);
       m = text.match(/agua\s+(\d{2,3}[.,]\d)/i); if (m) put('agua', num(m[1]), 10, 120);
     }
-    m = text.match(/IMC\s*\(kg[^)]*\)[^\d\n]*(\d{2}[.,]\d)/i); if (m) put('imc', num(m[1]), 10, 60);
+    m = text.match(/IMC\s*(?:\(kg[^)]*\))?[^\d\n]*\n?[^\d\n]*(\d{2}[.,]\d)\b/i); if (m) put('imc', num(m[1]), 10, 60);
     m = text.match(/grasa visceral\s+(\d{1,2})\b/i); if (m) put('visceral', +m[1], 1, 30);
     m = text.match(/metab[oó]lica basal\s+(\d{3,4})/i); if (m) put('tmb', +m[1], 800, 4000);
     m = text.match(/Edad corporal\s+(\d{2})\b/i); if (m) put('edadCorporal', +m[1], 15, 90);
@@ -1791,10 +1791,35 @@
     });
     return ocrLoading;
   }
-  async function readReport(file) {
+  // Recorta la columna derecha del informe (indicadores pequeños), la agranda y la pasa a escala de grises: se lee mucho mejor
+  async function rightColumn(file) {
+    const bmp = await createImageBitmap(file);
+    const sx = Math.floor(bmp.width * 0.6), sw = bmp.width - sx, k = Math.min(3, 2400 / sw);
+    const cv = document.createElement('canvas'); cv.width = Math.round(sw * k); cv.height = Math.round(bmp.height * k);
+    const cx = cv.getContext('2d'); cx.filter = 'grayscale(1) contrast(1.2)';
+    cx.drawImage(bmp, sx, 0, sw, bmp.height, 0, 0, cv.width, cv.height);
+    return new Promise((ok, fail) => cv.toBlob((b) => (b ? ok(b) : fail(new Error('imagen no válida'))), 'image/png'));
+  }
+  // Lee el informe en dos pasadas (imagen completa y columna derecha ampliada) y junta los valores
+  async function readReport(file, onStep) {
     const T = await loadOcr();
-    const w = await T.createWorker('spa');
-    try { return (await w.recognize(file)).data.text; } finally { await w.terminate(); }
+    const opts = { langPath: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/spa/4.0.0_best_int', gzip: true };
+    const w = await T.createWorker('spa', 1, opts);
+    try {
+      const a = parseFitdays((await w.recognize(file)).data.text);
+      let b = {};
+      try {
+        if (onStep) onStep();
+        await w.setParameters({ tessedit_pageseg_mode: '6' });
+        b = parseFitdays((await w.recognize(await rightColumn(file))).data.text);
+      } catch (e) { /* si falla la segunda pasada, vale la primera */ }
+      const d = Object.assign({}, a);
+      ['edadCorporal', 'whr', 'tmb', 'puntuacion', 'imc', 'visceral', 'fecha'].forEach((k) => { if (b[k] != null) d[k] = b[k]; });
+      Object.keys(b).forEach((k) => { if (d[k] == null) d[k] = b[k]; });
+      const alto = d.altura || body.profile.altura;
+      if (d.imc == null && d.peso && alto) d.imc = Math.round(d.peso / Math.pow(alto / 100, 2) * 10) / 10;
+      return d;
+    } finally { await w.terminate(); }
   }
 
   function renderCuerpo(root) {
@@ -1875,7 +1900,7 @@
       if (!file) return;
       upStatus.textContent = '⏳ Leyendo el informe… la primera vez descarga el lector (necesita internet) y puede tardar un minuto.';
       try {
-        const d = parseFitdays(await readReport(file));
+        const d = await readReport(file, () => { upStatus.textContent = '⏳ Leyendo los indicadores pequeños…'; });
         const keys = BODY_FIELDS.map((f) => f[0]).filter((k) => d[k] != null);
         if (!keys.length) { upStatus.textContent = 'No pude leer valores en esa imagen. Prueba con una captura más nítida o escríbelos a mano.'; return; }
         keys.forEach((k) => { form.elements[k].value = d[k]; });
