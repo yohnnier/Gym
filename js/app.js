@@ -281,7 +281,8 @@
   //  1. Subir peso cuando completas el tope del rango en todas las series (o te sobraban, dificultad <= 7).
   //     Si el salto de peso es grande para ese ejercicio (> 15 %), primero se piden mas repeticiones.
   //  2. Estancamiento: 3 sesiones sin superar la de antes -> descarga (~90 % del peso, mas reps en reserva).
-  //  3. Si quedaste bajo el minimo del rango (meta de peso no lograda), baja el peso ya la proxima vez.
+  //  3. Si quedaste 2 o mas reps bajo el minimo del rango (meta de peso no lograda), baja el peso ya la proxima vez.
+  //     Con 1 rep de margen, o si ese dia cambiaste el orden/maquina (altOrder), se mantiene.
   //  4. Si no, mantener el peso y sumar +1 repeticion por serie.
   const BIG_JUMP = 0.15;
   const EXTRA_REPS = 3;
@@ -329,9 +330,12 @@
           : 'Te sobraron repeticiones con ' + fmt(W) + '. Más carga = más estímulo para crecer.' };
     }
 
+    // Dias con orden de ejercicios o maquina distintos (marcados por ti): un mal dia asi no es motivo para bajar peso ni cuenta como estancamiento
+    const alt = recs[0].sets.some((x) => x.altOrder);
+
     // 2. Estancamiento
     const sums = recs.map(summarize);
-    if (sums.length >= 4 && sums.every(Boolean)) {
+    if (!recs.slice(0, 3).some((rc) => rc.sets.some((x) => x.altOrder)) && sums.length >= 4 && sums.every(Boolean)) {
       const ref = sums[3].e1rm;
       if (Math.max(sums[0].e1rm, sums[1].e1rm, sums[2].e1rm) <= ref) {
         const dw = Math.max(0, Math.min(W - ex.step, Math.round(W * 0.9 / ex.step) * ex.step));
@@ -342,6 +346,13 @@
 
     // 3. Bajo el minimo: la carga es demasiado alta para hipertrofia -> bajar ya la proxima vez
     //    al peso con el que, segun tu fuerza estimada, alcanzarias el minimo del rango.
+    if (last.avgReps < ex.repMin && (alt || last.avgReps >= ex.repMin - 1)) {
+      // Margen: solo faltó 1 rep, o el día fue distinto al habitual -> se repite el peso
+      return { weight: W, reps: reps(ex.repMin), trend: 'same',
+        title: 'Mantén ' + fmt(W) + ' ' + ex.unit,
+        text: alt ? 'La última vez cambiaste el orden o la máquina, así que no bajamos el peso. Repite ' + fmt(W) + ' e intenta llegar a ' + ex.repMin + ' reps.'
+          : 'Te faltó solo 1 rep para el mínimo (' + ex.repMin + '). Repite ' + fmt(W) + '; si vuelve a pasar, bajamos el peso.' };
+    }
     if (last.avgReps < ex.repMin) {
       const est = last.e1rm / (1 + ex.repMin / 30);
       const nw = Math.max(0, Math.min(W - ex.step, Math.floor(est / ex.step) * ex.step));
@@ -379,9 +390,9 @@
     const logged = todaySets(ex, routineId);
     let wi = 0; // indice entre las series de trabajo (el calentamiento no cuenta)
     const rows = logged.map((e) => {
-      const work = p.weight == null || (e.weight != null && e.weight >= 0.85 * p.weight);
+      const work = !e.altOrder && (p.weight == null || (e.weight != null && e.weight >= 0.85 * p.weight));
       const tr = p.reps[Math.min(wi, p.reps.length - 1)];
-      if (work) wi++;
+      if (work || e.altOrder) wi++;
       // Hipertrofia: la carga manda mientras la serie siga dentro del rango de repeticiones.
       // Con mas peso que la meta basta llegar al minimo del rango; con el peso de la meta hay que igualar las reps.
       const heavier = work && p.weight != null && e.weight != null && e.weight > p.weight;
@@ -447,6 +458,7 @@
     const reps = parseInt(r, 10);
     if (!(reps > 0)) { toast('Escribe las repeticiones de la serie ' + (row + 1) + '.'); return; }
     const entry = { exerciseId: ex.id, set: 0, weight: parseNum(w), reps: reps, rpe: null };
+    if (drafts[ex.id].alt) entry.altOrder = true;
     const before = bestWeight(ex.id, allSessions());
     const s = todaySession(routineId, true);
     s.entries.push(entry);
@@ -1167,7 +1179,15 @@
     const goalLine = gs.work
       ? h('div', { class: 'goal-line ' + (gs.hit === gs.work ? 'ok' : '') }, (gs.hit === gs.work ? '✓ ' : '') + 'Metas cumplidas: ' + gs.hit + ' de ' + gs.work + ' series de trabajo')
       : null;
-    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, addRow);
+    const altOn = !!drafts[ex.id].alt || logged.some((e) => e.altOrder);
+    const altBtn = h('button', { class: 'btn ghost small add' + (altOn ? ' on' : ''), type: 'button',
+      title: 'Úsalo cuando no pudiste seguir el orden habitual o usaste otra máquina: este día no baja tu peso',
+      onclick: () => {
+        const v = !altOn; drafts[ex.id].alt = v;
+        if (logged.length) { const ts = todaySession(r.id, true); ts.entries.forEach((e) => { if (e.exerciseId === ex.id) { if (v) e.altOrder = true; else delete e.altOrder; } }); touch(ts); save(true); }
+        render();
+      } }, altOn ? '✓ Orden o máquina distinta: no baja el peso' : '🔀 Orden o máquina distinta hoy');
+    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, addRow, altBtn);
   }
 
   // ---------- grafica de progreso (una linea por ejercicio) ----------
