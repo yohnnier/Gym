@@ -405,7 +405,7 @@ const PLAN = {
       id: 'dia-piernas', name: 'Día 5 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
         { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
-        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'patada-gluteo' }, { id: 'pantorrillas' }
+        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'pantorrillas' }
       ]
     },
     {
