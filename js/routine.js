@@ -34,6 +34,12 @@ const PIERNAS = {
       notes: 'Objetivo: quedar con 0–2 repeticiones en reserva.'
     },
     {
+      id: 'curl-femoral-split', name: 'Curl femoral unilateral (máquina split)', muscle: 'isquios', secondary: ['pantorrillas'],
+      sets: 3, repMin: 10, repMax: 15, perLeg: true, rest: 90, restText: '75–90 s',
+      unit: 'kg', step: 2.5, provisional: true,
+      notes: 'Máquina "Split type leg curl trainer": cada pierna mueve su propio brazo. Ajusta el respaldo para que la rodilla quede alineada con el eje, y baja lento (2–3 s). Haz primero la pierna más débil. Rango y peso provisorios: ajústalos a tu rutina.'
+    },
+    {
       id: 'hip-thrust', name: 'Hip thrust en máquina', muscle: 'gluteos', secondary: ['isquios'],
       sets: 3, repMin: 10, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg/lado', step: 2.5,
@@ -404,7 +410,7 @@ const PLAN = {
     {
       id: 'dia-piernas', name: 'Día 5 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
-        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'curl-femoral-split', sets: 4 }, { id: 'hip-thrust', sets: 4 },
         { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'pantorrillas' }
       ]
     },
