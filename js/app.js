@@ -7,6 +7,7 @@
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
   const UNIT_KEY = 'rutinas.unit.v1'; // ejercicios cuyo peso cambiaste entre "total" y "por lado"
+  const PHOTOS_KEY = 'rutinas.photos.v1'; // fotos propias de cada ejercicio (varias), solo en este dispositivo
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
@@ -25,6 +26,13 @@
 
   let state = load();
   let customImg = loadImages();
+  let photos = (function () { try { return JSON.parse(localStorage.getItem(PHOTOS_KEY)) || {}; } catch (e) { return {}; } })();
+  function savePhotos() { try { localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos)); return true; } catch (e) { return false; } }
+  // Fotos de la version anterior (una por ejercicio): pasan a la galeria
+  if (Object.keys(customImg).length) {
+    Object.keys(customImg).forEach((id) => { (photos[id] = photos[id] || []).unshift(customImg[id]); });
+    if (savePhotos()) { customImg = {}; try { localStorage.setItem(IMG_KEY, '{}'); } catch (e) { /* sin almacenamiento */ } }
+  }
   let body = (function () {
     try { const b = JSON.parse(localStorage.getItem(BODY_KEY)); if (b && Array.isArray(b.controls)) return b; } catch (e) { /* sin datos */ }
     return { profile: {}, controls: [] };
@@ -505,7 +513,7 @@
   }
 
   // ---------- imagenes ----------
-  function imgSrc(ex, i) { return (i === 0 && customImg[ex.id]) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
+  function imgSrc(ex, i) { return (i === 0 && photos[ex.id] && photos[ex.id][0]) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
   // Respaldo: si un ejercicio aun no tiene foto, evita la imagen rota con un marcador neutro.
   const IMG_PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">' +
@@ -540,42 +548,106 @@
     });
   }
 
-  function openSheet(ex) {
+  // Galeria de un ejercicio: imagenes de referencia (inicio y final) + tus fotos
+  function galleryOf(ex) {
+    const items = [{ src: 'img/ex/' + ex.id + '-0.jpg', label: ex.single ? 'Máquina del gimnasio' : 'Inicio del movimiento', own: -1 }];
+    if (!ex.single) items.push({ src: 'img/ex/' + ex.id + '-1.jpg', label: 'Final del movimiento', own: -1 });
+    (photos[ex.id] || []).forEach((u, k) => items.push({ src: u, label: 'Tu foto ' + (k + 1), own: k }));
+    return items;
+  }
+
+  // Foto a pantalla completa: toca para acercar, desliza o usa las flechas para cambiar de foto
+  function openLightbox(ex, items, start) {
+    let i = start, zoom = false, x0 = null;
+    const img = h('img', { alt: '' });
+    const wrap = h('div', { class: 'lb-scroll' }, img);
+    const cap = h('div', { class: 'lb-cap' });
+    const paint = () => {
+      img.src = items[i].src; img.alt = ex.name + ' — ' + items[i].label;
+      cap.textContent = ex.name + ' · ' + items[i].label + ' (' + (i + 1) + '/' + items.length + ')';
+      zoom = false; img.classList.remove('zoom'); wrap.scrollTo(0, 0);
+    };
+    const go = (d) => { const n = i + d; if (n < 0 || n >= items.length) return; i = n; paint(); };
+    const close = () => { document.removeEventListener('keydown', onKey, true); box.remove(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.stopPropagation(); close(); }
+      else if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1);
+    };
+    img.addEventListener('click', () => { zoom = !zoom; img.classList.toggle('zoom', zoom); });
+    wrap.addEventListener('touchstart', (e) => { x0 = !zoom && e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    wrap.addEventListener('touchend', (e) => {
+      if (x0 == null) return;
+      const dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+    });
+    const box = h('div', { class: 'lightbox', role: 'dialog', 'aria-modal': 'true', 'aria-label': ex.name },
+      h('button', { class: 'lb-x', type: 'button', 'aria-label': 'Cerrar', onclick: close }, '×'),
+      items.length > 1 ? h('button', { class: 'lb-nav prev', type: 'button', 'aria-label': 'Foto anterior', onclick: () => go(-1) }, '‹') : null,
+      items.length > 1 ? h('button', { class: 'lb-nav next', type: 'button', 'aria-label': 'Foto siguiente', onclick: () => go(1) }, '›') : null,
+      wrap, cap, h('div', { class: 'lb-hint' }, 'Toca la foto para acercar'));
+    document.addEventListener('keydown', onKey, true);
+    paint();
+    document.body.append(box);
+  }
+
+  function openSheet(ex, startAt) {
     const sheet = $('#sheet');
     const close = () => { sheet.classList.add('hidden'); sheet.replaceChildren(); };
+    const items = galleryOf(ex);
+    let cur = Math.max(0, Math.min(startAt || 0, items.length - 1));
     const fileInput = h('input', { type: 'file', accept: 'image/*', style: 'display:none' });
     fileInput.addEventListener('change', () => {
-      const f = fileInput.files[0];
+      const f = fileInput.files[0]; fileInput.value = '';
       if (!f) return;
-      resizeImage(f, 720).then((url) => {
-        customImg[ex.id] = url;
-        if (!saveImages()) { delete customImg[ex.id]; toast('No hay espacio para guardar la imagen.'); return; }
-        toast('Imagen actualizada.');
-        close(); render();
+      if ((photos[ex.id] || []).length >= 8) { toast('Máximo 8 fotos por ejercicio.'); return; }
+      resizeImage(f, 900).then((url) => {
+        (photos[ex.id] = photos[ex.id] || []).push(url);
+        if (!savePhotos()) { photos[ex.id].pop(); toast('No hay espacio para guardar la foto.'); return; }
+        toast('Foto agregada.');
+        render(); openSheet(ex, galleryOf(ex).length - 1);
       }).catch(() => toast('No se pudo leer la imagen.'));
     });
-    const custom = !!customImg[ex.id];
-    const one = custom || !!ex.single; // foto unica (la tuya, o la de la maquina del gimnasio)
+
+    const track = h('div', { class: 'gal-track' }, items.map((it, k) =>
+      h('button', { class: 'gal-slide', type: 'button', 'aria-label': 'Ampliar: ' + it.label, onclick: () => openLightbox(ex, items, k) },
+        h('img', { src: it.src, alt: ex.name + ' — ' + it.label, loading: 'lazy' }))));
+    const dots = h('div', { class: 'gal-dots' }, items.map((it, k) => h('i', { onclick: () => goTo(k) })));
+    const cap = h('p', { class: 'muted small gal-cap' });
+    const delBtn = h('button', { class: 'btn big danger', type: 'button', onclick: () => {
+      const it = items[cur];
+      if (it.own < 0 || !confirm('¿Eliminar esta foto?')) return;
+      photos[ex.id].splice(it.own, 1); savePhotos(); toast('Foto eliminada.');
+      render(); openSheet(ex, Math.max(0, cur - 1));
+    } }, 'Eliminar esta foto');
+    const sync = () => {
+      cap.textContent = items[cur].label + ' · ' + (cur + 1) + ' de ' + items.length + (items.length > 1 ? ' — desliza para ver más' : '');
+      Array.from(dots.children).forEach((d, k) => d.classList.toggle('on', k === cur));
+      delBtn.style.display = items[cur].own >= 0 ? '' : 'none';
+    };
+    const goTo = (k) => { cur = Math.max(0, Math.min(k, items.length - 1)); track.scrollTo({ left: cur * track.clientWidth, behavior: 'smooth' }); sync(); };
+    track.addEventListener('scroll', () => { const k = Math.round(track.scrollLeft / Math.max(1, track.clientWidth)); if (k !== cur) { cur = k; sync(); } });
+
     const panel = h('div', { class: 'sheet-panel', role: 'dialog', 'aria-modal': 'true', 'aria-label': ex.name },
       h('div', { class: 'sheet-grip' }),
       h('div', { class: 'row between' },
         h('h2', {}, ex.name),
         h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: close }, '×')),
-      h('div', { class: 'sheet-imgs' + (one ? ' one' : '') },
-        h('img', { src: imgSrc(ex, 0), alt: ex.name + ' — posición inicial' }),
-        one ? null : h('img', { src: imgSrc(ex, 1), alt: ex.name + ' — posición final' })),
-      h('p', { class: 'muted small' }, custom
-        ? 'Foto de tu gimnasio (guardada en este dispositivo).'
-        : ex.single ? 'Foto de la máquina de tu gimnasio.'
-        : 'Inicio y final del movimiento. Imagen de referencia: la máquina de tu gimnasio puede verse distinta.'),
+      h('div', { class: 'gal' },
+        track,
+        items.length > 1 ? h('button', { class: 'gal-nav prev', type: 'button', 'aria-label': 'Foto anterior', onclick: () => goTo(cur - 1) }, '‹') : null,
+        items.length > 1 ? h('button', { class: 'gal-nav next', type: 'button', 'aria-label': 'Foto siguiente', onclick: () => goTo(cur + 1) }, '›') : null),
+      items.length > 1 ? dots : null, cap,
+      h('p', { class: 'muted small' }, 'Toca una foto para verla en grande. Las imágenes de referencia pueden verse distintas a la máquina de tu gimnasio; agrega tus propias fotos del movimiento (se guardan solo en este dispositivo).'),
       ex.notes ? h('p', { class: 'note' }, ex.notes) : null,
       h('div', { class: 'stack' },
-        h('button', { class: 'btn primary big', type: 'button', onclick: () => fileInput.click() }, custom ? 'Cambiar foto' : 'Usar foto de mi gimnasio'),
-        custom ? h('button', { class: 'btn big', type: 'button', onclick: () => { delete customImg[ex.id]; saveImages(); toast('Imagen original restaurada.'); close(); render(); } }, 'Restaurar imagen original') : null),
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => fileInput.click() }, '＋ Agregar foto'),
+        delBtn),
       fileInput,
-      (custom || ex.single) ? null : h('p', { class: 'credit' }, 'Imágenes: free-exercise-db (dominio público).'));
+      h('p', { class: 'credit' }, 'Imágenes de referencia: free-exercise-db (dominio público).'));
     sheet.replaceChildren(h('div', { class: 'sheet-bg', onclick: close }), panel);
     sheet.classList.remove('hidden');
+    sync();
+    if (cur) track.scrollLeft = cur * track.clientWidth;
   }
 
   // ---------- temporizador ----------
