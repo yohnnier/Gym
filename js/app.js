@@ -551,21 +551,32 @@
   // Galeria de un ejercicio: imagenes de referencia (inicio y final) + tus fotos
   function galleryOf(ex) {
     const items = [{ src: 'img/ex/' + ex.id + '-0.jpg', label: ex.single ? 'Máquina del gimnasio' : 'Inicio del movimiento', own: -1 }];
-    if (!ex.single) items.push({ src: 'img/ex/' + ex.id + '-1.jpg', label: 'Final del movimiento', own: -1 });
+    if (!ex.single) {
+      items.push({ src: 'img/ex/' + ex.id + '-1.jpg', label: 'Final del movimiento', own: -1 });
+      // Animacion: alterna suavemente inicio y final para ver la dinamica del movimiento
+      items.push({ src: 'img/ex/' + ex.id + '-0.jpg', src2: 'img/ex/' + ex.id + '-1.jpg', anim: true, label: 'Animación del movimiento', own: -1 });
+    }
     (photos[ex.id] || []).forEach((u, k) => items.push({ src: u, label: 'Tu foto ' + (k + 1), own: k }));
     return items;
   }
 
   // Foto a pantalla completa: toca para acercar, desliza o usa las flechas para cambiar de foto
+  function animPair(it, name) {
+    return h('div', { class: 'anim-pair' },
+      h('img', { src: it.src, alt: name + ' — inicio' }), h('img', { class: 'b', src: it.src2, alt: name + ' — final' }));
+  }
   function openLightbox(ex, items, start) {
     let i = start, zoom = false, x0 = null;
-    const img = h('img', { alt: '' });
+    let img = h('img', { alt: '' });
     const wrap = h('div', { class: 'lb-scroll' }, img);
     const cap = h('div', { class: 'lb-cap' });
     const paint = () => {
-      img.src = items[i].src; img.alt = ex.name + ' — ' + items[i].label;
-      cap.textContent = ex.name + ' · ' + items[i].label + ' (' + (i + 1) + '/' + items.length + ')';
-      zoom = false; img.classList.remove('zoom'); wrap.scrollTo(0, 0);
+      const it = items[i];
+      img = it.anim ? animPair(it, ex.name) : h('img', { src: it.src, alt: ex.name + ' — ' + it.label });
+      img.addEventListener('click', () => { zoom = !zoom; img.classList.toggle('zoom', zoom); });
+      wrap.replaceChildren(img);
+      cap.textContent = ex.name + ' · ' + it.label + ' (' + (i + 1) + '/' + items.length + ')';
+      zoom = false; wrap.scrollTo(0, 0);
     };
     const go = (d) => { const n = i + d; if (n < 0 || n >= items.length) return; i = n; paint(); };
     const close = () => { document.removeEventListener('keydown', onKey, true); box.remove(); };
@@ -573,7 +584,6 @@
       if (e.key === 'Escape') { e.stopPropagation(); close(); }
       else if (e.key === 'ArrowLeft') go(-1); else if (e.key === 'ArrowRight') go(1);
     };
-    img.addEventListener('click', () => { zoom = !zoom; img.classList.toggle('zoom', zoom); });
     wrap.addEventListener('touchstart', (e) => { x0 = !zoom && e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
     wrap.addEventListener('touchend', (e) => {
       if (x0 == null) return;
@@ -610,7 +620,7 @@
 
     const track = h('div', { class: 'gal-track' }, items.map((it, k) =>
       h('button', { class: 'gal-slide', type: 'button', 'aria-label': 'Ampliar: ' + it.label, onclick: () => openLightbox(ex, items, k) },
-        h('img', { src: it.src, alt: ex.name + ' — ' + it.label, loading: 'lazy' }))));
+        it.anim ? animPair(it, ex.name) : h('img', { src: it.src, alt: ex.name + ' — ' + it.label, loading: 'lazy' }))));
     const dots = h('div', { class: 'gal-dots' }, items.map((it, k) => h('i', { onclick: () => goTo(k) })));
     const cap = h('p', { class: 'muted small gal-cap' });
     const delBtn = h('button', { class: 'btn big danger', type: 'button', onclick: () => {
