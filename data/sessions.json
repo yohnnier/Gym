@@ -1780,8 +1780,15 @@
     "weight": 120,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea",
+    "set": 4,
+    "weight": 120,
+    "reps": 12,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792248801431
+  "updatedAt": 1792249078492
  }
 ]
