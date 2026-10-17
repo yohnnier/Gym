@@ -24,7 +24,7 @@ PWA en JavaScript puro (sin dependencias ni compilación) para registrar rutinas
 ## Plan actual (6 días, pesas y cardio intercalados)
 1 Empuje (+ crunch en polea) · 2 Cardio intervalos guiados + pantorrillas · 3 Tirón (+ laterales en polea) · 4 Cardio zona 2 + core (silla romana, rollout, leñador; sin intervalos: es la víspera de piernas) · 5 Piernas (con hiperextensión 45° como bisagra de cadera: al usuario no le gusta el peso muerto) · 6 Cardio suave (sin ejercicios).
 - Criterio acordado con el usuario: sin ejercicios redundantes y músculos repartidos según recuperación (pantorrillas días 2 y 5, abdomen 1 y 4, hombro lateral 1 y 3). Series directas por ciclo: pecho 10, espalda 10, hombros 13, bíceps 8, tríceps 6, cuádriceps 9, isquios 8 (meta propia 8), glúteos 7, pantorrillas 8, abdomen 12.
-- A futuro (propuesto, no aplicado): esquema torso/pierna con 4 días de pesas para entrenar cada músculo 2 veces por semana; indicador de recuperación por músculo en el Inicio.
+- A futuro (propuesto, no aplicado): esquema torso/pierna con 4 días de pesas para entrenar cada músculo 2 veces por semana. El indicador de recuperación por músculo ya está en el Inicio (`recovery()`/`recoveryCard()`: grandes 72 h, pequeños 48 h, indirecto un día menos).
 - "Siguiente" = el día que sigue al último hecho (cuenta pesas y cardio); ver `planNext()`.
 - Los ids de día (`dia-empuje`, `dia-cardio-2`, `dia-cardio`, `dia-cardio-3`…) están guardados en los registros: no los renombres.
 

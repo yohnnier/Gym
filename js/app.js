@@ -1463,6 +1463,56 @@
     return out;
   }
 
+  // ---------- recuperacion por musculo ----------
+  // Musculos grandes: 72 h; el resto (brazos, hombros, pantorrillas, abdomen): 48 h.
+  // El trabajo indirecto (musculo secundario del ejercicio) tambien cansa, pero un dia menos.
+  const REC_DAYS = { cuadriceps: 3, isquios: 3, gluteos: 3, pecho: 3, espalda: 3, lumbar: 3 };
+  const recNeed = (k) => REC_DAYS[k] || 2;
+  function recovery() {
+    const out = {};
+    Object.keys(MUSCLES).forEach((k) => { out[k] = { left: 0, last: null }; });
+    allSessions().forEach((s) => {
+      const d = daysSince(s.date);
+      if (d < 0 || d > 7) return;
+      s.entries.forEach((x) => {
+        const ex = exById[x.exerciseId];
+        if (!ex) return;
+        const hit = (k, direct) => {
+          const o = out[k];
+          if (!o) return;
+          o.left = Math.max(o.left, recNeed(k) - (direct ? 0 : 1) - d);
+          if (direct && (o.last == null || d < o.last)) o.last = d;
+        };
+        hit(ex.muscle, true);
+        (ex.secondary || []).forEach((k) => hit(k, false));
+      });
+    });
+    return out;
+  }
+  function recoveryCard() {
+    const rec = recovery();
+    const keys = Object.keys(MUSCLES).filter((k) => (k !== 'lumbar' && k !== 'trapecio') || rec[k].last != null);
+    const stOf = (o) => (o.left <= 0 ? ['ok', 'Listo'] : o.left === 1 ? ['mid', 'Listo mañana'] : ['low', 'Listo en ' + o.left + ' días']);
+    const ago = (d) => (d == null ? 'sin entrenar esta semana' : d === 0 ? 'entrenado hoy' : d === 1 ? 'entrenado ayer' : 'hace ' + d + ' días');
+    const nx = planNext();
+    const nm = [];
+    (nx.exercises || []).forEach((e) => { if (nm.indexOf(e.muscle) === -1) nm.push(e.muscle); });
+    const waiting = nm.filter((k) => rec[k] && rec[k].left > 0);
+    const card = h('section', { class: 'card rec' },
+      nm.length ? h('div', { class: 'rec-next ' + (waiting.length ? 'mid' : 'ok') }, waiting.length
+        ? '⚠ Siguiente (' + nx.name.replace(/^Día \d+ · /, '') + '): aún se recupera ' + waiting.map((k) => MUSCLES[k].toLowerCase()).join(', ') + '. Si puedes, espera un día o baja un poco la intensidad.'
+        : '✓ Siguiente (' + nx.name.replace(/^Día \d+ · /, '') + '): todos sus músculos están recuperados.') : null,
+      h('div', { class: 'rec-grid' }, keys.map((k) => {
+        const o = rec[k], st = stOf(o);
+        return h('div', { class: 'rec-chip ' + st[0] }, h('i', { class: 'rec-dot', 'aria-hidden': 'true' }),
+          h('span', {}, h('b', {}, MUSCLES[k]), h('small', {}, st[1] + ' · ' + ago(o.last))));
+      })),
+      h('p', { class: 'muted small rec-legend', style: 'margin:8px 0 0' },
+        h('span', { class: 'rec-chip ok' }, h('i', { class: 'rec-dot' })), ' listo  ', h('span', { class: 'rec-chip mid' }, h('i', { class: 'rec-dot' })), ' listo mañana  ', h('span', { class: 'rec-chip low' }, h('i', { class: 'rec-dot' })), ' aún recuperándose. ',
+        'Grandes (piernas, pecho, espalda): 72 h; pequeños (brazos, hombros, pantorrillas, abdomen): 48 h. El trabajo indirecto también cuenta, pero menos.'));
+    return card;
+  }
+
   function renderHome(root) {
     const sessions = sortedSessions();
     const last = sessions[0];
@@ -1532,6 +1582,8 @@
           h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›'))));
     });
     root.append(days);
+
+    root.append(h('div', { class: 'section-title' }, 'Recuperación muscular'), recoveryCard());
 
     const vol = weeklyVolume();
     // Lumbar y trapecio no estan en el plan: solo se muestran si tienen series
