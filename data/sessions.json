@@ -1815,8 +1815,15 @@
     "weight": 50,
     "reps": 10,
     "rpe": 9
+   },
+   {
+    "exerciseId": "crunch-polea",
+    "set": 1,
+    "weight": 106,
+    "reps": 14,
+    "rpe": 8
    }
   ],
-  "updatedAt": 1792250939531
+  "updatedAt": 1792251037034
  }
 ]
