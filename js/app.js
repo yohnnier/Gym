@@ -6,12 +6,13 @@
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
+  const UNIT_KEY = 'rutinas.unit.v1'; // ejercicios cuyo peso cambiaste entre "total" y "por lado"
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
-  ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; }));
+  ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; e.baseUnit = e.unit; }));
   const routineById = {};
   ROUTINES.forEach((r) => { routineById[r.id] = r; });
   // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
@@ -44,6 +45,16 @@
     return { minutes: Math.round(minutes), kcal: Math.round(4 * lb.peso * minutes / 60) };
   }
   // Descanso entre series elegido por ti para cada ejercicio (segundos); si no hay, se usa el del plan
+  // Peso "total" o "por lado" por ejercicio: cambia solo la etiqueta (y, si quieres, convierte los registros viejos)
+  let customUnit = (function () { try { return JSON.parse(localStorage.getItem(UNIT_KEY)) || {}; } catch (e) { return {}; } })();
+  function saveUnits() { try { localStorage.setItem(UNIT_KEY, JSON.stringify(customUnit)); } catch (e) { /* sin almacenamiento */ } }
+  function setUnit(id, unit) {
+    exById[id].unit = unit;
+    DAYS.forEach((d) => d.exercises.forEach((e) => { if (e.id === id) e.unit = unit; }));
+  }
+  Object.keys(customUnit).forEach((id) => { if (exById[id]) setUnit(id, customUnit[id]); });
+  const canSwapUnit = (ex) => /^(kg|lb)(\/lado)?$/.test(ex.baseUnit || ex.unit);
+  const perSide = (ex) => /\/lado$/.test(ex.unit);
   let customRest = (function () { try { return JSON.parse(localStorage.getItem(REST_KEY)) || {}; } catch (e) { return {}; } })();
   const REST_OPTIONS = [45, 60, 75, 90, 120, 150, 180, 240];
   const restOf = (ex) => customRest[ex.id] || ex.rest;
@@ -1527,6 +1538,44 @@
       h('button', { class: 'rest-step', type: 'button', 'aria-label': 'Más 15 segundos', onclick: () => setRest(ex, cur + 15, true) }, '+15'));
   }
 
+  // Cambia el peso de un ejercicio entre "total" y "por lado". Los registros viejos se pueden convertir (x2 / ÷2).
+  function changeUnit(ex, toSide) {
+    const newUnit = toSide ? ex.unit.replace(/\/lado$/, '') + '/lado' : ex.unit.replace(/\/lado$/, '');
+    const factor = toSide ? 0.5 : 2;
+    const hist = allSessions().filter((x) => x.entries.some((e) => e.exerciseId === ex.id && e.weight != null));
+    const apply = (convert) => {
+      if (convert) {
+        hist.forEach((sess) => {
+          const n = Object.assign({}, sess, { updatedAt: Date.now(), entries: sess.entries.map((e) =>
+            Object.assign({}, e, e.exerciseId === ex.id && e.weight != null ? { weight: Math.round(e.weight * factor * 100) / 100 } : {})) });
+          state.sessions = state.sessions.filter((x) => x.id !== n.id);
+          state.sessions.push(n);
+        });
+        save(true);
+      }
+      if (newUnit === ex.baseUnit) delete customUnit[ex.id]; else customUnit[ex.id] = newUnit;
+      saveUnits(); setUnit(ex.id, newUnit);
+      toast(ex.name + ': ahora el peso es ' + (toSide ? 'por lado' : 'total') + (convert ? ' (registros convertidos)' : '') + '.');
+      closeSheet(); render();
+    };
+    const closeSheet = () => { const sh = $('#sheet'); sh.classList.add('hidden'); sh.replaceChildren(); };
+    if (!hist.length) { apply(false); return; }
+    const sheet = $('#sheet');
+    const panel = h('div', { class: 'sheet-panel', role: 'dialog', 'aria-modal': 'true' },
+      h('div', { class: 'sheet-grip' }),
+      h('div', { class: 'row between' }, h('h2', {}, ex.name), h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: closeSheet }, '×')),
+      h('p', {}, 'Vas a anotar el peso ', h('b', {}, toSide ? 'por lado' : 'total'), '. ¿Qué hago con tus registros anteriores de este ejercicio?'),
+      h('p', { class: 'muted small' }, toSide
+        ? 'Si los pesos que anotaste eran totales, conviértelos: se dividen entre 2 (por ejemplo 150 pasa a 75 por lado).'
+        : 'Si los pesos que anotaste eran por lado, conviértelos: se multiplican por 2 (por ejemplo 75 pasa a 150 en total).'),
+      h('div', { class: 'hiit-actions' },
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => apply(true) }, 'Convertir registros anteriores'),
+        h('button', { class: 'btn big', type: 'button', onclick: () => apply(false) }, 'Dejarlos como están'),
+        h('button', { class: 'btn big', type: 'button', onclick: closeSheet }, 'Cancelar')));
+    sheet.replaceChildren(h('div', { class: 'sheet-bg', onclick: closeSheet }), panel);
+    sheet.classList.remove('hidden');
+  }
+
   function exerciseCard(ex, idx, r) {
     const last = lastRecord(ex.id);
     const gs = goalStats(ex, r.id);
@@ -1622,7 +1671,12 @@
         if (logged.length) { const ts = todaySession(r.id, true); ts.entries.forEach((e) => { if (e.exerciseId === ex.id) { if (v) e.altOrder = true; else delete e.altOrder; } }); touch(ts); save(true); }
         render();
       } }, altOn ? '✓ Orden o máquina distinta: no baja el peso' : '🔀 Orden o máquina distinta hoy');
-    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, addRow, altBtn);
+    const unitRow = canSwapUnit(ex) ? h('div', { class: 'row between', style: 'margin-top:8px;align-items:center' },
+      h('span', { class: 'muted small' }, 'El peso que anotas es:'),
+      h('div', { class: 'unit-seg' },
+        h('button', { class: 'btn small' + (perSide(ex) ? '' : ' primary'), type: 'button', 'aria-pressed': String(!perSide(ex)), onclick: () => { if (perSide(ex)) changeUnit(ex, false); } }, 'Total'),
+        h('button', { class: 'btn small' + (perSide(ex) ? ' primary' : ''), type: 'button', 'aria-pressed': String(perSide(ex)), onclick: () => { if (!perSide(ex)) changeUnit(ex, true); } }, 'Por lado'))) : null;
+    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, unitRow, addRow, altBtn);
   }
 
   // ---------- grafica de progreso (una linea por ejercicio) ----------

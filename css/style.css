@@ -560,3 +560,5 @@ ul.plain li { margin: 4px 0; }
 .hiit-pulses .hiit-table { margin-top: 8px; background: var(--surface); }
 .hiit-tr.edit { align-items: center; gap: 8px; }
 .hiit-tr.edit input { width: 100%; padding: 8px; text-align: center; font-size: 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); }
+
+.unit-seg { display: flex; gap: 6px; }
