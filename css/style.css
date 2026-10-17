@@ -562,5 +562,9 @@ ul.plain li { margin: 4px 0; }
 .hiit-tr.edit input { width: 100%; padding: 8px; text-align: center; font-size: 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); }
 
 .unit-seg { display: flex; gap: 6px; }
-.kg-eq { display: block; font-size: 10px; font-weight: 500; color: var(--muted); }
-.kg-live { margin: 6px 0 0 4px; }
+
+/* Columna con el equivalente en kg para los ejercicios en libras */
+.log.has-kg .log-row { grid-template-columns: 30px minmax(0, 1fr) 72px 54px 58px 44px; }
+.log.has-kg .log-th span:nth-child(5) { text-align: center; }
+.log-row .val.kg { font-weight: 500; font-size: 14px; color: var(--muted); }
+@media (max-width: 430px) { .log.has-kg .log-row { grid-template-columns: 26px minmax(0, 1fr) 62px 46px 52px 40px; gap: 4px; } }
