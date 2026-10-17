@@ -513,7 +513,7 @@
   }
 
   // ---------- imagenes ----------
-  function imgSrc(ex, i) { return (i === 0 && photos[ex.id] && photos[ex.id][0]) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
+  function imgSrc(ex, i) { return (i === 0 && ((photos[ex.id] && photos[ex.id][0]) || (ex.gym && 'img/ex/' + ex.id + '-gym.jpg'))) || 'img/ex/' + ex.id + '-' + (i || 0) + '.jpg'; }
   // Respaldo: si un ejercicio aun no tiene foto, evita la imagen rota con un marcador neutro.
   const IMG_PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">' +
@@ -556,6 +556,7 @@
       // Animacion: alterna suavemente inicio y final para ver la dinamica del movimiento
       items.push({ src: 'img/ex/' + ex.id + '-0.jpg', src2: 'img/ex/' + ex.id + '-1.jpg', anim: true, label: 'Animación del movimiento', own: -1 });
     }
+    if (ex.gym) items.unshift({ src: 'img/ex/' + ex.id + '-gym.jpg', label: 'Máquina de tu gimnasio', own: -1 });
     (photos[ex.id] || []).forEach((u, k) => items.push({ src: u, label: 'Tu foto ' + (k + 1), own: k }));
     return items;
   }

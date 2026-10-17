@@ -40,10 +40,10 @@ const PIERNAS = {
       notes: 'Máquina "Split type leg curl trainer": cada pierna mueve su propio brazo. Ajusta el respaldo para que la rodilla quede alineada con el eje, y baja lento (2–3 s). Haz primero la pierna más débil. Rango y peso provisorios: ajústalos a tu rutina.'
     },
     {
-      id: 'hiperextension-45', name: 'Hiperextensión a 45° (isquios y glúteo)', muscle: 'isquios', secondary: ['gluteos', 'lumbar'],
+      id: 'hiperextension-45', name: 'Hiperextensión 45° en máquina (isquios y glúteo)', muscle: 'isquios', secondary: ['gluteos', 'lumbar'],
       sets: 4, repMin: 10, repMax: 15, rest: 90, restText: '90 s',
-      unit: 'kg adicional', step: 2.5, provisional: true,
-      notes: 'Banco de hiperextensión a 45°: cadera justo en el borde del cojín, tobillos bajo los rodillos, pies algo abiertos con las puntas afuera. Baja doblando la CADERA con la espalda recta y sube apretando glúteos hasta quedar en línea con las piernas (no te arquees arriba). Empieza sin peso; luego sostén un disco contra el pecho y anota los kg del disco.'
+      unit: 'kg', step: 5, provisional: true, gym: true,
+      notes: 'Máquina de hiperextensión con discos de tu gimnasio. Ajusta el cojín con la cremallera para que la cadera quede justo en el borde y puedas doblarte libremente; pies en la plataforma y tobillos bajo los rodillos. Baja doblando la CADERA con la espalda recta y sube apretando glúteos hasta quedar en línea con las piernas (no te arquees arriba). Empieza sin discos y anota el peso total que cargas (o usa el interruptor si prefieres anotarlo por lado).'
     },
     {
       id: 'hip-thrust', name: 'Hip thrust en máquina', muscle: 'gluteos', secondary: ['isquios'],
