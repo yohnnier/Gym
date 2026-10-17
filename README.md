@@ -86,6 +86,8 @@ data/sessions.json    historial publicado
 
 Imágenes de ejercicios: [free-exercise-db](https://github.com/yuhonas/free-exercise-db), dominio público (Unlicense).
 
+Formas del mapa muscular: derivadas de [react-body-highlighter](https://github.com/giavinh79/react-body-highlighter) (MIT License, Copyright (c) 2020 GV79).
+
 ## Nota
 
 La app es una ayuda de registro y no sustituye la guía de un profesional de la salud o del entrenamiento.

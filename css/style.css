@@ -611,22 +611,23 @@ ul.plain li { margin: 4px 0; }
 .rec-chip b { font-size: 13px; }
 .rec-chip small { font-size: 11px; line-height: 1.3; color: var(--muted); }
 .rec-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.rec-chip.ok .rec-dot { background: var(--accent); }
-.rec-chip.mid .rec-dot { background: var(--warm); }
-.rec-chip.low .rec-dot { background: var(--danger); }
+.rec-chip.ok .rec-dot { background: #1fae7a; }
+.rec-chip.mid .rec-dot { background: #f2a33a; }
+.rec-chip.low .rec-dot { background: #e5484d; }
 .rec-legend .rec-chip { display: inline-flex; padding: 0; background: none; vertical-align: middle; }
 .free-link { margin: 10px 0 4px; }
 
 /* Mapa del cuerpo */
-.bodymap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bodymap { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .bodymap figure { margin: 0; text-align: center; }
-.bodymap svg { width: 100%; max-height: 300px; }
+.bodymap svg { width: 100%; max-height: 340px; }
 .bodymap figcaption { font-size: 12px; color: var(--muted); font-weight: 600; }
-.bm-base { fill: var(--surface-2); stroke: var(--line); stroke-width: 1; }
+.bm-fascia path { fill: #6e4a40; stroke: #6e4a40; stroke-width: 2; stroke-linejoin: round; }
+.bm-mus path { stroke: rgba(70,20,20,.45); stroke-width: .3; }
+.bm-neutral { fill: #c7b3a6; }
+.bm-head { fill: #cdbdb2; }
 .bm-m { cursor: pointer; }
-.bm-m > * { stroke: rgba(0,0,0,.25); stroke-width: 1; }
-.bm-m.ok > * { fill: var(--accent); }
-.bm-m.mid > * { fill: var(--warm); }
-.bm-m.low > * { fill: var(--danger); }
-.bm-m:focus { outline: none; } .bm-m:focus > * { stroke: var(--text, #fff); stroke-width: 2; }
+.bm-m.ok { fill: #1fae7a; }
+.bm-m.mid { fill: #f2a33a; }
+.bm-m.low { fill: #e5484d; }
 .rec-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent); margin: 2px 0 8px; }
