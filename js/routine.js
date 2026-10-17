@@ -40,6 +40,12 @@ const PIERNAS = {
       notes: 'Máquina "Split type leg curl trainer": cada pierna mueve su propio brazo. Ajusta el respaldo para que la rodilla quede alineada con el eje, y baja lento (2–3 s). Haz primero la pierna más débil. Rango y peso provisorios: ajústalos a tu rutina.'
     },
     {
+      id: 'hiperextension-45', name: 'Hiperextensión a 45° (isquios y glúteo)', muscle: 'isquios', secondary: ['gluteos', 'lumbar'],
+      sets: 4, repMin: 10, repMax: 15, rest: 90, restText: '90 s',
+      unit: 'kg adicional', step: 2.5, provisional: true,
+      notes: 'Banco de hiperextensión a 45°: cadera justo en el borde del cojín, tobillos bajo los rodillos, pies algo abiertos con las puntas afuera. Baja doblando la CADERA con la espalda recta y sube apretando glúteos hasta quedar en línea con las piernas (no te arquees arriba). Empieza sin peso; luego sostén un disco contra el pecho y anota los kg del disco.'
+    },
+    {
       id: 'hip-thrust', name: 'Hip thrust en máquina', muscle: 'gluteos', secondary: ['isquios'],
       sets: 3, repMin: 10, repMax: 12, rest: 90, restText: '90 s',
       unit: 'kg/lado', step: 2.5,
@@ -380,38 +386,37 @@ const PLAN = {
   name: 'Plan de 6 días',
   days: [
     {
-      id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps',
+      id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps · Abdomen',
       exercises: [
         { id: 'press-pecho-maquina', sets: 4 }, { id: 'press-inclinado' }, { id: 'aperturas-peck-deck' },
         { id: 'press-hombro-maquina' }, { id: 'elevaciones-laterales', sets: 4 },
-        { id: 'extension-polea', sets: 4 }, { id: 'extension-polea-sobre-cabeza', sets: 4 }, { id: 'fondos-maquina', sets: 2 }
+        { id: 'extension-polea', sets: 3 }, { id: 'extension-polea-sobre-cabeza', sets: 3 }, { id: 'crunch-polea', sets: 3 }
       ]
     },
     {
-      id: 'dia-cardio-2', name: 'Día 2 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave', cardio: 'intervalos',
+      id: 'dia-cardio-2', name: 'Día 2 · Cardio intervalos', focus: '8 rondas: 1 min fuerte + 2 min suave · Pantorrillas', cardio: 'intervalos',
       covers: ['cardio-bici', 'cardio-eliptica', 'cardio-caminadora'],
-      exercises: []
+      exercises: [{ id: 'pantorrillas', sets: 4 }]
     },
     {
-      id: 'dia-tiron', name: 'Día 3 · Tirón', focus: 'Espalda · Bíceps · Hombro posterior · Abdomen',
+      id: 'dia-tiron', name: 'Día 3 · Tirón', focus: 'Espalda · Bíceps · Hombros',
       exercises: [
-        { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal' }, { id: 'remo-maquina' },
-        { id: 'face-pull' }, { id: 'pajaros-polea' },
-        { id: 'curl-polea', sets: 4 }, { id: 'curl-martillo-polea', sets: 4 },
-        { id: 'crunch-polea' }
+        { id: 'jalon-pecho', sets: 4 }, { id: 'remo-lineal', sets: 3 }, { id: 'pullover-polea', sets: 3 },
+        { id: 'face-pull', sets: 3 }, { id: 'elevaciones-laterales-polea', sets: 3 },
+        { id: 'curl-polea', sets: 4 }, { id: 'curl-martillo-polea', sets: 4 }
       ]
     },
     {
-      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Abdomen', cardio: 'constante',
+      id: 'dia-cardio', name: 'Día 4 · Cardio', focus: 'Cardio zona 2 · Core', cardio: 'constante',
       exercises: [
-        { id: 'rodillas-silla-romana' }, { id: 'rollout-rodante' }, { id: 'crunch-colchoneta' }, { id: 'tuck-oblicuo-rodante' }
+        { id: 'rodillas-silla-romana', sets: 3 }, { id: 'rollout-rodante', sets: 3 }, { id: 'rotacion-polea', sets: 3 }
       ]
     },
     {
       id: 'dia-piernas', name: 'Día 5 · Piernas', focus: 'Cuádriceps · Glúteos · Isquios · Pantorrillas',
       exercises: [
-        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'curl-femoral', sets: 4 }, { id: 'curl-femoral-split', sets: 4 }, { id: 'hip-thrust', sets: 4 },
-        { id: 'extension-cuadriceps', sets: 4 }, { id: 'abductores' }, { id: 'pantorrillas' }
+        { id: 'sentadilla-pendular' }, { id: 'prensa' }, { id: 'hiperextension-45', sets: 4 }, { id: 'curl-femoral', sets: 4 }, { id: 'hip-thrust', sets: 4 },
+        { id: 'extension-cuadriceps', sets: 3 }, { id: 'abductores' }, { id: 'pantorrillas', sets: 4 }
       ]
     },
     {

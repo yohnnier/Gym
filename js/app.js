@@ -2228,9 +2228,8 @@
       ['3 · Vuelta a la calma · 5 min', 'Muy suave hasta bajar de 100 lpm y luego estira piernas', calm]
     ] : [
       ['1 · Calentamiento · 5 min', 'Bici o caminadora suave', calm],
-      ['2 · Ritmo constante · 25 min', 'Bici, elíptica o caminadora inclinada (8–12 %)', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
-      ['3 · Intervalos (opcional) · 10 min', '5 × 30 s fuerte + 90 s suave. Sáltalo si tienes las piernas cansadas', zones ? hr(zones.z[3].lo, zones.z[3].hi) : '8 de 10'],
-      ['4 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas', calm]
+      ['2 · Ritmo constante · 30 min', 'Bici, elíptica o caminadora inclinada (8–12 %)', zones ? hr(zones.z[1].lo, zones.z[1].hi) : '5–6 de 10', true],
+      ['3 · Vuelta a la calma · 5 min', 'Muy suave y luego estira piernas. Sin intervalos: mañana toca piernas', calm]
     ];
     const card = h('section', { class: 'card' },
       h('div', { class: 'row between' }, h('strong', {}, '🏃 Cardio de hoy'), h('span', { class: 'muted small' }, cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min esta semana')),
@@ -2306,7 +2305,7 @@
     });
     card.append(form,
       h('button', { class: 'btn small full', type: 'button', style: 'margin-top:8px', onclick: () => go('#/cardio') }, 'Ver historial y mis zonas de pulso'));
-    if (!intervals && day.exercises.length) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, 'Después, abdomen: silla romana, rollout, colchoneta y oblicuos. Registra las series abajo.'));
+    if (day.exercises.length) card.append(h('p', { class: 'muted small', style: 'margin:10px 0 0' }, intervals ? 'Después del cardio: pantorrillas. Registra las series abajo.' : 'Después, core: silla romana, rollout y leñador. Registra las series abajo.'));
     return card;
   }
 
