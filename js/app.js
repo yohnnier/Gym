@@ -1490,6 +1490,47 @@
     });
     return out;
   }
+  // Mapa del cuerpo (frente y espalda) coloreado segun la recuperacion de cada musculo
+  function bodyMap(rec, stOf, ago) {
+    const N = 'class="bm-base"';
+    const R = (k, shape) => '<g class="bm-m" data-k="' + k + '">' + shape + '</g>';
+    const sym = (f) => f(1) + f(-1); // dibuja lado izquierdo y su espejo
+    const mx = (x, s) => 100 + s * (x - 100);
+    const sil = '<circle ' + N + ' cx="100" cy="28" r="17"/><rect ' + N + ' x="92" y="43" width="16" height="12" rx="4"/>' +
+      sym((s) => '<ellipse ' + N + ' cx="' + mx(51, s) + '" cy="160" rx="8" ry="24"/><circle ' + N + ' cx="' + mx(48, s) + '" cy="194" r="7"/>' +
+        '<ellipse ' + N + ' cx="' + mx(87, s) + '" cy="282" rx="9" ry="7"/><ellipse ' + N + ' cx="' + mx(87, s) + '" cy="360" rx="10" ry="6"/>') +
+      '<path ' + N + ' d="M78 176 L122 176 L124 204 Q100 214 76 204 Z"/>';
+    const front = sil +
+      R('hombros', sym((s) => '<ellipse cx="' + mx(63, s) + '" cy="76" rx="15" ry="13"/>')) +
+      R('pecho', sym((s) => '<path d="M100 64 L' + mx(76, s) + ' 68 Q' + mx(68, s) + ' 88 ' + mx(78, s) + ' 102 Q' + mx(90, s) + ' 108 100 104 Z"/>')) +
+      R('biceps', sym((s) => '<ellipse cx="' + mx(56, s) + '" cy="112" rx="9" ry="20"/>')) +
+      R('abdomen', '<rect x="85" y="108" width="30" height="66" rx="10"/>' + sym((s) => '<path d="M' + mx(84, s) + ' 110 L' + mx(76, s) + ' 106 Q' + mx(71, s) + ' 140 ' + mx(78, s) + ' 174 L' + mx(84, s) + ' 174 Z"/>')) +
+      R('cuadriceps', sym((s) => '<ellipse cx="' + mx(87, s) + '" cy="240" rx="14" ry="38"/>')) +
+      R('pantorrillas', sym((s) => '<ellipse cx="' + mx(87, s) + '" cy="320" rx="9" ry="30"/>'));
+    const back = sil +
+      R('trapecio', '<path d="M100 48 L80 66 L100 108 L120 66 Z"/>') +
+      R('hombros', sym((s) => '<ellipse cx="' + mx(63, s) + '" cy="76" rx="15" ry="13"/>')) +
+      R('espalda', sym((s) => '<path d="M' + mx(97, s) + ' 92 L' + mx(81, s) + ' 74 Q' + mx(70, s) + ' 104 ' + mx(82, s) + ' 140 L' + mx(97, s) + ' 140 Z"/>')) +
+      R('lumbar', '<rect x="86" y="142" width="28" height="30" rx="8"/>') +
+      R('triceps', sym((s) => '<ellipse cx="' + mx(56, s) + '" cy="112" rx="9" ry="20"/>')) +
+      R('gluteos', sym((s) => '<ellipse cx="' + mx(88, s) + '" cy="196" rx="13" ry="15"/>')) +
+      R('isquios', sym((s) => '<ellipse cx="' + mx(87, s) + '" cy="248" rx="13" ry="34"/>')) +
+      R('pantorrillas', sym((s) => '<ellipse cx="' + mx(87, s) + '" cy="320" rx="10" ry="30"/>'));
+    const svg = (inner, label) => '<figure><svg viewBox="30 6 140 364" role="img" aria-label="' + label + '">' + inner + '</svg><figcaption>' + label + '</figcaption></figure>';
+    const box = h('div', { class: 'bodymap' });
+    box.innerHTML = svg(front, 'Frente') + svg(back, 'Espalda');
+    box.querySelectorAll('.bm-m').forEach((g) => {
+      const k = g.dataset.k, o = rec[k];
+      if (!o) return;
+      const st = stOf(o);
+      g.classList.add(st[0]);
+      g.setAttribute('tabindex', '0');
+      const tell = () => toast(MUSCLES[k] + ': ' + st[1].toLowerCase() + ' · ' + ago(o.last));
+      g.addEventListener('click', tell);
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter') tell(); });
+    });
+    return box;
+  }
   function recoveryCard() {
     const rec = recovery();
     const keys = Object.keys(MUSCLES).filter((k) => (k !== 'lumbar' && k !== 'trapecio') || rec[k].last != null);
@@ -1503,11 +1544,13 @@
       nm.length ? h('div', { class: 'rec-next ' + (waiting.length ? 'mid' : 'ok') }, waiting.length
         ? '⚠ Siguiente (' + nx.name.replace(/^Día \d+ · /, '') + '): aún se recupera ' + waiting.map((k) => MUSCLES[k].toLowerCase()).join(', ') + '. Si puedes, espera un día o baja un poco la intensidad.'
         : '✓ Siguiente (' + nx.name.replace(/^Día \d+ · /, '') + '): todos sus músculos están recuperados.') : null,
-      h('div', { class: 'rec-grid' }, keys.map((k) => {
+      bodyMap(rec, stOf, ago),
+      h('p', { class: 'muted small', style: 'text-align:center;margin:2px 0 8px' }, 'Toca un músculo para ver su estado.'),
+      h('details', { class: 'rec-more' }, h('summary', {}, 'Ver detalle por músculo'), h('div', { class: 'rec-grid' }, keys.map((k) => {
         const o = rec[k], st = stOf(o);
         return h('div', { class: 'rec-chip ' + st[0] }, h('i', { class: 'rec-dot', 'aria-hidden': 'true' }),
           h('span', {}, h('b', {}, MUSCLES[k]), h('small', {}, st[1] + ' · ' + ago(o.last))));
-      })),
+      }))),
       h('p', { class: 'muted small rec-legend', style: 'margin:8px 0 0' },
         h('span', { class: 'rec-chip ok' }, h('i', { class: 'rec-dot' })), ' listo  ', h('span', { class: 'rec-chip mid' }, h('i', { class: 'rec-dot' })), ' listo mañana  ', h('span', { class: 'rec-chip low' }, h('i', { class: 'rec-dot' })), ' aún recuperándose. ',
         'Grandes (piernas, pecho, espalda): 72 h; pequeños (brazos, hombros, pantorrillas, abdomen): 48 h. El trabajo indirecto también cuenta, pero menos.'));
