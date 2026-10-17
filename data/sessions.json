@@ -198,28 +198,28 @@
    {
     "exerciseId": "press-pecho-maquina",
     "set": 1,
-    "weight": 80,
+    "weight": 40,
     "reps": 10,
     "rpe": null
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 2,
-    "weight": 120,
+    "weight": 60,
     "reps": 10,
     "rpe": null
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 3,
-    "weight": 160,
+    "weight": 80,
     "reps": 8,
     "rpe": null
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 4,
-    "weight": 160,
+    "weight": 80,
     "reps": 5,
     "rpe": null
    },
@@ -378,7 +378,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1792243560531
+  "updatedAt": 1792243568358
  },
  {
   "id": "chat-2026-10-07-dia-tiron",
@@ -934,28 +934,28 @@
    {
     "exerciseId": "press-pecho-maquina",
     "set": 1,
-    "weight": 80,
+    "weight": 40,
     "reps": 10,
     "rpe": 8
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 2,
-    "weight": 80,
+    "weight": 40,
     "reps": 12,
     "rpe": 9
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 3,
-    "weight": 120,
+    "weight": 60,
     "reps": 10,
     "rpe": 10
    },
    {
     "exerciseId": "press-pecho-maquina",
     "set": 4,
-    "weight": 120,
+    "weight": 60,
     "reps": 10,
     "rpe": 10
    },
@@ -1107,7 +1107,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1792243560531
+  "updatedAt": 1792243568358
  },
  {
   "id": "mv5fbsbklfr3x",
@@ -1631,29 +1631,5 @@
    }
   ],
   "updatedAt": 1792083107461
- },
- {
-  "id": "mvcfdwo9wlmf5",
-  "date": "2026-10-17",
-  "createdAt": 1792243299753,
-  "routineId": "dia-empuje",
-  "source": "app",
-  "entries": [
-   {
-    "exerciseId": "press-pecho-maquina",
-    "set": 1,
-    "weight": 140,
-    "reps": 11,
-    "rpe": 9
-   },
-   {
-    "exerciseId": "press-pecho-maquina",
-    "set": 2,
-    "weight": 140,
-    "reps": 11,
-    "rpe": 10
-   }
-  ],
-  "updatedAt": 1792243560531
  }
 ]
