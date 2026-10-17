@@ -124,8 +124,11 @@
   const setStr = (x) => fmt(x.weight) + '×' + x.reps;
   // Maquinas de poleas: el peso va en libras y aqui se muestra su equivalente en kg
   const isLb = (ex) => /^lb/.test(ex.unit);
-  const kgNum = (w) => (w != null && !isNaN(w) ? fmt(Math.round(w * 0.45359237 * 10) / 10) : '');
-  const kgEq = (ex, w) => (isLb(ex) && w != null && !isNaN(w) ? '≈ ' + fmt(Math.round(w * 0.45359237 * 10) / 10) + ' kg' : '');
+  // Equivalencia en la otra unidad: lb -> kg; kg con ex.dual (p. ej. peck deck) -> lb
+  const hasEq = (ex) => isLb(ex) || (!!ex.dual && /^kg/.test(ex.unit));
+  const eqName = (ex) => (isLb(ex) ? 'kg' : 'lb');
+  const eqNum = (ex, w) => (w == null || isNaN(w) ? '' : fmt(Math.round(w * (isLb(ex) ? 0.45359237 : 2.20462262) * 10) / 10));
+  const kgEq = (ex, w) => (hasEq(ex) && w != null && !isNaN(w) ? '≈ ' + eqNum(ex, w) + ' ' + eqName(ex) : '');
 
   const RPE_TEXT = {
     6: 'Te quedaban 4 o más', 7: 'Te quedaban 3', 8: 'Te quedaban 2', 9: 'Te quedaba 1', 10: 'Al límite'
@@ -1606,13 +1609,13 @@
     const sugg = h('div', { class: 'sugg ' + p.trend },
       h('span', { class: 'sugg-ico', 'aria-hidden': 'true' }, icon),
       h('div', {},
-        h('strong', {}, p.title + (p.weight != null && isLb(ex) ? ' (' + kgEq(ex, p.weight) + ')' : '') + ' · ' + ex.sets + ' × ' + (p.reps[0] === p.reps[p.reps.length - 1] ? p.reps[0] : p.reps.join('/')) + ' reps'),
+        h('strong', {}, p.title + (p.weight != null && hasEq(ex) ? ' (' + kgEq(ex, p.weight) + ')' : '') + ' · ' + ex.sets + ' × ' + (p.reps[0] === p.reps[p.reps.length - 1] ? p.reps[0] : p.reps.join('/')) + ' reps'),
         h('div', {}, p.text)));
 
     // Tabla: anterior | hoy
-    const table = h('div', { class: 'log' + (isLb(ex) ? ' has-kg' : '') },
+    const table = h('div', { class: 'log' + (hasEq(ex) ? ' has-kg' : '') },
       h('div', { class: 'log-row log-th' },
-        h('span', {}, '#'), h('span', {}, 'Anterior'), h('span', {}, ex.unit), isLb(ex) ? h('span', {}, 'kg ≈') : null, h('span', {}, 'Reps'), h('span', {})));
+        h('span', {}, '#'), h('span', {}, 'Anterior'), h('span', {}, ex.unit), hasEq(ex) ? h('span', {}, eqName(ex) + ' ≈') : null, h('span', {}, 'Reps'), h('span', {})));
     if (!drafts[ex.id]) drafts[ex.id] = {};
     let carry = p.weight;
     for (let i = 0; i < rows; i++) {
@@ -1627,7 +1630,7 @@
           h('span', { class: 'n' }, i + 1),
           h('span', { class: 'prev' }, prev ? setStr(prev) : '—'),
           h('span', { class: 'val' }, fmt(entry.weight)),
-          isLb(ex) ? h('span', { class: 'val kg' }, kgNum(entry.weight)) : null,
+          hasEq(ex) ? h('span', { class: 'val kg' }, eqNum(ex, entry.weight)) : null,
           h('span', { class: 'val' }, entry.reps),
           h('button', { class: 'tick on', type: 'button', 'aria-label': 'Deshacer serie ' + (i + 1), onclick: () => unlogSet(entry, r.id) }, '✓')));
         if (upNote) table.append(upNote);
@@ -1652,8 +1655,8 @@
       const defR = wu ? String(wu.r) : String(p.reps[Math.min(i - ((p.warm && p.warm.length) || 0), p.reps.length - 1)] || ex.repMin);
       const d = drafts[ex.id][i] || {};
       const keep = () => { drafts[ex.id][i] = d; };
-      const kgCell = isLb(ex) ? h('span', { class: 'val kg' }, kgNum(parseNum(d.w != null ? d.w : defW))) : null;
-      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); if (kgCell) kgCell.textContent = kgNum(parseNum(e.target.value)); } });
+      const kgCell = hasEq(ex) ? h('span', { class: 'val kg' }, eqNum(ex, parseNum(d.w != null ? d.w : defW))) : null;
+      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); if (kgCell) kgCell.textContent = eqNum(ex, parseNum(e.target.value)); } });
       const rIn = h('input', { inputmode: 'numeric', type: 'number', min: '1', value: d.r != null ? d.r : defR, 'aria-label': 'Reps serie ' + (i + 1), oninput: (e) => { d.r = e.target.value; keep(); } });
       const isNext = i === logged.length;
       table.append(h('div', { class: 'log-row' + (isNext ? ' next' : '') },
