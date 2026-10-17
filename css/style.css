@@ -615,3 +615,4 @@ ul.plain li { margin: 4px 0; }
 .rec-chip.mid .rec-dot { background: var(--warm); }
 .rec-chip.low .rec-dot { background: var(--danger); }
 .rec-legend .rec-chip { display: inline-flex; padding: 0; background: none; vertical-align: middle; }
+.free-link { margin: 10px 0 4px; }
