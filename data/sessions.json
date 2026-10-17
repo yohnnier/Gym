@@ -1631,22 +1631,5 @@
    }
   ],
   "updatedAt": 1792083107461
- },
- {
-  "id": "mvcfdeh9y3owp",
-  "date": "2026-10-17",
-  "createdAt": 1792243276173,
-  "routineId": "dia-empuje",
-  "source": "app",
-  "entries": [
-   {
-    "exerciseId": "press-pecho-maquina",
-    "set": 1,
-    "weight": 60,
-    "reps": 11,
-    "rpe": null
-   }
-  ],
-  "updatedAt": 1792243276173
  }
 ]
