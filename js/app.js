@@ -1655,8 +1655,10 @@
       const defR = wu ? String(wu.r) : String(p.reps[Math.min(i - ((p.warm && p.warm.length) || 0), p.reps.length - 1)] || ex.repMin);
       const d = drafts[ex.id][i] || {};
       const keep = () => { drafts[ex.id][i] = d; };
-      const kgCell = hasEq(ex) ? h('span', { class: 'val kg' }, eqNum(ex, parseNum(d.w != null ? d.w : defW))) : null;
-      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); if (kgCell) kgCell.textContent = eqNum(ex, parseNum(e.target.value)); } });
+      const eqF = isLb(ex) ? 0.45359237 : 2.20462262;
+      const kgCell = hasEq(ex) ? h('input', { class: 'eq-in', inputmode: 'decimal', 'aria-label': 'Equivalente en ' + eqName(ex) + ', serie ' + (i + 1), value: eqNum(ex, parseNum(d.w != null ? d.w : defW)),
+        oninput: (e) => { const v = parseNum(e.target.value); if (v == null) return; wIn.value = fmt(isLb(ex) ? Math.round(v / eqF) : Math.round(v / eqF * 2) / 2); d.w = wIn.value; keep(); } }) : null;
+      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); if (kgCell) kgCell.value = eqNum(ex, parseNum(e.target.value)); } });
       const rIn = h('input', { inputmode: 'numeric', type: 'number', min: '1', value: d.r != null ? d.r : defR, 'aria-label': 'Reps serie ' + (i + 1), oninput: (e) => { d.r = e.target.value; keep(); } });
       const isNext = i === logged.length;
       table.append(h('div', { class: 'log-row' + (isNext ? ' next' : '') },
