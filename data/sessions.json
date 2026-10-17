@@ -1729,8 +1729,15 @@
     "weight": 7.5,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "elevaciones-laterales",
+    "set": 4,
+    "weight": 7.5,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792247094688
+  "updatedAt": 1792247247192
  }
 ]
