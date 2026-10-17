@@ -90,13 +90,13 @@ const PECHO = {
     {
       id: 'aperturas-peck-deck', name: 'Aperturas en peck deck', muscle: 'pecho', secondary: ['hombros'],
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'lb', step: 5, provisional: true,
+      unit: 'kg', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Junta con control, pausa de 1 s al cerrar.'
     },
     {
       id: 'cruce-poleas', name: 'Cruce de poleas', muscle: 'pecho', secondary: ['hombros'],
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Ligera flexión de codos constante.'
     },
     {
@@ -132,7 +132,7 @@ const ESPALDA = {
     {
       id: 'pullover-polea', name: 'Pullover en polea', muscle: 'espalda', secondary: ['triceps'],
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5, provisional: true,
+      unit: 'lb', step: 5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Brazos casi rectos, siente el dorsal.'
     },
     {
@@ -180,7 +180,7 @@ const HOMBROS = {
     {
       id: 'elevaciones-laterales-polea', name: 'Elevaciones laterales en polea', muscle: 'hombros', secondary: ['trapecio'],
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
-      unit: 'kg', step: 1.25, provisional: true, perLeg: true,
+      unit: 'lb', step: 2.5, provisional: true, perLeg: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Tensión constante durante todo el recorrido.'
     },
     {
@@ -282,13 +282,13 @@ const TRICEPS = {
     {
       id: 'extension-polea-invertida', name: 'Extensión en polea agarre invertido', muscle: 'triceps',
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
-      unit: 'kg', step: 2.5, perLeg: true,
+      unit: 'lb', step: 5, perLeg: true,
       notes: 'Polea alta con manilla, palma hacia arriba. Codo pegado al costado: baja hasta estirar el brazo y sube controlado hasta la altura del pecho. Solo se mueve el antebrazo. Anota cada brazo si difieren.'
     },
     {
       id: 'extension-polea-sobre-cabeza', name: 'Extensión en polea sobre la cabeza (cuerda)', muscle: 'triceps',
       sets: 3, repMin: 10, repMax: 15, rest: 75, restText: '60–75 s',
-      unit: 'kg', step: 2.5,
+      unit: 'lb', step: 5,
       notes: 'De espaldas a la polea alta, con cuerda, un pie adelante y el torso inclinado. Codos junto a la cabeza y quietos: estira los brazos hacia adelante y abre la cuerda al final. Vuelve lento hasta sentir el estiramiento detrás del brazo. Si molesta el hombro, acorta la bajada.'
     },
     {
@@ -336,7 +336,7 @@ const CORE = {
     {
       id: 'rotacion-polea', name: 'Rotación en polea (leñador)', muscle: 'abdomen', secondary: ['hombros'],
       sets: 3, repMin: 12, repMax: 15, rest: 60, restText: '60 s',
-      unit: 'kg', step: 2.5, provisional: true, perLeg: true,
+      unit: 'lb', step: 5, provisional: true, perLeg: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Gira desde el tronco, no los brazos.'
     },
     {

@@ -122,6 +122,9 @@
   }
   function mmss(sec) { return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
   const setStr = (x) => fmt(x.weight) + '×' + x.reps;
+  // Maquinas de poleas: el peso va en libras y aqui se muestra su equivalente en kg
+  const isLb = (ex) => /^lb/.test(ex.unit);
+  const kgEq = (ex, w) => (isLb(ex) && w != null && !isNaN(w) ? '≈ ' + fmt(Math.round(w * 0.45359237 * 10) / 10) + ' kg' : '');
 
   const RPE_TEXT = {
     6: 'Te quedaban 4 o más', 7: 'Te quedaban 3', 8: 'Te quedaban 2', 9: 'Te quedaba 1', 10: 'Al límite'
@@ -1602,7 +1605,7 @@
     const sugg = h('div', { class: 'sugg ' + p.trend },
       h('span', { class: 'sugg-ico', 'aria-hidden': 'true' }, icon),
       h('div', {},
-        h('strong', {}, p.title + ' · ' + ex.sets + ' × ' + (p.reps[0] === p.reps[p.reps.length - 1] ? p.reps[0] : p.reps.join('/')) + ' reps'),
+        h('strong', {}, p.title + (p.weight != null && isLb(ex) ? ' (' + kgEq(ex, p.weight) + ')' : '') + ' · ' + ex.sets + ' × ' + (p.reps[0] === p.reps[p.reps.length - 1] ? p.reps[0] : p.reps.join('/')) + ' reps'),
         h('div', {}, p.text)));
 
     // Tabla: anterior | hoy
@@ -1610,6 +1613,8 @@
       h('div', { class: 'log-row log-th' },
         h('span', {}, '#'), h('span', {}, 'Anterior'), h('span', {}, ex.unit), h('span', {}, 'Reps'), h('span', {})));
     if (!drafts[ex.id]) drafts[ex.id] = {};
+    const kgLine = (w) => (isLb(ex) && kgEq(ex, w) ? 'Esta serie: ' + fmt(w) + ' lb ' + kgEq(ex, w) : '');
+    const kgLive = h('div', { class: 'muted small kg-live' });
     let carry = p.weight;
     for (let i = 0; i < rows; i++) {
       const prev = last && last.sets[i];
@@ -1622,7 +1627,7 @@
         table.append(h('div', { class: 'log-row done' + gcls },
           h('span', { class: 'n' }, i + 1),
           h('span', { class: 'prev' }, prev ? setStr(prev) : '—'),
-          h('span', { class: 'val' }, fmt(entry.weight)),
+          h('span', { class: 'val' }, fmt(entry.weight), isLb(ex) ? h('small', { class: 'kg-eq' }, kgEq(ex, entry.weight)) : null),
           h('span', { class: 'val' }, entry.reps),
           h('button', { class: 'tick on', type: 'button', 'aria-label': 'Deshacer serie ' + (i + 1), onclick: () => unlogSet(entry, r.id) }, '✓')));
         if (upNote) table.append(upNote);
@@ -1647,9 +1652,10 @@
       const defR = wu ? String(wu.r) : String(p.reps[Math.min(i - ((p.warm && p.warm.length) || 0), p.reps.length - 1)] || ex.repMin);
       const d = drafts[ex.id][i] || {};
       const keep = () => { drafts[ex.id][i] = d; };
-      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); } });
+      const wIn = h('input', { inputmode: 'decimal', value: d.w != null ? d.w : defW, 'aria-label': 'Peso serie ' + (i + 1), oninput: (e) => { d.w = e.target.value; keep(); if (i === logged.length) kgLive.textContent = kgLine(parseNum(e.target.value)); } });
       const rIn = h('input', { inputmode: 'numeric', type: 'number', min: '1', value: d.r != null ? d.r : defR, 'aria-label': 'Reps serie ' + (i + 1), oninput: (e) => { d.r = e.target.value; keep(); } });
       const isNext = i === logged.length;
+      if (isNext) kgLive.textContent = kgLine(parseNum(d.w != null ? d.w : defW));
       table.append(h('div', { class: 'log-row' + (isNext ? ' next' : '') },
         h('span', { class: 'n' }, i + 1),
         h('span', { class: 'prev' }, prev ? setStr(prev) : '—'),
@@ -1676,7 +1682,7 @@
       h('div', { class: 'unit-seg' },
         h('button', { class: 'btn small' + (perSide(ex) ? '' : ' primary'), type: 'button', 'aria-pressed': String(!perSide(ex)), onclick: () => { if (perSide(ex)) changeUnit(ex, false); } }, 'Total'),
         h('button', { class: 'btn small' + (perSide(ex) ? ' primary' : ''), type: 'button', 'aria-pressed': String(perSide(ex)), onclick: () => { if (!perSide(ex)) changeUnit(ex, true); } }, 'Por lado'))) : null;
-    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, goalLine, unitRow, addRow, altBtn);
+    return h('section', { class: 'card ex' + (complete ? ' done' : '') }, head, sugg, table, isLb(ex) ? kgLive : null, goalLine, unitRow, addRow, altBtn);
   }
 
   // ---------- grafica de progreso (una linea por ejercicio) ----------

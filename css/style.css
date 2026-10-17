@@ -562,3 +562,5 @@ ul.plain li { margin: 4px 0; }
 .hiit-tr.edit input { width: 100%; padding: 8px; text-align: center; font-size: 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); }
 
 .unit-seg { display: flex; gap: 6px; }
+.kg-eq { display: block; font-size: 10px; font-weight: 500; color: var(--muted); }
+.kg-live { margin: 6px 0 0 4px; }
