@@ -28,6 +28,20 @@ PWA en JavaScript puro (sin dependencias ni compilación) para registrar rutinas
 - "Siguiente" = el día que sigue al último hecho (cuenta pesas y cardio); ver `planNext()`.
 - Los ids de día (`dia-empuje`, `dia-cardio-2`, `dia-cardio`, `dia-cardio-3`…) están guardados en los registros: no los renombres.
 
+## Nutrición: se registra desde el chat
+El usuario dice lo que comió (p. ej. "desayuno: 3 huevos, 100 g de yogurt griego y un kiwi"). Tú:
+1. Estimas kcal, proteína, carbohidratos y grasa por alimento (con gramos) y agregas una entrada a `data/nutrition.json`:
+   `{"id": "<único>", "date": "AAAA-MM-DD", "meal": "desayuno|almuerzo|colación|cena", "items": [{"food": "Huevo entero", "g": 150, "kcal": 215, "prot": 19, "carb": 1, "fat": 15}], "kcal": …, "prot": …, "carb": …, "fat": …, "notes": "supuestos: crudo/cocido, aceite…"}`
+   (los totales de la entrada son la suma de sus items; redondea a 1 decimal).
+2. Commit directo a `main` ("Nutrición: <comida> <fecha>"), igual que las sesiones: `git fetch origin main`, parte de `origin/main`, nunca reescribas historia.
+3. Respondes siempre con el **acumulado del día y lo que queda** frente a la meta del día.
+- **Metas** en `js/routine.js` (`NUTRITION`): pesas (Empuje, Tirón, Piernas) 2.100 kcal · 155 g prot · 230 g carb; descanso o solo cardio 1.950 kcal · 155 g · 170 g; piernas +150 kcal en carbohidratos. Grasa = lo que queda. Tipo de día: sesión de pesas registrada ese día; si no hay, el siguiente día del plan (`dayTypeOf()` en `js/app.js`).
+- **La app** lee `data/nutrition.json`: "Nutrición de hoy" en el Inicio; "Nutrición · últimos 7 días" y "Evaluación de la semana" (series, proteína, déficit, cardio, peso/grasa, fuerza y sugerencia de ±150 kcal) en Progreso.
+- **Alimentos frecuentes:** yogurt griego 65 kcal y 8,8 g de proteína por 100 g (porción de 200 g = 130 kcal). **Evita la avena**: le sube el azúcar; no la sugieras.
+- **Objetivo:** recomposición (perder grasa y ganar músculo).
+- **Datos del cuerpo** (peso, % grasa, basales, peso objetivo): NO están en el repo por privacidad; están en la app (Mi cuerpo). Si los necesitas para calcular, pídeselos al usuario.
+- `data/nutrition.json` es público (repositorio público); el usuario lo aceptó al pedir este registro.
+
 ## Pendiente / por confirmar con el usuario
 1. **Press de pecho del 5 de octubre:** ¿el 80 que se anotó era peso total o por lado? Hoy el ejercicio es `kg/lado` y la gráfica dice "bajaste 20". Según su respuesta, corregir `data/sessions.json` (y que las sesiones locales no lo pisen: la app une por `id` y `updatedAt`).
 2. Confirmar si **prensa, hip thrust y abductores** son realmente "por lado".

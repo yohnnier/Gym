@@ -1,4 +1,4 @@
-const CACHE = 'rutinas-v84';
+const CACHE = 'rutinas-v85';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './js/app.js',
   './manifest.webmanifest',
   './data/sessions.json',
+  './data/nutrition.json',
   './icons/icon.svg'
 ].concat(
   // Imagen principal de cada ejercicio, para usar la app sin conexion

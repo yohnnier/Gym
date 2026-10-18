@@ -427,6 +427,20 @@ const PLAN = {
   ]
 };
 
+/* Nutricion: metas por tipo de dia (objetivo: recomposicion, perder grasa y ganar musculo).
+ * La grasa de la meta es lo que queda de calorias tras proteina y carbohidratos.
+ * Los registros de comidas van en data/nutrition.json y se agregan desde el chat. */
+const NUTRITION = {
+  goal: 'recomposición (perder grasa y ganar músculo)',
+  targets: {
+    pesas: { label: 'Día de pesas', kcal: 2100, prot: 155, carb: 230 },
+    descanso: { label: 'Descanso o solo cardio', kcal: 1950, prot: 155, carb: 170 }
+  },
+  legsExtra: { kcal: 150, carb: 37 }, // dia de piernas: +150 kcal en carbohidratos
+  weightDays: ['dia-empuje', 'dia-tiron', 'dia-piernas'],
+  legsDay: 'dia-piernas'
+};
+
 /* Nombres de los musculos para el volumen semanal (series directas por semana). */
 const MUSCLES = {
   cuadriceps: 'Cuádriceps', isquios: 'Isquiotibiales', gluteos: 'Glúteos', pantorrillas: 'Pantorrillas',
