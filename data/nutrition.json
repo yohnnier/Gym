@@ -1,3 +1,56 @@
 {
- "entries": []
+ "entries": [
+  {
+   "id": "2026-10-18-desayuno",
+   "date": "2026-10-18",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (3 unidades)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 18.9,
+     "carb": 1.1,
+     "fat": 14.3
+    },
+    {
+     "food": "Pan dulce",
+     "g": 75,
+     "kcal": 270,
+     "prot": 5.3,
+     "carb": 41.3,
+     "fat": 9.0
+    },
+    {
+     "food": "Queso crema",
+     "g": 25,
+     "kcal": 86,
+     "prot": 1.5,
+     "carb": 1.0,
+     "fat": 8.5
+    },
+    {
+     "food": "Café de grano filtrado",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 100,
+     "kcal": 65,
+     "prot": 8.8,
+     "carb": 4.0,
+     "fat": 1.5
+    }
+   ],
+   "kcal": 638,
+   "prot": 34.8,
+   "carb": 47.4,
+   "fat": 33.3,
+   "notes": "huevos sin aceite añadido (fritos en aceite suman ~45 kcal por cucharadita); pan dulce + queso crema = 100 g en total, supuesto 75 g de pan y 25 g de queso crema normal; café sin azúcar ni leche"
+  }
+ ]
 }
