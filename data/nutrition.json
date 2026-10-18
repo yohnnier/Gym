@@ -51,6 +51,74 @@
    "carb": 47.4,
    "fat": 33.3,
    "notes": "huevos sin aceite añadido (fritos en aceite suman ~45 kcal por cucharadita); pan dulce + queso crema = 100 g en total, supuesto 75 g de pan y 25 g de queso crema normal; café sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-18-almuerzo",
+   "date": "2026-10-18",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Salmón en freidora de aire",
+     "g": 220,
+     "kcal": 458,
+     "prot": 44.9,
+     "carb": 0,
+     "fat": 29.5
+    },
+    {
+     "food": "Aceite de oliva (1 cucharada, salmón)",
+     "g": 13.5,
+     "kcal": 119,
+     "prot": 0,
+     "carb": 0,
+     "fat": 13.5
+    },
+    {
+     "food": "Palta",
+     "g": 180,
+     "kcal": 288,
+     "prot": 3.6,
+     "carb": 15.3,
+     "fat": 26.5
+    },
+    {
+     "food": "Tomate",
+     "g": 80,
+     "kcal": 14,
+     "prot": 0.7,
+     "carb": 3.1,
+     "fat": 0.2
+    },
+    {
+     "food": "Patacones fritos en aceite de oliva (4)",
+     "g": 72,
+     "kcal": 222,
+     "prot": 1.1,
+     "carb": 35.3,
+     "fat": 8.5
+    },
+    {
+     "food": "Yuca cocida",
+     "g": 60,
+     "kcal": 67,
+     "prot": 0.8,
+     "carb": 16.0,
+     "fat": 0.2
+    },
+    {
+     "food": "Ceviche de reineta (copa)",
+     "g": 120,
+     "kcal": 105,
+     "prot": 17.5,
+     "carb": 3.5,
+     "fat": 2.3
+    }
+   ],
+   "kcal": 1273,
+   "prot": 68.6,
+   "carb": 73.2,
+   "fat": 80.7,
+   "notes": "salmón 220 g en crudo (si era el peso ya cocido, suma ~90 kcal y ~9 g de proteína); palta 180 g más ~80 g de tomate; patacones con el aceite que absorben al freír; yuca cocida (no frita); ceviche ≈ 90 g de reineta + cebolla y limón"
   }
  ]
 }
