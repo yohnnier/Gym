@@ -434,8 +434,11 @@ const NUTRITION = {
   goal: 'recomposición (perder grasa y ganar músculo)',
   targets: {
     pesas: { label: 'Día de pesas', kcal: 2100, prot: 155, carb: 230 },
-    descanso: { label: 'Descanso o solo cardio', kcal: 1950, prot: 155, carb: 170 }
+    descanso: { label: 'Descanso o cardio suave', kcal: 1950, prot: 155, carb: 170 },
+    intervalos: { label: 'Día de intervalos', kcal: 2050, prot: 155, carb: 195 } // +100 kcal en carbohidratos para rendir y recuperar
   },
+  extraCardioShare: 0.5, // cardio libre extra: la meta sube la mitad de lo quemado, en carbohidratos
+  intervalDay: 'dia-cardio-2',
   legsExtra: { kcal: 150, carb: 37 }, // dia de piernas: +150 kcal en carbohidratos
   weightDays: ['dia-empuje', 'dia-tiron', 'dia-piernas'],
   legsDay: 'dia-piernas'

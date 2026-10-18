@@ -1567,14 +1567,25 @@
   function dayTypeOf(date) {
     const s = allSessions().filter((x) => x.date === date && x.entries.length && isWeightDay(x.routineId));
     if (s.length) { const id = s.some((x) => x.routineId === NUTRITION.legsDay) ? NUTRITION.legsDay : s[0].routineId; return { kind: 'pesas', legs: id === NUTRITION.legsDay, id: id, from: 'sesión registrada' }; }
-    if (date !== todayISO() || cardio.sessions.some((c) => c.date === date && !c.libre) || allSessions().some((x) => x.date === date && x.entries.length)) return { kind: 'descanso', legs: false, id: null, from: date === todayISO() ? 'lo registrado hoy' : 'registro' };
+    const cs = cardio.sessions.filter((c) => c.date === date && !c.libre);
+    if (cs.some((c) => c.dia === NUTRITION.intervalDay || c.tipo === 'Intervalos')) return { kind: 'intervalos', legs: false, id: NUTRITION.intervalDay, from: 'cardio registrado' };
+    if (date !== todayISO() || cs.length || allSessions().some((x) => x.date === date && x.entries.length)) return { kind: 'descanso', legs: false, id: null, from: date === todayISO() ? 'lo registrado hoy' : 'registro' };
     const nx = planNext();
-    return { kind: isWeightDay(nx.id) ? 'pesas' : 'descanso', legs: nx.id === NUTRITION.legsDay, id: nx.id, from: 'siguiente día del plan (' + nx.name.replace(/^Día \d+ · /, '') + ')' };
+    return { kind: isWeightDay(nx.id) ? 'pesas' : nx.id === NUTRITION.intervalDay ? 'intervalos' : 'descanso', legs: nx.id === NUTRITION.legsDay, id: nx.id, from: 'siguiente día del plan (' + nx.name.replace(/^Día \d+ · /, '') + ')' };
   }
-  function nutTarget(dt) {
+  // Calorias netas de una sesion de cardio (por encima del reposo), con tu peso del ultimo control
+  function cardioNetKcal(c) {
+    const met = (CARDIO_TYPES.find((t) => t[0] === c.tipo) || [0, 5])[1];
+    const lb = lastBody(), kg = (lb && lb.peso) || 75;
+    return Math.max(0, (met - 1) * kg * (c.min || 0) / 60);
+  }
+  function nutTarget(dt, date) {
     const b = NUTRITION.targets[dt.kind];
-    const t = { label: b.label, kcal: b.kcal, prot: b.prot, carb: b.carb };
+    const t = { label: b.label, kind: dt.kind, kcal: b.kcal, prot: b.prot, carb: b.carb, extra: 0 };
     if (dt.legs) { t.kcal += NUTRITION.legsExtra.kcal; t.carb += NUTRITION.legsExtra.carb; t.label = 'Día de piernas'; }
+    // Cardio libre extra de ese dia: suma la mitad de lo quemado, en carbohidratos
+    const extra = Math.round(cardio.sessions.filter((c) => c.date === (date || todayISO()) && c.libre).reduce((s, c) => s + cardioNetKcal(c), 0) * NUTRITION.extraCardioShare / 10) * 10;
+    if (extra) { t.extra = extra; t.kcal += extra; t.carb += Math.round(extra / 4); }
     t.fat = Math.max(0, Math.round((t.kcal - 4 * t.prot - 4 * t.carb) / 9));
     return t;
   }
@@ -1602,9 +1613,10 @@
       h('div', { class: 'goal-msg' }, left > 0 ? 'Te quedan ' + fmt(left) + ' ' + unit : over ? 'Pasaste la meta por ' + fmt(-left) + ' ' + unit : '✓ Meta cumplida'));
   }
   function nutritionCard() {
-    const today = todayISO(), dt = dayTypeOf(today), t = nutTarget(dt), d = nutDay(today);
+    const today = todayISO(), dt = dayTypeOf(today), t = nutTarget(dt, today), d = nutDay(today);
     const card = h('section', { class: 'card' },
-      h('div', { class: 'row between' }, h('strong', {}, '🍽️ ' + t.label), h('span', { class: 'muted small' }, 'según ' + dt.from)));
+      h('div', { class: 'row between' }, h('strong', {}, '🍽️ ' + t.label), h('span', { class: 'muted small' }, 'según ' + dt.from)),
+      t.extra ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, '+' + t.extra + ' kcal por tu cardio extra de hoy (en carbohidratos).') : null);
     if (!d.list.length) {
       card.append(h('p', { class: 'muted small', style: 'margin:6px 0 4px' }, 'Aún no registras comidas hoy. Dímelas en el chat ("desayuno: 3 huevos y un kiwi") y aparecen aquí.'),
         h('p', { class: 'small', style: 'margin:0' }, 'Meta: ' + fmt(t.kcal) + ' kcal · ' + t.prot + ' g proteína · ' + t.carb + ' g carbohidratos · ' + t.fat + ' g grasa'));
@@ -1625,7 +1637,7 @@
     for (let i = 6; i >= 0; i--) {
       const date = isoAdd(todayISO(), -i), d = nutDay(date);
       if (!d.list.length) continue;
-      const t = nutTarget(dayTypeOf(date));
+      const t = nutTarget(dayTypeOf(date), date);
       out.push({ date: date, tot: d.tot, t: t, protOk: d.tot.prot >= t.prot * 0.95, open: i === 0 });
     }
     return out;
@@ -1673,7 +1685,7 @@
       const pOk = wk.filter((x) => x.protOk).length;
       parts.push('proteína en meta ' + pOk + ' de ' + wk.length + ' días');
       if (b) {
-        const spend = wk.reduce((s, x) => s + b.kcal * (x.t.label === NUTRITION.targets.descanso.label ? 1.3 : 1.55), 0) / wk.length;
+        const spend = wk.reduce((s, x) => s + b.kcal * (x.t.kind === 'pesas' ? 1.55 : 1.3) + cardio.sessions.filter((c) => c.date === x.date && (x.t.kind !== 'pesas' || c.libre)).reduce((k, c) => k + cardioNetKcal(c), 0), 0) / wk.length;
         const eat = wk.reduce((s, x) => s + x.tot.kcal, 0) / wk.length;
         const def = Math.round((spend - eat) / 10) * 10;
         parts.push(def >= 0 ? 'déficit promedio de ' + def + ' kcal' : 'superávit promedio de ' + (-def) + ' kcal');
