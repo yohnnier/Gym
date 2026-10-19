@@ -235,6 +235,26 @@
    "carb": 76.6,
    "fat": 31.4,
    "notes": "salmón 139 g pesado ya cocido, sin aceite; maduro cocido (no frito); palta en pulpa"
+  },
+  {
+   "id": "2026-10-19-colacion-1",
+   "date": "2026-10-19",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 119,
+   "prot": 24.0,
+   "carb": 2.6,
+   "fat": 1.4,
+   "notes": "según etiqueta; en agua (si fue con leche u otra bebida, avisar)"
   }
  ]
 }
