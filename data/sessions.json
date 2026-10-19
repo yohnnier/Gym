@@ -389,28 +389,28 @@
    {
     "exerciseId": "jalon-pecho",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 12,
     "rpe": 7
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 2,
-    "weight": 30,
+    "weight": 15,
     "reps": 12,
     "rpe": 9
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 3,
-    "weight": 30,
+    "weight": 15,
     "reps": 8,
     "rpe": 9
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 4,
-    "weight": 30,
+    "weight": 15,
     "reps": 8,
     "rpe": 10
    },
@@ -577,7 +577,7 @@
     "rpe": null
    }
   ],
-  "updatedAt": 1791389110038
+  "updatedAt": 1792415590690
  },
  {
   "id": "mv0y6f1tcpvc9",
@@ -1199,28 +1199,28 @@
    {
     "exerciseId": "jalon-pecho",
     "set": 1,
-    "weight": 40,
+    "weight": 20,
     "reps": 11,
     "rpe": 10
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 2,
-    "weight": 40,
+    "weight": 20,
     "reps": 12,
     "rpe": 10
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 3,
-    "weight": 40,
+    "weight": 20,
     "reps": 11,
     "rpe": 10
    },
    {
     "exerciseId": "jalon-pecho",
     "set": 4,
-    "weight": 40,
+    "weight": 20,
     "reps": 9,
     "rpe": 10
    },
@@ -1379,7 +1379,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1791925655173
+  "updatedAt": 1792415590690
  },
  {
   "id": "mv8k9i20bywx1",
