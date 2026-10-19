@@ -2016,9 +2016,9 @@
     "set": 1,
     "weight": 80,
     "reps": 10,
-    "rpe": null
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792420011749
+  "updatedAt": 1792420072605
  }
 ]
