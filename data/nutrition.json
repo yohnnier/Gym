@@ -130,8 +130,8 @@
      "g": 200,
      "kcal": 130,
      "prot": 17.6,
-     "carb": 8.0,
-     "fat": 3.0
+     "carb": 11.8,
+     "fat": 1.4
     },
     {
      "food": "Plátano",
@@ -144,9 +144,45 @@
    ],
    "kcal": 190,
    "prot": 18.3,
-   "carb": 23.3,
-   "fat": 3.2,
+   "carb": 27.1,
+   "fat": 1.6,
    "notes": "plátano 67 g de pulpa (sin cáscara)"
+  },
+  {
+   "id": "2026-10-19-desayuno",
+   "date": "2026-10-19",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (4 unidades)",
+     "g": 200,
+     "kcal": 286,
+     "prot": 25.2,
+     "carb": 1.4,
+     "fat": 19.0
+    },
+    {
+     "food": "Pan (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 553,
+   "prot": 49.8,
+   "carb": 39.2,
+   "fat": 21.0,
+   "notes": "huevos ~50 g c/u, sin aceite; pan y yogurt según etiqueta"
   }
  ]
 }
