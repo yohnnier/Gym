@@ -119,6 +119,34 @@
    "carb": 73.2,
    "fat": 80.7,
    "notes": "salmón 220 g en crudo (si era el peso ya cocido, suma ~90 kcal y ~9 g de proteína); palta 180 g más ~80 g de tomate; patacones con el aceite que absorben al freír; yuca cocida (no frita); ceviche ≈ 90 g de reineta + cebolla y limón"
+  },
+  {
+   "id": "2026-10-18-cena",
+   "date": "2026-10-18",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 8.0,
+     "fat": 3.0
+    },
+    {
+     "food": "Plátano",
+     "g": 67,
+     "kcal": 60,
+     "prot": 0.7,
+     "carb": 15.3,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 190,
+   "prot": 18.3,
+   "carb": 23.3,
+   "fat": 3.2,
+   "notes": "plátano 67 g de pulpa (sin cáscara)"
   }
  ]
 }
