@@ -35,6 +35,7 @@ El usuario dice lo que comió (p. ej. "desayuno: 3 huevos, 100 g de yogurt grieg
    (los totales de la entrada son la suma de sus items; redondea a 1 decimal).
 2. Commit directo a `main` ("Nutrición: <comida> <fecha>"), igual que las sesiones: `git fetch origin main`, parte de `origin/main`, nunca reescribas historia.
 3. Respondes siempre con el **acumulado del día y lo que queda** frente a la meta del día.
+- **Zona horaria del usuario: Santiago de Chile (`America/Santiago`).** El servidor está en UTC: para la fecha del registro usa `TZ=America/Santiago date +%F`, no la fecha UTC (de noche en Chile, en UTC ya es el día siguiente).
 - **Metas** en `js/routine.js` (`NUTRITION`): pesas (Empuje, Tirón, Piernas) 2.100 kcal · 155 g prot · 230 g carb; descanso o cardio suave (días 4 y 6) 1.950 kcal · 155 g · 170 g; intervalos (día 2) 2.050 kcal · 155 g · 195 g; piernas +150 kcal en carbohidratos; cardio libre extra: la meta sube la mitad de lo quemado (neto, MET−1), en carbohidratos. Grasa = lo que queda. Tipo de día: sesión de pesas registrada ese día; si no hay, el siguiente día del plan (`dayTypeOf()` en `js/app.js`).
 - **La app** lee `data/nutrition.json`: "Nutrición de hoy" en el Inicio; "Nutrición · últimos 7 días" y "Evaluación de la semana" (series, proteína, déficit, cardio, peso/grasa, fuerza y sugerencia de ±150 kcal) en Progreso.
 - **Alimentos frecuentes:** yogurt griego 65 kcal y 8,8 g de proteína por 100 g (porción de 200 g = 130 kcal). **Evita la avena**: le sube el azúcar; no la sugieras.
