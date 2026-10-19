@@ -417,14 +417,14 @@
    {
     "exerciseId": "remo-lineal",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 10,
     "rpe": 9
    },
    {
     "exerciseId": "remo-lineal",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 20,
     "rpe": 10,
     "note": "Descanso largo por una llamada"
@@ -432,7 +432,7 @@
    {
     "exerciseId": "remo-lineal",
     "set": 3,
-    "weight": 30,
+    "weight": 15,
     "reps": 15,
     "rpe": 9
    },
@@ -577,7 +577,7 @@
     "rpe": null
    }
   ],
-  "updatedAt": 1792415590690
+  "updatedAt": 1792416359017
  },
  {
   "id": "mv0y6f1tcpvc9",
@@ -1227,14 +1227,14 @@
    {
     "exerciseId": "remo-lineal",
     "set": 1,
-    "weight": 40,
+    "weight": 20,
     "reps": 10,
     "rpe": 9
    },
    {
     "exerciseId": "remo-lineal",
     "set": 2,
-    "weight": 40,
+    "weight": 20,
     "reps": 10,
     "rpe": 8
    },
@@ -1379,7 +1379,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1792415590690
+  "updatedAt": 1792416359017
  },
  {
   "id": "mv8k9i20bywx1",
