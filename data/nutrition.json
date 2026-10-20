@@ -255,6 +255,50 @@
    "carb": 2.6,
    "fat": 1.4,
    "notes": "según etiqueta; en agua (si fue con leche u otra bebida, avisar)"
+  },
+  {
+   "id": "2026-10-19-cena",
+   "date": "2026-10-19",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo al jugo (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Arroz blanco cocido",
+     "g": 80,
+     "kcal": 104,
+     "prot": 2.2,
+     "carb": 22.6,
+     "fat": 0.2
+    },
+    {
+     "food": "Huevo duro",
+     "g": 50,
+     "kcal": 78,
+     "prot": 6.3,
+     "carb": 0.6,
+     "fat": 5.3
+    },
+    {
+     "food": "Agua con limón (1 vaso)",
+     "g": 250,
+     "kcal": 3,
+     "prot": 0,
+     "carb": 1.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 383,
+   "prot": 45.7,
+   "carb": 24.2,
+   "fat": 9.8,
+   "notes": "pollo 120 g cocido, pechuga sin piel (si era trutro o con piel, suma ~60–90 kcal de grasa); limón ~15 ml sin azúcar"
   }
  ]
 }
