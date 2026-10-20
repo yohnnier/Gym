@@ -2041,5 +2041,22 @@
    }
   ],
   "updatedAt": 1792420326359
+ },
+ {
+  "id": "mvgspm6x8alct",
+  "date": "2026-10-20",
+  "createdAt": 1792507545753,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "rotacion-polea",
+    "set": 1,
+    "weight": 60,
+    "reps": 12,
+    "rpe": 8
+   }
+  ],
+  "updatedAt": 1792507548893
  }
 ]
