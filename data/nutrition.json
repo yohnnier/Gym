@@ -371,6 +371,26 @@
    "carb": 29.4,
    "fat": 15.6,
    "notes": "huevos sin aceite; queso fresco tipo chileno (~210 kcal/100 g); plátano 70 g de pulpa; endulzante sin calorías"
+  },
+  {
+   "id": "2026-10-20-colacion-1",
+   "date": "2026-10-20",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Monster Ultra Paradise sin azúcar (1 lata)",
+     "g": 473,
+     "kcal": 10,
+     "prot": 0,
+     "carb": 3.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 10,
+   "prot": 0,
+   "carb": 3.0,
+   "fat": 0,
+   "notes": "según etiqueta; 150 mg de cafeína"
   }
  ]
 }
