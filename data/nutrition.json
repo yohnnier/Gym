@@ -391,6 +391,26 @@
    "carb": 3.0,
    "fat": 0,
    "notes": "según etiqueta; 150 mg de cafeína"
+  },
+  {
+   "id": "2026-10-20-colacion-2",
+   "date": "2026-10-20",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 119,
+   "prot": 24.0,
+   "carb": 2.6,
+   "fat": 1.4,
+   "notes": "según etiqueta; diluida en agua"
   }
  ]
 }
