@@ -411,6 +411,34 @@
    "carb": 2.6,
    "fat": 1.4,
    "notes": "según etiqueta; diluida en agua"
+  },
+  {
+   "id": "2026-10-20-almuerzo",
+   "date": "2026-10-20",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Lentejas cocidas",
+     "g": 230,
+     "kcal": 267,
+     "prot": 20.7,
+     "carb": 46.2,
+     "fat": 0.9
+    },
+    {
+     "food": "Pernil de pollo cocido (con piel, sin hueso)",
+     "g": 133,
+     "kcal": 305,
+     "prot": 31.9,
+     "carb": 0,
+     "fat": 18.6
+    }
+   ],
+   "kcal": 572,
+   "prot": 52.6,
+   "carb": 46.2,
+   "fat": 19.5,
+   "notes": "pernil 133 g de carne cocida con piel y sin hueso (sin piel: −60 kcal y −9 g de grasa); lentejas cocidas sin aceite ni tocino"
   }
  ]
 }
