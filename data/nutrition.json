@@ -299,6 +299,26 @@
    "carb": 24.2,
    "fat": 9.8,
    "notes": "pollo 120 g cocido, pechuga sin piel (si era trutro o con piel, suma ~60–90 kcal de grasa); limón ~15 ml sin azúcar"
+  },
+  {
+   "id": "2026-10-19-colacion-2",
+   "date": "2026-10-19",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano",
+     "g": 66,
+     "kcal": 59,
+     "prot": 0.7,
+     "carb": 15.1,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 59,
+   "prot": 0.7,
+   "carb": 15.1,
+   "fat": 0.2,
+   "notes": "plátano 66 g de pulpa (sin cáscara)"
   }
  ]
 }
