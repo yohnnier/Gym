@@ -2055,8 +2055,15 @@
     "weight": 60,
     "reps": 12,
     "rpe": 8
+   },
+   {
+    "exerciseId": "rotacion-polea",
+    "set": 2,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1792507548893
+  "updatedAt": 1792507704818
  }
 ]
