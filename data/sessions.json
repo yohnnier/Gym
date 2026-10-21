@@ -2170,8 +2170,15 @@
     "weight": 35,
     "reps": 8,
     "rpe": 9
+   },
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 2,
+    "weight": 35,
+    "reps": 8,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1792608932923
+  "updatedAt": 1792609228710
  }
 ]
