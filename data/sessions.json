@@ -2114,5 +2114,22 @@
    }
   ],
   "updatedAt": 1792510408542
+ },
+ {
+  "id": "mvighdldh1jjg",
+  "date": "2026-10-21",
+  "createdAt": 1792607938321,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "curl-femoral",
+    "set": 1,
+    "weight": 65,
+    "reps": 15,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1792607938321
  }
 ]
