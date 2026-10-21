@@ -78,7 +78,7 @@ const PIERNAS = {
     {
       id: 'pantorrillas-prensa', name: 'Pantorrillas en prensa 45° (con discos)', muscle: 'pantorrillas',
       sets: 4, repMin: 10, repMax: 15, rest: 90, restText: '60–90 s',
-      unit: 'kg/lado', step: 2.5, gym: true, single: true, startKg: 35,
+      unit: 'kg/lado', step: 2.5, gym: true, startKg: 35,
       notes: 'En la prensa de tu gimnasio: apoya solo la parte delantera del pie en el borde de abajo de la plataforma, con el talón libre. Piernas casi estiradas (sin bloquear la rodilla). Baja lento (2 s) hasta sentir el estiramiento, pausa de 1 s abajo sin rebotar, sube hasta quedar en punta y aprieta 1 s. Deja puestos los topes de seguridad. Anota los discos de un lado (parte con 35 kg por lado).'
     }
   ]
