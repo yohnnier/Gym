@@ -479,6 +479,66 @@
    "carb": 75.6,
    "fat": 28.4,
    "notes": "3 pandebonos de ~70 g c/u con bastante queso (supuesto: ~310 kcal/100 g)"
+  },
+  {
+   "id": "2026-10-21-desayuno",
+   "date": "2026-10-21",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (3 unidades)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 18.9,
+     "carb": 1.1,
+     "fat": 14.3
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Pan de molde zero (1 rodaja)",
+     "g": 30,
+     "kcal": 70,
+     "prot": 4.0,
+     "carb": 8.0,
+     "fat": 1.5
+    },
+    {
+     "food": "Queso crema",
+     "g": 15,
+     "kcal": 50,
+     "prot": 0.9,
+     "carb": 0.6,
+     "fat": 5.0
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Café de grano filtrado",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 586,
+   "prot": 65.7,
+   "carb": 24.1,
+   "fat": 23.6,
+   "notes": "huevos sin aceite; pan zero supuesto 30 g (~70 kcal) y queso crema 1 cucharada (15 g): pendiente confirmar con etiqueta; proteína diluida en agua; café sin azúcar"
   }
  ]
 }
