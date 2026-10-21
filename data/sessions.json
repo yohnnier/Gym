@@ -2123,27 +2123,6 @@
   "source": "app",
   "entries": [
    {
-    "exerciseId": "curl-femoral",
-    "set": 1,
-    "weight": 65,
-    "reps": 15,
-    "rpe": 9
-   },
-   {
-    "exerciseId": "curl-femoral",
-    "set": 2,
-    "weight": 65,
-    "reps": 15,
-    "rpe": 10
-   },
-   {
-    "exerciseId": "curl-femoral",
-    "set": 3,
-    "weight": 65,
-    "reps": 15,
-    "rpe": 10
-   },
-   {
     "exerciseId": "extension-cuadriceps",
     "set": 1,
     "weight": 62.5,
@@ -2254,8 +2233,15 @@
     "weight": 15,
     "reps": 22,
     "rpe": 10
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 1,
+    "weight": 65,
+    "reps": 13,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1792612464107
+  "updatedAt": 1792612699407
  }
 ]
