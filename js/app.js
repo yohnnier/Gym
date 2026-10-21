@@ -328,6 +328,11 @@
     const range = ex.repMin + '–' + ex.repMax;
     const reps = (n) => Array(ex.sets).fill(n);
     const last = recs[0] && summarize(recs[0]);
+    if (!recs.length && ex.startKg != null && ex.unit === 'kg/lado') {
+      return { weight: ex.startKg, reps: reps(ex.repMin), trend: 'new',
+        title: 'Primera vez · peso de partida',
+        text: 'Parte con ' + ex.startKg + ' kg por lado y busca ' + range + ' reps con 1–2 en reserva. Si sobra mucho o no llegas, ajústalo.' };
+    }
     if (!recs.length) {
       return { weight: null, reps: reps(ex.repMin), trend: 'new',
         title: 'Primera vez',
