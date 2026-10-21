@@ -459,6 +459,26 @@
    "carb": 8.9,
    "fat": 1.1,
    "notes": "según etiqueta (65 kcal/100 g)"
+  },
+  {
+   "id": "2026-10-20-cena",
+   "date": "2026-10-20",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pandebono colombiano con queso (3)",
+     "g": 210,
+     "kcal": 649,
+     "prot": 22.7,
+     "carb": 75.6,
+     "fat": 28.4
+    }
+   ],
+   "kcal": 649,
+   "prot": 22.7,
+   "carb": 75.6,
+   "fat": 28.4,
+   "notes": "3 pandebonos de ~70 g c/u con bastante queso (supuesto: ~310 kcal/100 g)"
   }
  ]
 }
