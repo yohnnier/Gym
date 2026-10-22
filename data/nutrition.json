@@ -539,6 +539,42 @@
    "carb": 24.1,
    "fat": 23.6,
    "notes": "huevos sin aceite; pan zero supuesto 30 g (~70 kcal) y queso crema 1 cucharada (15 g): pendiente confirmar con etiqueta; proteína diluida en agua; café sin azúcar"
+  },
+  {
+   "id": "2026-10-21-almuerzo",
+   "date": "2026-10-21",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Carne molida cocida",
+     "g": 130,
+     "kcal": 306,
+     "prot": 33.8,
+     "carb": 0,
+     "fat": 17.6
+    },
+    {
+     "food": "Pasta cocida",
+     "g": 180,
+     "kcal": 284,
+     "prot": 10.4,
+     "carb": 55.6,
+     "fat": 1.6
+    },
+    {
+     "food": "Plátano (3 unidades, postre)",
+     "g": 201,
+     "kcal": 180,
+     "prot": 2.1,
+     "carb": 45.9,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 770,
+   "prot": 46.3,
+   "carb": 101.5,
+   "fat": 19.8,
+   "notes": "carne molida 130 g ya cocida (~12 % grasa) y pasta 180 g cocida, sin aceite ni salsa; plátanos 67 g de pulpa c/u"
   }
  ]
 }
