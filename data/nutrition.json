@@ -575,6 +575,34 @@
    "carb": 101.5,
    "fat": 19.8,
    "notes": "carne molida 130 g ya cocida (~12 % grasa) y pasta 180 g cocida, sin aceite ni salsa; plátanos 67 g de pulpa c/u"
+  },
+  {
+   "id": "2026-10-21-cena",
+   "date": "2026-10-21",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Hamburguesa de carne cocida",
+     "g": 140,
+     "kcal": 350,
+     "prot": 36.3,
+     "carb": 0,
+     "fat": 21.0
+    },
+    {
+     "food": "Lentejas cocidas",
+     "g": 120,
+     "kcal": 139,
+     "prot": 10.8,
+     "carb": 24.1,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 489,
+   "prot": 47.1,
+   "carb": 24.1,
+   "fat": 21.5,
+   "notes": "hamburguesa 140 g ya cocida (~15 % grasa), sin pan ni aceite extra; lentejas cocidas sin aceite ni tocino"
   }
  ]
 }
