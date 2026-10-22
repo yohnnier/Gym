@@ -603,6 +603,58 @@
    "carb": 24.1,
    "fat": 21.5,
    "notes": "hamburguesa 140 g ya cocida (~15 % grasa), sin pan ni aceite extra; lentejas cocidas sin aceite ni tocino"
+  },
+  {
+   "id": "2026-10-22-desayuno",
+   "date": "2026-10-22",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo duro (2 unidades)",
+     "g": 100,
+     "kcal": 155,
+     "prot": 12.6,
+     "carb": 1.1,
+     "fat": 10.6
+    },
+    {
+     "food": "Pan de molde zero (1 rodaja)",
+     "g": 30,
+     "kcal": 70,
+     "prot": 4.0,
+     "carb": 8.0,
+     "fat": 1.5
+    },
+    {
+     "food": "Queso crema",
+     "g": 15,
+     "kcal": 50,
+     "prot": 0.9,
+     "carb": 0.6,
+     "fat": 5.0
+    },
+    {
+     "food": "Proteína vegana Revitta (2 medidas)",
+     "g": 66,
+     "kcal": 238,
+     "prot": 48.0,
+     "carb": 5.2,
+     "fat": 2.8
+    },
+    {
+     "food": "Café",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 515,
+   "prot": 65.8,
+   "carb": 14.9,
+   "fat": 19.9,
+   "notes": "pan zero 30 g y queso crema 15 g supuestos; proteína en agua; café sin azúcar"
   }
  ]
 }
