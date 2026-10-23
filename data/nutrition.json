@@ -779,6 +779,86 @@
    "carb": 13.1,
    "fat": 2.1,
    "notes": "según etiqueta"
+  },
+  {
+   "id": "2026-10-23-desayuno",
+   "date": "2026-10-23",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Pollo cocido (pechuga)",
+     "g": 100,
+     "kcal": 165,
+     "prot": 31.0,
+     "carb": 0,
+     "fat": 3.6
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano (3 unidades)",
+     "g": 201,
+     "kcal": 180,
+     "prot": 2.1,
+     "carb": 45.9,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 618,
+   "prot": 63.3,
+   "carb": 58.4,
+   "fat": 15.1,
+   "notes": "huevos sin aceite; pollo 100 g cocido, pechuga sin piel; plátanos 67 g de pulpa c/u"
+  },
+  {
+   "id": "2026-10-23-almuerzo",
+   "date": "2026-10-23",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Arroz blanco cocido",
+     "g": 180,
+     "kcal": 234,
+     "prot": 4.9,
+     "carb": 50.8,
+     "fat": 0.5
+    },
+    {
+     "food": "Palta",
+     "g": 50,
+     "kcal": 80,
+     "prot": 1.0,
+     "carb": 4.3,
+     "fat": 7.3
+    },
+    {
+     "food": "Carne de vacuno magra cocida",
+     "g": 200,
+     "kcal": 380,
+     "prot": 58.0,
+     "carb": 0,
+     "fat": 15.0
+    }
+   ],
+   "kcal": 694,
+   "prot": 63.9,
+   "carb": 55.1,
+   "fat": 22.8,
+   "notes": "carne supuesta magra (posta/lomo), cocida y sin aceite; si era molida o con grasa suma ~60-100 kcal"
   }
  ]
 }
