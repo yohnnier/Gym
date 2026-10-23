@@ -780,5 +780,12 @@
    "fat": 2.1,
    "notes": "según etiqueta"
   }
+ ],
+ "ajustes": [
+  {
+   "date": "2026-10-23",
+   "kcal": -200,
+   "motivo": "compensar el exceso del jueves (+487 kcal)"
+  }
  ]
 }

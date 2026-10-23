@@ -93,6 +93,7 @@
   }
   let repoSessions = [];
   let nutrition = []; // comidas registradas desde el chat (data/nutrition.json)
+  let nutAdjust = []; // ajustes puntuales de la meta de un dia (p. ej. compensar un exceso): [{date, kcal, motivo}]
   const drafts = {}; // valores escritos y aun no registrados: drafts[exId][fila] = { w, r }
 
   // ---------- utilidades ----------
@@ -1604,6 +1605,9 @@
     // Cardio libre extra de ese dia: suma la mitad de lo quemado, en carbohidratos
     const extra = Math.round(cardio.sessions.filter((c) => c.date === (date || todayISO()) && c.libre).reduce((s, c) => s + cardioNetKcal(c), 0) * NUTRITION.extraCardioShare / 10) * 10;
     if (extra) { t.extra = extra; t.kcal += extra; t.carb += Math.round(extra / 4); }
+    // Ajuste puntual del dia (data/nutrition.json -> "ajustes"): la mitad sale de carbohidratos y el resto de grasa; la proteina no se toca
+    const adj = nutAdjust.filter((x) => x.date === (date || todayISO())).reduce((s, x) => s + (+x.kcal || 0), 0);
+    if (adj) { t.adj = adj; t.kcal += adj; t.carb = Math.max(0, t.carb + Math.round(adj / 2 / 4)); t.adjWhy = (nutAdjust.find((x) => x.date === (date || todayISO()) && x.motivo) || {}).motivo || ''; }
     t.fat = Math.max(0, Math.round((t.kcal - 4 * t.prot - 4 * t.carb) / 9));
     return t;
   }
@@ -1616,8 +1620,9 @@
   function loadNutrition() {
     fetch('data/nutrition.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => {
       const list = d && Array.isArray(d.entries) ? d.entries : null;
-      if (!list || JSON.stringify(list) === JSON.stringify(nutrition)) return;
-      nutrition = list; render();
+      const adj = d && Array.isArray(d.ajustes) ? d.ajustes : [];
+      if (!list || (JSON.stringify(list) === JSON.stringify(nutrition) && JSON.stringify(adj) === JSON.stringify(nutAdjust))) return;
+      nutrition = list; nutAdjust = adj; render();
     }).catch(() => { /* sin conexion */ });
   }
   function nutBar(label, val, goal, unit) {
@@ -1634,7 +1639,8 @@
     const today = todayISO(), dt = dayTypeOf(today), t = nutTarget(dt, today), d = nutDay(today);
     const card = h('section', { class: 'card' },
       h('div', { class: 'row between' }, h('strong', {}, '🍽️ ' + t.label), h('span', { class: 'muted small' }, 'según ' + dt.from)),
-      t.extra ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, '+' + t.extra + ' kcal por tu cardio extra de hoy (en carbohidratos).') : null);
+      t.extra ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, '+' + t.extra + ' kcal por tu cardio extra de hoy (en carbohidratos).') : null,
+      t.adj ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, (t.adj > 0 ? '+' : '−') + Math.abs(t.adj) + ' kcal de ajuste de hoy' + (t.adjWhy ? ': ' + t.adjWhy : '') + '.') : null);
     if (!d.list.length) {
       card.append(h('p', { class: 'muted small', style: 'margin:6px 0 4px' }, 'Aún no registras comidas hoy. Dímelas en el chat ("desayuno: 3 huevos y un kiwi") y aparecen aquí.'),
         h('p', { class: 'small', style: 'margin:0' }, 'Meta: ' + fmt(t.kcal) + ' kcal · ' + t.prot + ' g proteína · ' + t.carb + ' g carbohidratos · ' + t.fat + ' g grasa'));
