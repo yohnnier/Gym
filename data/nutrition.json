@@ -923,6 +923,34 @@
    "carb": 40.1,
    "fat": 0.5,
    "notes": "yuca cocida (no frita)"
+  },
+  {
+   "id": "2026-10-23-cena-2",
+   "date": "2026-10-23",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 180,
+     "kcal": 117,
+     "prot": 15.8,
+     "carb": 10.6,
+     "fat": 1.3
+    },
+    {
+     "food": "Proteína vegana Revitta (½ medida)",
+     "g": 16.5,
+     "kcal": 60,
+     "prot": 12.0,
+     "carb": 1.3,
+     "fat": 0.7
+    }
+   ],
+   "kcal": 177,
+   "prot": 27.8,
+   "carb": 11.9,
+   "fat": 2.0,
+   "notes": "según etiqueta; proteína en agua"
   }
  ]
 }
