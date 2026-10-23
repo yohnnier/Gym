@@ -859,6 +859,50 @@
    "carb": 55.1,
    "fat": 22.8,
    "notes": "carne supuesta magra (posta/lomo), cocida y sin aceite; si era molida o con grasa suma ~60-100 kcal"
+  },
+  {
+   "id": "2026-10-23-cena",
+   "date": "2026-10-23",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pan (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Jamón (1 lámina)",
+     "g": 20,
+     "kcal": 22,
+     "prot": 3.6,
+     "carb": 0.4,
+     "fat": 0.7
+    },
+    {
+     "food": "Queso gouda (1 rebanada)",
+     "g": 20,
+     "kcal": 71,
+     "prot": 5.0,
+     "carb": 0.5,
+     "fat": 5.5
+    },
+    {
+     "food": "Coca-Cola Zero (1 lata)",
+     "g": 350,
+     "kcal": 0,
+     "prot": 0,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 230,
+   "prot": 15.6,
+   "carb": 26.9,
+   "fat": 6.8,
+   "notes": "pan según etiqueta (64 g las 2 rebanadas); jamón de pierna ~20 g y gouda ~20 g supuestos; bebida sin calorías"
   }
  ]
 }
