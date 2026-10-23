@@ -715,6 +715,42 @@
    "carb": 55.6,
    "fat": 35.6,
    "notes": "papa y carne cocidas; mayonesa supuesta 20 g (1 cucharada); carne sin aceite; cerveza 450 ml (~4,5 % alcohol, ~16 g de alcohol que aportan ~112 kcal)"
+  },
+  {
+   "id": "2026-10-22-cena",
+   "date": "2026-10-22",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo asado (cuarto, con piel; parte comestible)",
+     "g": 200,
+     "kcal": 458,
+     "prot": 48.0,
+     "carb": 0,
+     "fat": 28.0
+    },
+    {
+     "food": "Yuca cocida",
+     "g": 200,
+     "kcal": 223,
+     "prot": 2.7,
+     "carb": 53.4,
+     "fat": 0.6
+    },
+    {
+     "food": "Vino tinto (1 copa)",
+     "g": 150,
+     "kcal": 127,
+     "prot": 0.1,
+     "carb": 3.9,
+     "fat": 0
+    }
+   ],
+   "kcal": 808,
+   "prot": 50.8,
+   "carb": 57.3,
+   "fat": 28.6,
+   "notes": "cuarto de pollo asado con piel y hueso: se estimaron ~200 g comestibles; yuca cocida (no frita); copa de vino de ~150 ml (~17 g de alcohol, ~120 kcal)"
   }
  ]
 }
