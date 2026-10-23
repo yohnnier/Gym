@@ -751,6 +751,34 @@
    "carb": 57.3,
    "fat": 28.6,
    "notes": "cuarto de pollo asado con piel y hueso: se estimaron ~200 g comestibles; yuca cocida (no frita); copa de vino de ~150 ml (~17 g de alcohol, ~120 kcal)"
+  },
+  {
+   "id": "2026-10-22-colacion-1",
+   "date": "2026-10-22",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (½ medida)",
+     "g": 16.5,
+     "kcal": 60,
+     "prot": 12.0,
+     "carb": 1.3,
+     "fat": 0.7
+    }
+   ],
+   "kcal": 190,
+   "prot": 29.6,
+   "carb": 13.1,
+   "fat": 2.1,
+   "notes": "según etiqueta"
   }
  ]
 }
