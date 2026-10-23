@@ -903,6 +903,26 @@
    "carb": 26.9,
    "fat": 6.8,
    "notes": "pan según etiqueta (64 g las 2 rebanadas); jamón de pierna ~20 g y gouda ~20 g supuestos; bebida sin calorías"
+  },
+  {
+   "id": "2026-10-23-colacion-1",
+   "date": "2026-10-23",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yuca cocida",
+     "g": 150,
+     "kcal": 168,
+     "prot": 2.0,
+     "carb": 40.1,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 168,
+   "prot": 2.0,
+   "carb": 40.1,
+   "fat": 0.5,
+   "notes": "yuca cocida (no frita)"
   }
  ]
 }
