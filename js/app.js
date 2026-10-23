@@ -11,6 +11,7 @@
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
+  const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
   ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; e.baseUnit = e.unit; }));
@@ -42,6 +43,11 @@
     return { sessions: [] };
   })();
   function saveCardio() { try { localStorage.setItem(CARDIO_KEY, JSON.stringify(cardio)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
+  let labs = (function () {
+    try { const l = JSON.parse(localStorage.getItem(LAB_KEY)); if (l && Array.isArray(l.records)) return l; } catch (e) { /* sin datos */ }
+    return { records: [] };
+  })();
+  function saveLabs() { try { localStorage.setItem(LAB_KEY, JSON.stringify(labs)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
   const lastBody = () => { const s = bodySorted(); return s.length ? s[s.length - 1] : null; };
@@ -1421,7 +1427,7 @@
   function route() {
     const p = location.hash.replace(/^#\/?/, '').split('/');
     if (p[0] === 'g' && routineById[p[1]]) return { view: 'group', group: routineById[p[1]] };
-    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio') return { view: p[0] };
+    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio' || p[0] === 'examenes') return { view: p[0] };
     return { view: 'hoy' };
   }
   function go(hash) {
@@ -1434,12 +1440,13 @@
     const root = $('#app');
     root.replaceChildren();
     $('#sub').textContent = longDate(new Date());
-    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio') ? 'prog' : r.view;
+    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio' || r.view === 'examenes') ? 'prog' : r.view;
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === tab));
     if (r.view === 'group') renderGroup(root, r.group);
     else if (r.view === 'prog') renderProg(root);
     else if (r.view === 'cuerpo') renderCuerpo(root);
     else if (r.view === 'cardio') renderCardio(root);
+    else if (r.view === 'examenes') renderExamenes(root);
     else if (r.view === 'hist') renderHist(root);
     else if (r.view === 'rutina') renderRutina(root);
     else renderHome(root);
@@ -2721,6 +2728,110 @@
     }
   }
 
+
+  // ---------- mis examenes (laboratorio) ----------
+  // [clave, nombre, unidad, minimo, maximo, decimales]. Los rangos son los del laboratorio RedSalud; un maximo/minimo null = sin limite.
+  const LAB_FIELDS = [
+    ['testo', 'Testosterona total', 'nmol/L', 4.6, 28.2], ['testoLibre', 'Testosterona libre', 'pg/mL', 9.57, 40.6],
+    ['estradiol', 'Estradiol', 'pg/mL', null, null], ['shbg', 'SHBG', 'nmol/L', null, null], ['psa', 'PSA', 'ng/mL', 0, 4],
+    ['hto', 'Hematocrito', '%', 40, 54], ['hb', 'Hemoglobina', 'g/dL', 13.5, 17], ['rbc', 'Glóbulos rojos', 'x10⁶/µL', 4.9, 5.7],
+    ['leucos', 'Leucocitos', 'x10³/µL', 4, 10], ['plaquetas', 'Plaquetas', 'x10³/µL', 150, 400], ['vhs', 'VHS', 'mm/h', 0, 13],
+    ['colTotal', 'Colesterol total', 'mg/dL', null, 200], ['ldl', 'LDL', 'mg/dL', null, 130], ['hdl', 'HDL', 'mg/dL', 40, 60], ['tg', 'Triglicéridos', 'mg/dL', 0, 150],
+    ['glicemia', 'Glicemia', 'mg/dL', 74, 99], ['insulina', 'Insulina', 'uUI/mL', 3, 29.1], ['homa', 'HOMA', '', null, 2.5], ['hba1c', 'Hb glicosilada', '%', null, 5.7],
+    ['got', 'GOT', 'U/L', 17, 59], ['gpt', 'GPT', 'U/L', 21, 72], ['bilirrubina', 'Bilirrubina total', 'mg/dL', 0.2, 1.3], ['pcr', 'PCR', 'mg/L', 0, 10],
+    ['vitD', 'Vitamina D', 'ng/mL', 20, 100], ['b12', 'Vitamina B12', 'pg/mL', 239, 931], ['tsh', 'TSH', 'mIU/L', 0.4, 4.05], ['t4l', 'T4 libre', 'ng/dL', 0.78, 2.19]
+  ];
+  const labSorted = () => labs.records.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+  function importLabs(text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
+    const list = Array.isArray(data) ? data : [data];
+    let added = 0;
+    list.forEach((c) => {
+      if (!c || !c.fecha || !/^\d{4}-\d{2}-\d{2}$/.test(c.fecha)) return;
+      const rec = { id: uid(), date: c.fecha, v: {} };
+      LAB_FIELDS.forEach((f) => { if (c[f[0]] != null && !isNaN(+c[f[0]])) rec.v[f[0]] = +c[f[0]]; });
+      if (c.nota) rec.nota = String(c.nota).slice(0, 400);
+      labs.records = labs.records.filter((x) => x.date !== rec.date); // un registro por fecha
+      labs.records.push(rec); added++;
+    });
+    if (!added) { toast('No encontré exámenes en el texto.'); return; }
+    saveLabs(); toast(added + ' examen' + (added > 1 ? 'es' : '') + ' guardado' + (added > 1 ? 's' : '') + ' en este dispositivo.'); render();
+  }
+  function labState(f, v) {
+    if (v == null) return null;
+    if (f[3] != null && v < f[3]) return 'bajo';
+    if (f[4] != null && v > f[4]) return 'alto';
+    return f[3] == null && f[4] == null ? null : 'ok';
+  }
+  function renderExamenes(root) {
+    root.append(h('div', { class: 'group-head' },
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('div', { class: 'grow' }, h('h2', {}, 'Mis exámenes'), h('div', { class: 'muted small' }, 'Resultados de laboratorio y su evolución'))));
+    $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo. No se suben a GitHub ni forman parte del repositorio público. Son informativos: tu médico es quien los interpreta.')));
+
+    const recs = labSorted();
+    if (!recs.length) {
+      root.append(h('section', { class: 'card', style: 'border-color:var(--warm)' },
+        h('strong', {}, 'Aún no hay exámenes guardados aquí'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Pega el texto que te dé el asistente en "Importar exámenes", más abajo. Se guardan solo en el navegador de este celular.')));
+    } else {
+      const last = recs[recs.length - 1], prev = recs[recs.length - 2];
+      const tbl = h('table', { class: 'lab-table' },
+        h('thead', {}, h('tr', {}, h('th', {}, 'Examen'), h('th', {}, prev ? fmtDate(prev.date) : ''), h('th', {}, fmtDate(last.date)), h('th', {}, 'Rango'))));
+      const tb = h('tbody', {});
+      LAB_FIELDS.forEach((f) => {
+        const v = last.v[f[0]], p = prev ? prev.v[f[0]] : null;
+        if (v == null && p == null) return;
+        const st = labState(f, v);
+        const rng = f[3] != null && f[4] != null ? f[3] + '–' + f[4] : f[4] != null ? '≤ ' + f[4] : f[3] != null ? '≥ ' + f[3] : '—';
+        tb.append(h('tr', {},
+          h('td', {}, f[1], f[2] ? h('div', { class: 'muted small' }, f[2]) : null),
+          h('td', { class: 'muted' }, p != null ? fmt(p) : '—'),
+          h('td', { class: 'lab-val' + (st === 'alto' || st === 'bajo' ? ' out' : '') }, v != null ? fmt(v) : '—', st === 'alto' ? ' ▲' : st === 'bajo' ? ' ▼' : ''),
+          h('td', { class: 'muted small' }, rng)));
+      });
+      tbl.append(tb);
+      root.append(h('div', { class: 'section-title' }, prev ? 'Último examen vs. anterior' : 'Último examen'),
+        h('section', { class: 'card' }, tbl,
+          h('p', { class: 'muted small', style: 'margin:8px 0 0' }, '▲ sobre el rango del laboratorio · ▼ bajo el rango. Los rangos son los del laboratorio y no siempre son la meta ideal para ti.')));
+      if (last.nota) root.append(h('section', { class: 'card soft' }, h('div', { class: 'muted small' }, 'Nota del ' + fmtDate(last.date)), h('p', { class: 'small', style: 'margin:4px 0 0' }, last.nota)));
+
+      const list = h('section', { class: 'card' });
+      recs.slice().reverse().forEach((c) => {
+        const det = h('div', {});
+        LAB_FIELDS.forEach((f) => { if (c.v[f[0]] != null) det.append(h('div', { class: 'ctl-row' }, h('span', {}, f[1]), h('strong', {}, fmt(c.v[f[0]]) + ' ' + f[2]))); });
+        if (c.nota) det.append(h('p', { class: 'muted small' }, c.nota));
+        det.append(h('button', { class: 'btn small', type: 'button', style: 'margin-top:8px', onclick: () => {
+          if (!confirm('¿Borrar el examen del ' + fmtDate(c.date) + ' de este dispositivo?')) return;
+          labs.records = labs.records.filter((x) => x.id !== c.id); saveLabs(); render();
+        } }, 'Borrar este examen'));
+        list.append(h('details', { class: 'ctl' }, h('summary', {}, h('strong', {}, fmtDate(c.date)), h('span', { class: 'muted small' }, Object.keys(c.v).length + ' valores')), det));
+      });
+      root.append(h('div', { class: 'section-title' }, 'Historial'), list);
+    }
+
+    const ta = h('textarea', { class: 'body-paste', rows: '3', placeholder: '{"fecha":"2026-10-22","testo":57.2,…}', 'aria-label': 'Texto de exámenes para importar' });
+    root.append(h('div', { class: 'section-title' }, 'Importar exámenes'),
+      h('section', { class: 'card' },
+        h('p', { class: 'muted small', style: 'margin-top:0' }, 'Pega aquí el texto que te dé el asistente. Si pegas un examen con una fecha que ya existe, lo reemplaza.'),
+        ta, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => { importLabs(ta.value.trim()); } }, 'Importar')));
+    if (recs.length) {
+      const backup = () => JSON.stringify(recs.map((c) => Object.assign({ fecha: c.date }, c.v, c.nota ? { nota: c.nota } : {})), null, 1);
+      root.append(h('div', { class: 'section-title' }, 'Copia de seguridad'),
+        h('section', { class: 'card' },
+          h('p', { class: 'muted small', style: 'margin:0 0 8px' }, 'Guarda una copia por si cambias de celular o borras los datos del navegador. Para recuperarla, pega el texto en "Importar exámenes".'),
+          h('div', { class: 'hiit-actions' },
+            h('button', { class: 'btn', type: 'button', onclick: () => {
+              const t = backup();
+              if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado. Pégalo en un lugar seguro.'), () => toast('No se pudo copiar.'));
+              else toast('Tu navegador no permite copiar. Usa Descargar.');
+            } }, 'Copiar texto'),
+            h('button', { class: 'btn', type: 'button', onclick: () => download('mis-examenes.json', backup(), 'application/json') }, 'Descargar'))));
+    }
+  }
+
   function renderProg(root) {
     root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.')));
     const lb = lastBody();
@@ -2729,6 +2840,11 @@
         h('div', { class: 'muted small' }, lb
           ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '')
           : 'Guarda tus controles de peso y composición corporal')),
+      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    const lbs = labSorted(), ll = lbs[lbs.length - 1];
+    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/examenes') },
+      h('div', {}, h('strong', {}, '🩺 Mis exámenes'),
+        h('div', { class: 'muted small' }, ll ? 'Último examen ' + fmtDate(ll.date) + ' · ' + Object.keys(ll.v).length + ' valores' : 'Guarda tus resultados de laboratorio')),
       h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
     const cmin = cardioWeekMinutes();
     root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cardio') },

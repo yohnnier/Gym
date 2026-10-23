@@ -631,3 +631,11 @@ ul.plain li { margin: 4px 0; }
 .bm-m.mid { fill: #f2a33a; }
 .bm-m.low { fill: #e5484d; }
 .rec-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent); margin: 2px 0 8px; }
+
+/* Mis examenes */
+.lab-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lab-table th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 4px 4px 6px; }
+.lab-table td { padding: 7px 4px; border-top: 1px solid var(--line); vertical-align: top; }
+.lab-table th:nth-child(2), .lab-table th:nth-child(3), .lab-table td:nth-child(2), .lab-table td:nth-child(3) { text-align: right; white-space: nowrap; }
+.lab-val { font-weight: 700; }
+.lab-val.out { color: var(--warm); }
