@@ -11,6 +11,7 @@
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
+  const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
   const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
@@ -47,6 +48,11 @@
     try { const l = JSON.parse(localStorage.getItem(LAB_KEY)); if (l && Array.isArray(l.records)) return l; } catch (e) { /* sin datos */ }
     return { records: [] };
   })();
+  let dose = (function () {
+    try { const d = JSON.parse(localStorage.getItem(DOSE_KEY)); if (d && d.proxima) return d; } catch (e) { /* sin datos */ }
+    return null;
+  })();
+  function saveDose() { try { localStorage.setItem(DOSE_KEY, JSON.stringify(dose)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveLabs() { try { localStorage.setItem(LAB_KEY, JSON.stringify(labs)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
@@ -1744,6 +1750,8 @@
       h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
       h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
 
+    root.append(doseCard());
+
     // Aviso de control corporal: pasan 5 semanas desde el ultimo
     const lbody = lastBody();
     let snoozed = 0;
@@ -2728,6 +2736,92 @@
     }
   }
 
+
+
+  // ---------- recordatorio de aplicacion ----------
+  const isoOk = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
+  function doseDays() { return Math.round((isoToDate(dose.proxima) - isoToDate(todayISO())) / DAY); }
+  function doseIcs() {
+    const nombre = (dose.nombre || 'Aplicación').replace(/[\r\n,;]/g, ' ');
+    const d = dose.proxima.replace(/-/g, '');
+    const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+    const alarm = (trig, txt) => ['BEGIN:VALARM', 'TRIGGER:' + trig, 'ACTION:DISPLAY', 'DESCRIPTION:' + txt, 'END:VALARM'];
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Rutinas//ES', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+      'UID:aplicacion-' + d + '@rutinas', 'DTSTAMP:' + now, 'DTSTART:' + d + 'T090000', 'DTEND:' + d + 'T091500',
+      'SUMMARY:💉 ' + nombre + ': toca la aplicación',
+      'DESCRIPTION:Confírmala en la app Rutinas cuando te la pongas. Si se corre\\, cambia la fecha en la app.']
+      .concat(alarm('-P1D', 'Mañana toca la aplicación'), alarm('PT0S', 'Hoy toca la aplicación'), ['END:VEVENT', 'END:VCALENDAR']).join('\r\n');
+  }
+  function doseCard() {
+    const mk = (cls) => h('section', { class: 'card ' + (cls || '') });
+    if (!dose) {
+      const nom = h('input', { type: 'text', placeholder: 'Ej: Sostenón', 'aria-label': 'Nombre' });
+      const ult = h('input', { type: 'date', 'aria-label': 'Última aplicación', max: todayISO() });
+      const inter = h('input', { type: 'number', inputmode: 'numeric', min: '1', max: '90', placeholder: 'Ej: 10', 'aria-label': 'Cada cuántos días' });
+      return h('section', { class: 'card dose' },
+        h('strong', {}, '💉 Recordatorio de aplicación'),
+        h('p', { class: 'muted small', style: 'margin:4px 0 10px' }, '🔒 Se guarda solo en este celular. Anota tu última aplicación y cada cuántos días te toca: la app calcula la próxima y te avisa aquí.'),
+        h('label', { class: 'small muted' }, 'Nombre (solo para ti)'), nom,
+        h('label', { class: 'small muted' }, 'Última aplicación'), ult,
+        h('label', { class: 'small muted' }, 'Cada cuántos días'), inter,
+        h('button', { class: 'btn primary', type: 'button', style: 'margin-top:10px', onclick: () => {
+          const n = Math.round(parseNum(inter.value) || 0);
+          if (!isoOk(ult.value) || n < 1 || n > 90) { toast('Pon la fecha de tu última aplicación y los días entre dosis (1 a 90).'); return; }
+          dose = { nombre: nom.value.trim().slice(0, 40), intervalo: n, proxima: isoAdd(ult.value, n), ultima: ult.value, aplicadas: [ult.value] };
+          saveDose(); toast('Listo. Próxima aplicación: ' + fmtDate(dose.proxima) + '.'); render();
+        } }, 'Guardar recordatorio'));
+    }
+    const d = doseDays();
+    const due = d <= 0;
+    const title = d > 1 ? 'en ' + d + ' días' : d === 1 ? 'mañana' : d === 0 ? 'HOY' : 'atrasada ' + (-d) + (d === -1 ? ' día' : ' días');
+    const card = h('section', { class: 'card dose' + (d <= 1 ? ' warm' : '') });
+    card.append(h('strong', {}, '💉 ' + (dose.nombre || 'Aplicación') + ' · ' + (d === 0 ? 'toca HOY' : d < 0 ? title : 'próxima ' + title)),
+      h('p', { class: 'small', style: 'margin:4px 0 10px' },
+        'Próxima: ' + longDay(dose.proxima) + ' (' + fmtDate(dose.proxima) + ')' + (dose.ultima ? ' · última: ' + fmtDate(dose.ultima) : '') + ' · cada ' + dose.intervalo + ' días.' +
+        (d === 0 ? ' Hoy te toca: confírmala cuando te la pongas.' : d < 0 ? ' Se pasó la fecha: si ya te la pusiste, márcala; si se corrió, cambia la fecha.' : '')));
+    const panel = h('div', { style: 'margin-top:10px' });
+    const dateIn = h('input', { type: 'date', value: todayISO(), max: todayISO(), 'aria-label': 'Fecha de aplicación' });
+    const moveIn = h('input', { type: 'date', value: dose.proxima, min: todayISO(), 'aria-label': 'Nueva fecha' });
+    const open = (kind) => {
+      panel.replaceChildren();
+      if (kind === 'done') {
+        panel.append(h('label', { class: 'small muted' }, '¿Qué día te la pusiste?'), dateIn,
+          h('button', { class: 'btn primary', type: 'button', style: 'margin-top:8px', onclick: () => {
+            if (!isoOk(dateIn.value)) { toast('Elige la fecha.'); return; }
+            dose.ultima = dateIn.value; dose.aplicadas = (dose.aplicadas || []).filter((x) => x !== dateIn.value).concat(dateIn.value).sort();
+            dose.proxima = isoAdd(dateIn.value, dose.intervalo); saveDose();
+            toast('Anotada. Próxima: ' + fmtDate(dose.proxima) + '.'); render();
+          } }, 'Guardar y calcular la próxima'));
+      } else if (kind === 'move') {
+        panel.append(h('label', { class: 'small muted' }, 'Nueva fecha de la próxima aplicación'), moveIn,
+          h('button', { class: 'btn primary', type: 'button', style: 'margin-top:8px', onclick: () => {
+            if (!isoOk(moveIn.value)) { toast('Elige la fecha.'); return; }
+            dose.proxima = moveIn.value; saveDose(); toast('Fecha cambiada: ' + fmtDate(dose.proxima) + '.'); render();
+          } }, 'Cambiar fecha'));
+      } else if (kind === 'cfg') {
+        const nom = h('input', { type: 'text', value: dose.nombre || '', 'aria-label': 'Nombre' });
+        const inter = h('input', { type: 'number', inputmode: 'numeric', min: '1', max: '90', value: String(dose.intervalo), 'aria-label': 'Cada cuántos días' });
+        panel.append(h('label', { class: 'small muted' }, 'Nombre'), nom, h('label', { class: 'small muted' }, 'Cada cuántos días'), inter,
+          h('div', { class: 'row wrap', style: 'margin-top:8px' },
+            h('button', { class: 'btn primary', type: 'button', onclick: () => {
+              const n = Math.round(parseNum(inter.value) || 0);
+              if (n < 1 || n > 90) { toast('Pon entre 1 y 90 días.'); return; }
+              dose.nombre = nom.value.trim().slice(0, 40);
+              if (n !== dose.intervalo && dose.ultima) dose.proxima = isoAdd(dose.ultima, n);
+              dose.intervalo = n; saveDose(); toast('Guardado.'); render();
+            } }, 'Guardar'),
+            h('button', { class: 'btn', type: 'button', onclick: () => { if (confirm('¿Borrar el recordatorio de este dispositivo?')) { dose = null; try { localStorage.removeItem(DOSE_KEY); } catch (e) { /* sin almacenamiento */ } render(); } } }, 'Borrar recordatorio')));
+      }
+    };
+    card.append(h('div', { class: 'row wrap' },
+      h('button', { class: 'btn primary small', type: 'button', onclick: () => open('done') }, due ? '✅ Ya me la puse' : '✅ Ya me la puse'),
+      h('button', { class: 'btn small', type: 'button', onclick: () => open('move') }, '📆 Cambiar fecha'),
+      h('button', { class: 'btn small', type: 'button', onclick: () => download('proxima-aplicacion.ics', doseIcs(), 'text/calendar') }, '📅 Al calendario'),
+      h('button', { class: 'btn small', type: 'button', 'aria-label': 'Ajustes', onclick: () => open('cfg') }, '⚙️')),
+      panel);
+    return card;
+  }
+  function longDay(iso) { return isoToDate(iso).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }); }
 
   // ---------- mis examenes (laboratorio) ----------
   // [clave, nombre, unidad, minimo, maximo, decimales]. Los rangos son los del laboratorio RedSalud; un maximo/minimo null = sin limite.

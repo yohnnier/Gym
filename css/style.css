@@ -639,3 +639,7 @@ ul.plain li { margin: 4px 0; }
 .lab-table th:nth-child(2), .lab-table th:nth-child(3), .lab-table td:nth-child(2), .lab-table td:nth-child(3) { text-align: right; white-space: nowrap; }
 .lab-val { font-weight: 700; }
 .lab-val.out { color: var(--warm); }
+
+/* Recordatorio de aplicacion */
+.card.dose input { width: 100%; padding: 10px; margin: 2px 0 8px; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.card.dose label { display: block; margin-top: 6px; }
