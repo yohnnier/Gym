@@ -951,6 +951,34 @@
    "carb": 11.9,
    "fat": 2.0,
    "notes": "según etiqueta; proteína en agua"
+  },
+  {
+   "id": "2026-10-24-desayuno",
+   "date": "2026-10-24",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de harina de trigo",
+     "g": 100,
+     "kcal": 240,
+     "prot": 7.0,
+     "carb": 48.0,
+     "fat": 2.5
+    }
+   ],
+   "kcal": 383,
+   "prot": 19.6,
+   "carb": 48.7,
+   "fat": 12.0,
+   "notes": "huevos sin aceite; arepa de harina de trigo ~100 g ya hecha (~240 kcal/100 g), sin mantequilla ni relleno"
   }
  ]
 }
