@@ -2404,8 +2404,24 @@
     "weight": 60,
     "reps": 14,
     "rpe": 10
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 1,
+    "weight": 20,
+    "reps": 11,
+    "rpe": 10,
+    "altOrder": true
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 2,
+    "weight": 20,
+    "reps": 10,
+    "rpe": null,
+    "altOrder": true
    }
   ],
-  "updatedAt": 1792853669088
+  "updatedAt": 1792854140361
  }
 ]
