@@ -2341,8 +2341,15 @@
     "weight": 35,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 3,
+    "weight": 35,
+    "reps": 11,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1792851399335
+  "updatedAt": 1792851562009
  }
 ]
