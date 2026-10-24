@@ -12,6 +12,7 @@
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
   const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
+  const SOMA_KEY = 'rutinas.soma.v1'; // somatocarta: SOLO en este dispositivo, nunca se sube a GitHub
   const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
@@ -53,6 +54,11 @@
     return null;
   })();
   function saveDose() { try { localStorage.setItem(DOSE_KEY, JSON.stringify(dose)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
+  let soma = (function () {
+    try { const s = JSON.parse(localStorage.getItem(SOMA_KEY)); if (s && Array.isArray(s.records)) return s; } catch (e) { /* sin datos */ }
+    return { records: [] };
+  })();
+  function saveSoma() { try { localStorage.setItem(SOMA_KEY, JSON.stringify(soma)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveLabs() { try { localStorage.setItem(LAB_KEY, JSON.stringify(labs)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
@@ -1434,7 +1440,7 @@
   function route() {
     const p = location.hash.replace(/^#\/?/, '').split('/');
     if (p[0] === 'g' && routineById[p[1]]) return { view: 'group', group: routineById[p[1]] };
-    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio' || p[0] === 'examenes') return { view: p[0] };
+    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio' || p[0] === 'examenes' || p[0] === 'somatocarta') return { view: p[0] };
     return { view: 'hoy' };
   }
   function go(hash) {
@@ -1447,13 +1453,14 @@
     const root = $('#app');
     root.replaceChildren();
     $('#sub').textContent = longDate(new Date());
-    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio' || r.view === 'examenes') ? 'prog' : r.view;
+    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio' || r.view === 'examenes' || r.view === 'somatocarta') ? 'prog' : r.view;
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === tab));
     if (r.view === 'group') renderGroup(root, r.group);
     else if (r.view === 'prog') renderProg(root);
     else if (r.view === 'cuerpo') renderCuerpo(root);
     else if (r.view === 'cardio') renderCardio(root);
     else if (r.view === 'examenes') renderExamenes(root);
+    else if (r.view === 'somatocarta') renderSoma(root);
     else if (r.view === 'hist') renderHist(root);
     else if (r.view === 'rutina') renderRutina(root);
     else renderHome(root);
@@ -2829,6 +2836,132 @@
   }
   function longDay(iso) { return isoToDate(iso).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }); }
 
+
+  // ---------- somatocarta (Heath-Carter) ----------
+  // Entradas: altura (cm), peso (kg), pliegues (mm): triceps, subescapular, supraespinal, pantorrilla medial;
+  // diametros (cm): humero y femur (biepicondileos); perimetros (cm): brazo flexionado y contraido, pantorrilla maxima.
+  const SOMA_FIELDS = [
+    ['altura', 'Estatura', 'cm', 120, 230], ['peso', 'Peso', 'kg', 30, 250],
+    ['triceps', 'Pliegue tríceps', 'mm', 2, 80], ['subescapular', 'Pliegue subescapular', 'mm', 2, 80], ['supraespinal', 'Pliegue supraespinal', 'mm', 2, 80], ['pantorrilla', 'Pliegue pantorrilla medial', 'mm', 2, 80],
+    ['humero', 'Diámetro húmero (biepicondíleo)', 'cm', 4, 11], ['femur', 'Diámetro fémur (biepicondíleo)', 'cm', 6, 14],
+    ['brazo', 'Perímetro brazo flexionado y contraído', 'cm', 20, 60], ['pierna', 'Perímetro pantorrilla máximo', 'cm', 20, 60]
+  ];
+  function somaCalc(v) {
+    const X = (v.triceps + v.subescapular + v.supraespinal) * (170.18 / v.altura);
+    const endo = Math.max(0.1, -0.7182 + 0.1451 * X - 0.00068 * X * X + 0.0000014 * X * X * X);
+    const meso = Math.max(0.1, 0.858 * v.humero + 0.601 * v.femur + 0.188 * (v.brazo - v.triceps / 10) + 0.161 * (v.pierna - v.pantorrilla / 10) - 0.131 * v.altura + 4.5);
+    const hwr = v.altura / Math.cbrt(v.peso);
+    const ecto = hwr >= 40.75 ? 0.732 * hwr - 28.58 : hwr > 38.25 ? 0.463 * hwr - 17.63 : 0.1;
+    const r = (n) => Math.round(n * 10) / 10;
+    return { endo: r(endo), meso: r(meso), ecto: r(Math.max(0.1, ecto)), x: r(ecto - endo), y: r(2 * meso - (endo + ecto)) };
+  }
+  function somaName(s) {
+    const c = [['endomorfo', s.endo], ['mesomorfo', s.meso], ['ectomorfo', s.ecto]].sort((p, q) => q[1] - p[1]);
+    if (c[0][1] - c[2][1] <= 1) return 'Central (equilibrado)';
+    if (c[0][1] - c[1][1] > 0.5) return c[0][0].charAt(0).toUpperCase() + c[0][0].slice(1);
+    return c[0][0].charAt(0).toUpperCase() + c[0][0].slice(1) + '–' + c[1][0];
+  }
+  function somaChart(recs) {
+    const NS = 'http://www.w3.org/2000/svg', W = 320, H = 340, sx = (x) => W / 2 + x * 17, sy = (y) => 316 - (y + 10) * 11;
+    const el = (n, at, txt) => { const e = document.createElementNS(NS, n); Object.keys(at).forEach((k) => e.setAttribute(k, at[k])); if (txt != null) e.textContent = txt; return e; };
+    const svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'soma-svg', role: 'img', 'aria-label': 'Somatocarta' });
+    for (let x = -8; x <= 8; x += 2) svg.append(el('line', { x1: sx(x), y1: sy(-10), x2: sx(x), y2: sy(16), class: x === 0 ? 'soma-ax' : 'soma-grid' }));
+    for (let y = -10; y <= 16; y += 2) svg.append(el('line', { x1: sx(-8), y1: sy(y), x2: sx(8), y2: sy(y), class: y === 0 ? 'soma-ax' : 'soma-grid' }));
+    svg.append(el('polygon', { points: [[-7, -7], [0, 14], [7, -7]].map((p) => sx(p[0]) + ',' + sy(p[1])).join(' '), class: 'soma-tri' }));
+    svg.append(el('text', { x: sx(-7), y: sy(-7) + 15, class: 'soma-lbl', 'text-anchor': 'middle' }, 'Endomorfia'));
+    svg.append(el('text', { x: sx(0), y: sy(14) - 6, class: 'soma-lbl', 'text-anchor': 'middle' }, 'Mesomorfia'));
+    svg.append(el('text', { x: sx(7), y: sy(-7) + 15, class: 'soma-lbl', 'text-anchor': 'middle' }, 'Ectomorfia'));
+    recs.forEach((r, i) => {
+      const last = i === recs.length - 1;
+      svg.append(el('circle', { cx: sx(Math.max(-8, Math.min(8, r.x))), cy: sy(Math.max(-10, Math.min(16, r.y))), r: last ? 6 : 4, class: last ? 'soma-pt last' : 'soma-pt' }));
+    });
+    return svg;
+  }
+  function importSoma(text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
+    const list = Array.isArray(data) ? data : [data];
+    let added = 0;
+    list.forEach((c) => {
+      if (!c || !isoOk(c.fecha)) return;
+      const v = {};
+      for (let i = 0; i < SOMA_FIELDS.length; i++) {
+        const f = SOMA_FIELDS[i], n = +c[f[0]];
+        if (!(n >= f[3] && n <= f[4])) return;
+        v[f[0]] = n;
+      }
+      soma.records = soma.records.filter((x) => x.date !== c.fecha);
+      soma.records.push(Object.assign({ id: uid(), date: c.fecha, v: v }, somaCalc(v))); added++;
+    });
+    if (!added) { toast('No encontré mediciones completas en el texto.'); return; }
+    saveSoma(); toast(added + ' medición' + (added > 1 ? 'es' : '') + ' guardada' + (added > 1 ? 's' : '') + ' en este dispositivo.'); render();
+  }
+  function renderSoma(root) {
+    root.append(h('div', { class: 'group-head' },
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('div', { class: 'grow' }, h('h2', {}, 'Somatocarta'), h('div', { class: 'muted small' }, 'Tu somatotipo (método Heath-Carter)'))));
+    $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo. El somatotipo se calcula con mediciones de antropometría (pliegues, diámetros y perímetros), no con exámenes de sangre ni con la báscula.')));
+    const recs = soma.records.slice().sort((x, y) => (x.date < y.date ? -1 : 1));
+    const last = recs[recs.length - 1], prev = recs[recs.length - 2];
+    if (last) {
+      const dlt = (k) => prev ? (last[k] - prev[k] > 0 ? '+' : '') + fmt(last[k] - prev[k]) : null;
+      root.append(h('section', { class: 'card' },
+        h('div', { class: 'muted small' }, 'Medición del ' + fmtDate(last.date)),
+        h('div', { class: 'soma-nums' },
+          [['Endomorfia', 'endo'], ['Mesomorfia', 'meso'], ['Ectomorfia', 'ecto']].map((k) => h('div', {}, h('b', {}, fmt(last[k[1]])), h('span', {}, k[0]), prev ? h('em', {}, dlt(k[1]) + ' vs. anterior') : null))),
+        h('p', { style: 'margin:8px 0 0' }, h('strong', {}, somaName(last)), h('span', { class: 'muted small' }, '  ·  ' + fmt(last.endo) + '–' + fmt(last.meso) + '–' + fmt(last.ecto))),
+        somaChart(recs),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Cada punto es una medición; el grande es la última. Endomorfia = adiposidad relativa, mesomorfia = músculo y hueso, ectomorfia = linealidad.')));
+    } else {
+      root.append(h('section', { class: 'card', style: 'border-color:var(--warm)' },
+        h('strong', {}, 'Aún no hay mediciones'),
+        h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Anota abajo tus mediciones de antropometría. Si te las hizo un nutricionista o un profesional con plicómetro y paquímetro, pídele el informe con pliegues, diámetros y perímetros.')));
+    }
+    const p = body.profile || {}, lb = lastBody();
+    const inputs = {};
+    const form = h('section', { class: 'card' }, h('strong', {}, 'Nueva medición'));
+    const dateIn = h('input', { type: 'date', value: todayISO(), max: todayISO(), 'aria-label': 'Fecha' });
+    form.append(h('label', { class: 'small muted' }, 'Fecha'), dateIn);
+    SOMA_FIELDS.forEach((f) => {
+      const pre = f[0] === 'altura' ? p.altura : f[0] === 'peso' ? (lb && lb.peso) : '';
+      inputs[f[0]] = h('input', { type: 'text', inputmode: 'decimal', value: pre ? String(pre).replace('.', ',') : '', 'aria-label': f[1] });
+      form.append(h('label', { class: 'small muted' }, f[1] + ' (' + f[2] + ')'), inputs[f[0]]);
+    });
+    form.append(h('button', { class: 'btn primary', type: 'button', style: 'margin-top:10px', onclick: () => {
+      const o = { fecha: dateIn.value };
+      SOMA_FIELDS.forEach((f) => { o[f[0]] = parseNum(inputs[f[0]].value); });
+      const bad = SOMA_FIELDS.find((f) => !(o[f[0]] >= f[3] && o[f[0]] <= f[4]));
+      if (bad) { toast('Revisa "' + bad[1] + '" (entre ' + bad[3] + ' y ' + bad[4] + ' ' + bad[2] + ').'); return; }
+      importSoma(JSON.stringify(o));
+    } }, 'Calcular y guardar'));
+    root.append(form);
+    const ta = h('textarea', { class: 'body-paste', rows: '3', placeholder: '{"fecha":"2026-10-24","altura":…}', 'aria-label': 'Texto de mediciones para importar' });
+    root.append(h('div', { class: 'section-title' }, 'Importar mediciones'),
+      h('section', { class: 'card' }, h('p', { class: 'muted small', style: 'margin-top:0' }, 'Pega aquí el texto que te dé el asistente (o tu copia de seguridad).'),
+        ta, h('button', { class: 'btn', type: 'button', style: 'margin-top:8px', onclick: () => importSoma(ta.value.trim()) }, 'Importar')));
+    if (recs.length) {
+      const list = h('section', { class: 'card' });
+      recs.slice().reverse().forEach((c) => list.append(h('details', { class: 'ctl' },
+        h('summary', {}, h('strong', {}, fmtDate(c.date)), h('span', { class: 'muted small' }, fmt(c.endo) + '–' + fmt(c.meso) + '–' + fmt(c.ecto))),
+        SOMA_FIELDS.map((f) => h('div', { class: 'ctl-row' }, h('span', {}, f[1]), h('strong', {}, fmt(c.v[f[0]]) + ' ' + f[2]))),
+        h('button', { class: 'btn small', type: 'button', style: 'margin-top:8px', onclick: () => {
+          if (!confirm('¿Borrar la medición del ' + fmtDate(c.date) + '?')) return;
+          soma.records = soma.records.filter((x) => x.id !== c.id); saveSoma(); render();
+        } }, 'Borrar esta medición'))));
+      const backup = () => JSON.stringify(recs.map((c) => Object.assign({ fecha: c.date }, c.v)), null, 1);
+      root.append(h('div', { class: 'section-title' }, 'Historial'), list,
+        h('div', { class: 'section-title' }, 'Copia de seguridad'),
+        h('section', { class: 'card' }, h('div', { class: 'hiit-actions' },
+          h('button', { class: 'btn', type: 'button', onclick: () => {
+            const t = backup();
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.'));
+            else toast('Tu navegador no permite copiar. Usa Descargar.');
+          } }, 'Copiar texto'),
+          h('button', { class: 'btn', type: 'button', onclick: () => download('mi-somatocarta.json', backup(), 'application/json') }, 'Descargar'))));
+    }
+  }
+
   // ---------- mis examenes (laboratorio) ----------
   // [clave, nombre, unidad, minimo, maximo, decimales]. Los rangos son los del laboratorio RedSalud; un maximo/minimo null = sin limite.
   const LAB_FIELDS = [
@@ -2945,6 +3078,11 @@
     root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/examenes') },
       h('div', {}, h('strong', {}, '🩺 Mis exámenes'),
         h('div', { class: 'muted small' }, ll ? 'Último examen ' + fmtDate(ll.date) + ' · ' + Object.keys(ll.v).length + ' valores' : 'Guarda tus resultados de laboratorio')),
+      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    const sr = soma.records.slice().sort((x, y) => (x.date < y.date ? -1 : 1)), sl = sr[sr.length - 1];
+    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/somatocarta') },
+      h('div', {}, h('strong', {}, '🧬 Somatocarta'),
+        h('div', { class: 'muted small' }, sl ? fmtDate(sl.date) + ' · ' + somaName(sl) + ' (' + fmt(sl.endo) + '–' + fmt(sl.meso) + '–' + fmt(sl.ecto) + ')' : 'Calcula tu somatotipo con tus mediciones de antropometría')),
       h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
     const cmin = cardioWeekMinutes();
     root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cardio') },
