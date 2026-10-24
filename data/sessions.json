@@ -2418,10 +2418,10 @@
     "set": 2,
     "weight": 20,
     "reps": 10,
-    "rpe": null,
+    "rpe": 10,
     "altOrder": true
    }
   ],
-  "updatedAt": 1792854140361
+  "updatedAt": 1792854176209
  }
 ]
