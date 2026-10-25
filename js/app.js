@@ -13,6 +13,7 @@
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
   const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
   const WEIGHT_KEY = 'rutinas.weight.v1'; // peso diario: SOLO en este dispositivo, nunca se sube a GitHub
+  const WAIST_KEY = 'rutinas.waist.v1'; // cintura/abdomen semanal: SOLO en este dispositivo, nunca se sube a GitHub
   const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
@@ -59,6 +60,11 @@
     return { entries: [] };
   })();
   function saveW() { try { localStorage.setItem(WEIGHT_KEY, JSON.stringify(wlog)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
+  let waist = (function () {
+    try { const w = JSON.parse(localStorage.getItem(WAIST_KEY)); if (w && Array.isArray(w.entries)) return w; } catch (e) { /* sin datos */ }
+    return { entries: [] };
+  })();
+  function saveWaist() { try { localStorage.setItem(WAIST_KEY, JSON.stringify(waist)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveLabs() { try { localStorage.setItem(LAB_KEY, JSON.stringify(labs)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
@@ -1762,7 +1768,7 @@
       h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
       h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
 
-    root.append(weightCard(), doseCard());
+    root.append(weightCard(), waistCard(), doseCard());
 
     // Aviso de control corporal: pasan 5 semanas desde el ultimo
     const lbody = lastBody();
@@ -2796,6 +2802,54 @@
           h('span', {}, h('strong', {}, fmt(e.kg) + ' kg '), h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { wlog.entries = wlog.entries.filter((x) => x.date !== e.date); saveW(); render(); } }, '×')))),
         h('div', { class: 'hiit-actions', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: copy }, 'Copiar copia de seguridad')),
         ta, h('button', { class: 'btn small', type: 'button', style: 'margin-top:6px', onclick: () => importWeights(ta.value.trim()) }, 'Importar pesos')));
+    }
+    return card;
+  }
+
+
+  // ---------- abdomen semanal ----------
+  const WAIST_DAYS = 7;
+  const waistSorted = () => waist.entries.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+  function importWaist(text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
+    const list = Array.isArray(data) ? data : [data];
+    let n = 0;
+    list.forEach((c) => { if (c && isoOk(c.fecha) && +c.abdomen >= 40 && +c.abdomen <= 200) { waist.entries = waist.entries.filter((e) => e.date !== c.fecha).concat({ date: c.fecha, cm: Math.round(+c.abdomen * 10) / 10 }); n++; } });
+    if (!n) { toast('No encontré medidas en el texto.'); return; }
+    saveWaist(); toast(n + ' medida' + (n > 1 ? 's' : '') + ' guardada' + (n > 1 ? 's' : '') + '.'); render();
+  }
+  function waistCard() {
+    const list = waistSorted(), last = list[list.length - 1], prev = list[list.length - 2];
+    const due = !last || daysSince(last.date) >= WAIST_DAYS;
+    const dateIn = h('input', { type: 'date', value: todayISO(), max: todayISO(), 'aria-label': 'Fecha de la medida' });
+    const inp = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Ej: 84,5', 'aria-label': 'Abdomen en cm' });
+    const card = h('section', { class: 'card dose' + (due ? ' warm' : '') },
+      h('div', { class: 'row between' }, h('strong', {}, '📏 Abdomen (semanal)'),
+        h('span', { class: 'muted small' }, last ? 'Última: ' + fmt(last.cm) + ' cm · ' + agoText(last.date) : 'Aún sin medidas')));
+    if (due) card.append(h('p', { class: 'small', style: 'margin:4px 0 0' }, last ? 'Toca medirte esta semana.' : 'Anota tu primera medida.',
+      ' Pasa la huincha por el ombligo, en ayunas y al final de una exhalación normal, sin apretar ni meter el abdomen.'));
+    card.append(h('div', { class: 'row', style: 'gap:8px;margin-top:8px' }, inp,
+      h('button', { class: 'btn primary', type: 'button', style: 'white-space:nowrap', onclick: () => {
+        const v = parseNum(inp.value), d = dateIn.value;
+        if (!isoOk(d) || !(v >= 40 && v <= 200)) { toast('Escribe el abdomen en cm (entre 40 y 200).'); return; }
+        waist.entries = waist.entries.filter((e) => e.date !== d).concat({ date: d, cm: Math.round(v * 10) / 10 });
+        saveWaist(); toast('Medida guardada.'); render();
+      } }, 'Guardar')));
+    card.append(h('div', { class: 'row', style: 'gap:8px;margin-top:6px;align-items:center' }, h('span', { class: 'muted small' }, 'Fecha'), dateIn));
+    if (last && prev) {
+      const d = Math.round((last.cm - prev.cm) * 10) / 10, tot = Math.round((last.cm - list[0].cm) * 10) / 10;
+      card.append(h('p', { class: 'small', style: 'margin:8px 0 0' }, (d > 0 ? '+' : '') + fmt(d) + ' cm vs. la medida anterior (' + fmtDate(prev.date) + ')' +
+        (list.length > 2 ? ' · ' + (tot > 0 ? '+' : '') + fmt(tot) + ' cm desde el inicio (' + fmtDate(list[0].date) + ')' : '')));
+    }
+    if (list.length) {
+      const ta = h('textarea', { class: 'body-paste', rows: '2', placeholder: '[{"fecha":"2026-10-25","abdomen":84.5}]', 'aria-label': 'Texto de medidas para importar' });
+      const copy = () => { const t = JSON.stringify(list.map((e) => ({ fecha: e.date, abdomen: e.cm })), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
+      card.append(h('details', { class: 'ctl', style: 'margin-top:8px' }, h('summary', {}, h('span', { class: 'muted small' }, 'Historial (' + list.length + ')')),
+        list.slice().reverse().map((e) => h('div', { class: 'ctl-row' }, h('span', {}, fmtDate(e.date)),
+          h('span', {}, h('strong', {}, fmt(e.cm) + ' cm '), h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { waist.entries = waist.entries.filter((x) => x.date !== e.date); saveWaist(); render(); } }, '×')))),
+        h('div', { class: 'hiit-actions', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: copy }, 'Copiar copia de seguridad')),
+        ta, h('button', { class: 'btn small', type: 'button', style: 'margin-top:6px', onclick: () => importWaist(ta.value.trim()) }, 'Importar medidas')));
     }
     return card;
   }
