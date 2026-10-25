@@ -2845,13 +2845,14 @@
       h('label', { class: 'full' }, 'Tipo', typeSel),
       h('label', {}, 'Minutos', h('input', { name: 'min', inputmode: 'numeric' })),
       h('label', {}, 'Pulso promedio (lpm)', h('input', { name: 'hr', id: 'cardio-hr', inputmode: 'numeric' })),
+      h('label', { class: 'full check-row' }, h('input', { name: 'extra', type: 'checkbox' }), ' Es cardio extra (no cuenta como día del plan)'),
       h('button', { class: 'btn primary full', type: 'submit' }, 'Guardar sesión de cardio'));
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       const m = parseNum(form.elements.min.value), date = form.elements.fecha.value;
       if (!m || !date) { toast('Escribe la fecha y los minutos.'); return; }
       const nx = planNext();
-      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), dia: form.elements.tipo.value === 'Intervalos' ? 'dia-cardio-2' : (nx && nx.cardio && nx.cardio !== 'intervalos' ? nx.id : undefined) });
+      cardio.sessions.push({ id: uid(), date: date, tipo: form.elements.tipo.value, min: Math.round(m), hr: parseNum(form.elements.hr.value), dia: form.elements.extra.checked ? undefined : (form.elements.tipo.value === 'Intervalos' ? 'dia-cardio-2' : (nx && nx.cardio && nx.cardio !== 'intervalos' ? nx.id : undefined)), libre: form.elements.extra.checked || undefined });
       saveCardio(); toast('Cardio guardado en este dispositivo.'); render();
     });
     root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));

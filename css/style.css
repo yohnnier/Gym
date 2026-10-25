@@ -643,3 +643,6 @@ ul.plain li { margin: 4px 0; }
 /* Recordatorio de aplicacion */
 .card.dose input { width: 100%; padding: 10px; margin: 2px 0 8px; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
 .card.dose label { display: block; margin-top: 6px; }
+
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.check-row input { width: auto; }
