@@ -1107,6 +1107,34 @@
    "carb": 25.1,
    "fat": 0.3,
    "notes": "plátano 110 g de pulpa (sin cáscara)"
+  },
+  {
+   "id": "2026-10-25-desayuno",
+   "date": "2026-10-25",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Contramuslo de pollo (con piel y hueso; ~75 % comestible)",
+     "g": 112,
+     "kcal": 257,
+     "prot": 26.9,
+     "carb": 0,
+     "fat": 15.7
+    }
+   ],
+   "kcal": 400,
+   "prot": 39.5,
+   "carb": 0.7,
+   "fat": 25.2,
+   "notes": "huevos sin aceite; contramuslo 150 g con piel y hueso: ~112 g comestibles (sin piel resta ~60 kcal y ~7 g de grasa)"
   }
  ]
 }
