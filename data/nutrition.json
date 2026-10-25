@@ -1135,6 +1135,50 @@
    "carb": 0.7,
    "fat": 25.2,
    "notes": "huevos sin aceite; contramuslo 150 g con piel y hueso: ~112 g comestibles (sin piel resta ~60 kcal y ~7 g de grasa)"
+  },
+  {
+   "id": "2026-10-25-almuerzo",
+   "date": "2026-10-25",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Tomate",
+     "g": 150,
+     "kcal": 27,
+     "prot": 1.4,
+     "carb": 5.9,
+     "fat": 0.3
+    },
+    {
+     "food": "Choclo",
+     "g": 40,
+     "kcal": 38,
+     "prot": 1.3,
+     "carb": 8.4,
+     "fat": 0.5
+    },
+    {
+     "food": "Mayonesa (~1 cucharada)",
+     "g": 20,
+     "kcal": 136,
+     "prot": 0.3,
+     "carb": 0.6,
+     "fat": 14.8
+    },
+    {
+     "food": "Brisket de vacuno cocido",
+     "g": 250,
+     "kcal": 675,
+     "prot": 67.5,
+     "carb": 0,
+     "fat": 43.8
+    }
+   ],
+   "kcal": 876,
+   "prot": 70.5,
+   "carb": 14.9,
+   "fat": 59.4,
+   "notes": "brisket 250 g cocido, supuesto con grasa media (~270 kcal/100 g; si era corte magro resta ~150 kcal y ~15 g de grasa); tomate ~150 g; mayonesa ~20 g"
   }
  ]
 }
