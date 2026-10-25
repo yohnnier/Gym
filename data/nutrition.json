@@ -1087,6 +1087,26 @@
    "carb": 0,
    "fat": 26.3,
    "notes": "250 g de contramuslo asado con piel y hueso: se estimaron ~188 g comestibles; si era sin piel resta ~100 kcal y ~12 g de grasa"
+  },
+  {
+   "id": "2026-10-24-colacion-2",
+   "date": "2026-10-24",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano",
+     "g": 110,
+     "kcal": 98,
+     "prot": 1.2,
+     "carb": 25.1,
+     "fat": 0.3
+    }
+   ],
+   "kcal": 98,
+   "prot": 1.2,
+   "carb": 25.1,
+   "fat": 0.3,
+   "notes": "plátano 110 g de pulpa (sin cáscara)"
   }
  ]
 }
