@@ -12,6 +12,7 @@
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
   const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
+  const WEIGHT_KEY = 'rutinas.weight.v1'; // peso diario: SOLO en este dispositivo, nunca se sube a GitHub
   const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
   const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
   const exById = {};
@@ -53,6 +54,11 @@
     return null;
   })();
   function saveDose() { try { localStorage.setItem(DOSE_KEY, JSON.stringify(dose)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
+  let wlog = (function () {
+    try { const w = JSON.parse(localStorage.getItem(WEIGHT_KEY)); if (w && Array.isArray(w.entries)) return w; } catch (e) { /* sin datos */ }
+    return { entries: [] };
+  })();
+  function saveW() { try { localStorage.setItem(WEIGHT_KEY, JSON.stringify(wlog)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveLabs() { try { localStorage.setItem(LAB_KEY, JSON.stringify(labs)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   function saveBody() { try { localStorage.setItem(BODY_KEY, JSON.stringify(body)); } catch (e) { toast('No se pudo guardar en este dispositivo.'); } }
   const bodySorted = () => body.controls.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
@@ -1756,7 +1762,7 @@
       h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
       h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
 
-    root.append(doseCard());
+    root.append(weightCard(), doseCard());
 
     // Aviso de control corporal: pasan 5 semanas desde el ultimo
     const lbody = lastBody();
@@ -2743,6 +2749,56 @@
   }
 
 
+
+
+  // ---------- peso diario ----------
+  const wSorted = () => wlog.entries.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0));
+  function wAvg(fromDays, toDays) { // promedio de las entradas con antiguedad entre toDays (incluido) y fromDays (excluido)
+    const v = wlog.entries.filter((e) => { const d = daysSince(e.date); return d >= toDays && d < fromDays; }).map((e) => e.kg);
+    return v.length ? { avg: v.reduce((s, x) => s + x, 0) / v.length, n: v.length } : null;
+  }
+  function addWeight(date, kg) {
+    if (!isoOk(date) || !(kg >= 30 && kg <= 250)) { toast('Escribe un peso entre 30 y 250 kg.'); return false; }
+    wlog.entries = wlog.entries.filter((e) => e.date !== date).concat({ date: date, kg: Math.round(kg * 10) / 10 });
+    saveW(); return true;
+  }
+  function importWeights(text) {
+    let data;
+    try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
+    const list = Array.isArray(data) ? data : [data];
+    let n = 0;
+    list.forEach((c) => { if (c && isoOk(c.fecha) && +c.peso >= 30 && +c.peso <= 250) { wlog.entries = wlog.entries.filter((e) => e.date !== c.fecha).concat({ date: c.fecha, kg: Math.round(+c.peso * 10) / 10 }); n++; } });
+    if (!n) { toast('No encontré pesos en el texto.'); return; }
+    saveW(); toast(n + ' peso' + (n > 1 ? 's' : '') + ' guardado' + (n > 1 ? 's' : '') + '.'); render();
+  }
+  function weightCard() {
+    const today = todayISO(), mine = wlog.entries.find((e) => e.date === today);
+    const inp = h('input', { type: 'text', inputmode: 'decimal', placeholder: mine ? fmt(mine.kg) : 'Ej: 77,2', 'aria-label': 'Peso de hoy en kg' });
+    const card = h('section', { class: 'card dose' },
+      h('div', { class: 'row between' }, h('strong', {}, '⚖️ Peso'), h('span', { class: 'muted small' }, mine ? 'Hoy: ' + fmt(mine.kg) + ' kg' : 'Aún no anotas hoy')),
+      h('div', { class: 'row', style: 'gap:8px;margin-top:6px' }, inp,
+        h('button', { class: 'btn primary', type: 'button', style: 'white-space:nowrap', onclick: () => { if (addWeight(today, parseNum(inp.value))) { toast('Peso guardado.'); render(); } } }, mine ? 'Cambiar' : 'Guardar')));
+    const w1 = wAvg(7, 0), w0 = wAvg(14, 7);
+    if (w1 && w1.n >= 3) {
+      const d = w0 && w0.n >= 3 ? w1.avg - w0.avg : null;
+      card.append(h('p', { class: 'small', style: 'margin:8px 0 0' }, 'Promedio de 7 días: ',
+        h('b', {}, fmt(Math.round(w1.avg * 10) / 10) + ' kg'),
+        d != null ? ' (' + (d > 0 ? '+' : '') + fmt(Math.round(d * 100) / 100) + ' kg vs. la semana anterior)' : ''));
+    } else {
+      card.append(h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Pésate a la misma hora, en ayunas. Con 3 o más pesos en la semana te muestro el promedio, que es lo que importa (el peso de un día varía 1–2 kg por agua y comida).'));
+    }
+    if (wlog.entries.length) {
+      const sorted = wSorted().slice().reverse();
+      const ta = h('textarea', { class: 'body-paste', rows: '2', placeholder: '[{"fecha":"2026-10-24","peso":75.9}]', 'aria-label': 'Texto de pesos para importar' });
+      const copy = () => { const t = JSON.stringify(wSorted().map((e) => ({ fecha: e.date, peso: e.kg })), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
+      card.append(h('details', { class: 'ctl', style: 'margin-top:8px' }, h('summary', {}, h('span', { class: 'muted small' }, 'Historial (' + sorted.length + ')')),
+        sorted.slice(0, 30).map((e) => h('div', { class: 'ctl-row' }, h('span', {}, fmtDate(e.date)),
+          h('span', {}, h('strong', {}, fmt(e.kg) + ' kg '), h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { wlog.entries = wlog.entries.filter((x) => x.date !== e.date); saveW(); render(); } }, '×')))),
+        h('div', { class: 'hiit-actions', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: copy }, 'Copiar copia de seguridad')),
+        ta, h('button', { class: 'btn small', type: 'button', style: 'margin-top:6px', onclick: () => importWeights(ta.value.trim()) }, 'Importar pesos')));
+    }
+    return card;
+  }
 
   // ---------- recordatorio de aplicacion ----------
   const isoOk = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
