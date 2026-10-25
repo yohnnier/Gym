@@ -1067,6 +1067,26 @@
    "carb": 30.4,
    "fat": 3.0,
    "notes": "según etiqueta; proteína en el yogurt o en agua"
+  },
+  {
+   "id": "2026-10-24-cena",
+   "date": "2026-10-24",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Contramuslo de pollo asado (con piel y hueso; ~75 % comestible)",
+     "g": 188,
+     "kcal": 430,
+     "prot": 45.1,
+     "carb": 0,
+     "fat": 26.3
+    }
+   ],
+   "kcal": 430,
+   "prot": 45.1,
+   "carb": 0,
+   "fat": 26.3,
+   "notes": "250 g de contramuslo asado con piel y hueso: se estimaron ~188 g comestibles; si era sin piel resta ~100 kcal y ~12 g de grasa"
   }
  ]
 }
