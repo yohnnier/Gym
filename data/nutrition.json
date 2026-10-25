@@ -1179,6 +1179,34 @@
    "carb": 14.9,
    "fat": 59.4,
    "notes": "brisket 250 g cocido, supuesto con grasa media (~270 kcal/100 g; si era corte magro resta ~150 kcal y ~15 g de grasa); tomate ~150 g; mayonesa ~20 g"
+  },
+  {
+   "id": "2026-10-25-colacion-1",
+   "date": "2026-10-25",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 60,
+     "kcal": 54,
+     "prot": 0.7,
+     "carb": 13.7,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 184,
+   "prot": 18.3,
+   "carb": 25.5,
+   "fat": 1.6,
+   "notes": "yogurt según etiqueta; plátano 60 g de pulpa"
   }
  ]
 }
