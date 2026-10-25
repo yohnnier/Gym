@@ -2522,5 +2522,22 @@
    }
   ],
   "updatedAt": 1792857252315
+ },
+ {
+  "id": "mvnyi55p24nyb",
+  "date": "2026-10-25",
+  "createdAt": 1792940538013,
+  "routineId": "dia-cardio-2",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "pantorrillas",
+    "set": 1,
+    "weight": 40,
+    "reps": 19,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1792940539737
  }
 ]
