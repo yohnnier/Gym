@@ -1271,6 +1271,42 @@
    "carb": 17.7,
    "fat": 17.6,
    "notes": "huevos sin aceite; kéfir natural sin azúcar (~55 kcal/100 ml); papa cocida sin aceite"
+  },
+  {
+   "id": "2026-10-26-almuerzo",
+   "date": "2026-10-26",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga)",
+     "g": 200,
+     "kcal": 330,
+     "prot": 62.0,
+     "carb": 0,
+     "fat": 7.2
+    },
+    {
+     "food": "Papa cocida",
+     "g": 120,
+     "kcal": 104,
+     "prot": 2.3,
+     "carb": 24.1,
+     "fat": 0.1
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida, en agua)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 553,
+   "prot": 88.3,
+   "carb": 26.7,
+   "fat": 8.7,
+   "notes": "pollo supuesto pechuga sin piel cocida (con piel o trutro suma ~100-150 kcal); papa sin aceite"
   }
  ]
 }
