@@ -2553,8 +2553,15 @@
     "weight": 40,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 2,
+    "weight": 40,
+    "reps": 12,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1793019465449
+  "updatedAt": 1793019717086
  }
 ]
