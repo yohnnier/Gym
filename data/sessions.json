@@ -2686,8 +2686,22 @@
     "weight": 80,
     "reps": 10,
     "rpe": 10
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 1,
+    "weight": 80,
+    "reps": 10,
+    "rpe": 8
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 2,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 8
    }
   ],
-  "updatedAt": 1793023150607
+  "updatedAt": 1793023296579
  }
 ]
