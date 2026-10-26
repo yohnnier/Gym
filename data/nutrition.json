@@ -1207,6 +1207,34 @@
    "carb": 25.5,
    "fat": 1.6,
    "notes": "yogurt según etiqueta; plátano 60 g de pulpa"
+  },
+  {
+   "id": "2026-10-25-colacion-2",
+   "date": "2026-10-25",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Leche semidescremada deslactosada",
+     "g": 200,
+     "kcal": 92,
+     "prot": 6.6,
+     "carb": 9.6,
+     "fat": 3.0
+    }
+   ],
+   "kcal": 211,
+   "prot": 30.6,
+   "carb": 12.2,
+   "fat": 4.4,
+   "notes": "proteína según etiqueta; leche 200 ml (~46 kcal/100 ml)"
   }
  ]
 }
