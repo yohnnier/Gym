@@ -2658,8 +2658,15 @@
     "weight": 30,
     "reps": 12,
     "rpe": 10
+   },
+   {
+    "exerciseId": "curl-polea",
+    "set": 1,
+    "weight": 80,
+    "reps": 10,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1793022314538
+  "updatedAt": 1793022441064
  }
 ]
