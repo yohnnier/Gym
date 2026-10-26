@@ -2637,8 +2637,15 @@
     "weight": 30,
     "reps": 21,
     "rpe": 10
+   },
+   {
+    "exerciseId": "elevaciones-laterales-polea",
+    "set": 1,
+    "weight": 30,
+    "reps": 11,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793021947596
+  "updatedAt": 1793022039589
  }
 ]
