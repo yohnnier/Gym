@@ -646,3 +646,11 @@ ul.plain li { margin: 4px 0; }
 
 .check-row { display: flex; align-items: center; gap: 8px; font-size: 14px; }
 .check-row input { width: auto; }
+
+/* Maquinas alternativas */
+.alt-btn { margin: 4px 0 2px; padding: 4px 10px; font: inherit; font-size: 13px; color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 999px; cursor: pointer; }
+.alt-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.alt-opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px; background: var(--surface-2); border-radius: var(--radius-sm); }
+.alt-opt input { width: auto; margin-top: 3px; }
+.alt-opt.sub { padding: 6px 10px; }
+.alt-sub { padding-left: 14px; display: flex; flex-direction: column; gap: 4px; }

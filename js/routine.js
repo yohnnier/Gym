@@ -170,6 +170,12 @@ const ESPALDA = {
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
       unit: 'kg/lado', step: 2.5, provisional: true,
       notes: 'Máquina de discos con apoyo de pecho y brazos articulados. Opción para variar el jalón o el remo. Confirma el movimiento con el cartel de la máquina. Anota los discos de un lado.'
+    },
+    {
+      id: 'remo-low-row', name: 'Remo bajo con discos (Low Row)', muscle: 'espalda', secondary: ['biceps', 'hombros'], single: true, gym: true,
+      sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
+      unit: 'kg/lado', step: 2.5, provisional: true,
+      notes: 'Máquina de discos de tu gimnasio (cartel "Low Row"). Siéntate con el pecho apoyado y tira de los mangos hacia el abdomen, con los codos pasando junto al cuerpo; junta los omóplatos 1 s y vuelve lento. Misma función que el Linear Row: úsala en lugar de él, no además. Anota los discos de un lado (usa el interruptor si prefieres el total).'
     }
   ]
 };
@@ -458,3 +464,20 @@ const MUSCLES = {
 };
 
 const ROUTINES = [PIERNAS, PECHO, ESPALDA, HOMBROS, BICEPS, TRICEPS, CORE];
+
+/* Maquinas alternativas: ejercicios de cada grupo que trabajan lo mismo y se pueden intercambiar en un mismo lugar del plan.
+ * Cada maquina conserva su propio historial de peso (los pesos no son comparables entre maquinas). */
+const ALT_GROUPS = [
+  ['remo-lineal', 'remo-low-row', 'remo-maquina', 'remo-alto-discos'],
+  ['pantorrillas', 'pantorrillas-prensa'],
+  ['curl-femoral', 'curl-femoral-split'],
+  ['elevaciones-laterales', 'elevaciones-laterales-polea'],
+  ['aperturas-peck-deck', 'cruce-poleas'],
+  ['extension-polea', 'extension-polea-invertida'],
+  ['extension-polea-sobre-cabeza', 'extension-sobre-cabeza'],
+  ['curl-polea', 'curl-barra', 'curl-predicador-polea'],
+  ['curl-martillo-polea', 'curl-martillo'],
+  ['crunch-polea', 'crunch-maquina'],
+  ['rodillas-silla-romana', 'elevacion-piernas'],
+  ['face-pull', 'pajaros-polea', 'pajaros']
+];

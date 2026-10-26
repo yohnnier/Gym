@@ -11,6 +11,7 @@
   const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
   const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
   const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
+  const ALT_KEY = 'rutinas.alts.v1'; // maquina elegida para cada lugar del plan (o rotacion automatica)
   const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
   const WEIGHT_KEY = 'rutinas.weight.v1'; // peso diario: SOLO en este dispositivo, nunca se sube a GitHub
   const WAIST_KEY = 'rutinas.waist.v1'; // cintura/abdomen semanal: SOLO en este dispositivo, nunca se sube a GitHub
@@ -1963,7 +1964,83 @@
     return 'En sesión: ' + Math.max(0, Math.round((Date.now() - first) / 60000)) + ' min';
   }
 
+
+  // ---------- maquinas alternativas ----------
+  // Cada lugar del plan puede usar cualquiera de las maquinas de su grupo (ALT_GROUPS): fija una, o rota la que llevas mas tiempo sin usar.
+  // Cada maquina guarda su propio historial (los pesos no se comparan entre maquinas).
+  let altPref = (function () { try { return JSON.parse(localStorage.getItem(ALT_KEY)) || {}; } catch (e) { return {}; } })();
+  function saveAlts() { try { localStorage.setItem(ALT_KEY, JSON.stringify(altPref)); } catch (e) { /* sin almacenamiento */ } }
+  const altGroupOf = (id) => (typeof ALT_GROUPS !== 'undefined' ? ALT_GROUPS.find((g) => g.indexOf(id) !== -1) : null) || null;
+  const lastUsedOn = (id) => { const r = lastRecord(id); return r ? r.session.date : ''; };
+  // Maquinas que participan en la rotacion: las elegidas, o por defecto las que ya usaste mas la del plan
+  function altRotationSet(slot, g) {
+    const p = altPref[slot];
+    if (p && Array.isArray(p.set) && p.set.length) return p.set.filter((m) => g.indexOf(m) !== -1);
+    return g.filter((m) => m === slot || lastUsedOn(m));
+  }
+  function effectiveId(slot, routineId) {
+    const g = altGroupOf(slot);
+    if (!g) return slot;
+    const s = todaySession(routineId, false);
+    if (s) { const used = g.find((m) => s.entries.some((e) => e.exerciseId === m)); if (used) return used; } // hoy ya empezaste con una: no cambia
+    const p = altPref[slot];
+    if (p && p.mode === 'rotar') {
+      const set = altRotationSet(slot, g);
+      let best = set[0] || slot, bd = lastUsedOn(best);
+      set.forEach((m) => { const d = lastUsedOn(m); if (d < bd) { best = m; bd = d; } });
+      return best;
+    }
+    return p && p.pick && g.indexOf(p.pick) !== -1 ? p.pick : slot;
+  }
+  function slotView(r) {
+    if (!r.isDay) return r;
+    return Object.assign({}, r, { exercises: r.exercises.map((ex) => {
+      const slot = ex.slot || ex.id, eff = effectiveId(slot, r.id);
+      if (eff === ex.id) return Object.assign({}, ex, { slot: slot });
+      return Object.assign({}, exById[eff], { sets: ex.sets, setsText: null, slot: slot });
+    }) });
+  }
+  function altSheet(ex, r) {
+    const slot = ex.slot, g = altGroupOf(slot);
+    if (!g) return;
+    if (todaySets(ex, r.id).length) { toast('Ya registraste series hoy con esta máquina. Cámbiala en tu próxima sesión.'); return; }
+    const p = altPref[slot] || {};
+    const sheet = $('#sheet');
+    const close = () => { sheet.classList.add('hidden'); sheet.replaceChildren(); };
+    const rot = p.mode === 'rotar';
+    const picks = g.map((m) => ({ id: m, ex: exById[m], used: lastUsedOn(m) }));
+    const rotSet = altRotationSet(slot, g);
+    const radios = picks.map((o) => h('label', { class: 'alt-opt' },
+      h('input', { type: 'radio', name: 'altmode', value: o.id, checked: !rot && ex.id === o.id }),
+      h('span', {}, h('b', {}, o.ex.name), h('span', { class: 'muted small' }, ' · ' + (o.used ? 'última vez ' + fmtDate(o.used) : 'sin usar aún') + ' · ' + o.ex.unit))));
+    const rotRadio = h('input', { type: 'radio', name: 'altmode', value: '__rotar', checked: rot });
+    const checks = picks.map((o) => h('label', { class: 'alt-opt sub' },
+      h('input', { type: 'checkbox', name: 'altset', value: o.id, checked: rotSet.indexOf(o.id) !== -1 }), h('span', {}, o.ex.name)));
+    const panel = h('div', { class: 'sheet-panel', role: 'dialog', 'aria-modal': 'true' },
+      h('div', { class: 'sheet-grip' }),
+      h('div', { class: 'row between' }, h('h2', {}, '🔁 Máquina para este ejercicio'), h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: close }, '×')),
+      h('p', { class: 'muted small' }, 'Estas máquinas trabajan lo mismo: usa una u otra. Cada una guarda su propio historial, porque el peso no es comparable entre máquinas. Las series cuentan igual para tu meta semanal del músculo.'),
+      h('div', { class: 'alt-list' }, radios,
+        h('label', { class: 'alt-opt' }, rotRadio, h('span', {}, h('b', {}, '↻ Rotar automáticamente'), h('span', { class: 'muted small' }, ' · cada sesión usa la que llevas más tiempo sin hacer'))),
+        h('div', { class: 'alt-sub' }, h('div', { class: 'muted small' }, 'Rotar entre:'), checks)),
+      h('div', { class: 'hiit-actions' },
+        h('button', { class: 'btn primary big', type: 'button', onclick: () => {
+          const mode = (panel.querySelector('input[name=altmode]:checked') || {}).value;
+          if (mode === '__rotar') {
+            const set = [].slice.call(panel.querySelectorAll('input[name=altset]:checked')).map((i) => i.value);
+            if (set.length < 2) { toast('Marca al menos dos máquinas para rotar.'); return; }
+            altPref[slot] = { mode: 'rotar', set: set };
+          } else if (mode && mode !== slot) altPref[slot] = { mode: 'fija', pick: mode };
+          else delete altPref[slot];
+          saveAlts(); close(); render();
+        } }, 'Guardar'),
+        h('button', { class: 'btn big', type: 'button', onclick: close }, 'Cancelar')));
+    sheet.replaceChildren(h('div', { class: 'sheet-bg', onclick: close }), panel);
+    sheet.classList.remove('hidden');
+  }
+
   function renderGroup(root, r) {
+    r = slotView(r);
     const today = todaySession(r.id, false);
     const total = r.exercises.reduce((t, e) => t + e.sets, 0);
     // Cuenta tambien lo subido desde el chat (sesion de hoy en el historial)
@@ -2095,6 +2172,8 @@
       h('div', { class: 'grow' },
         h('div', { class: 'ex-name' }, (idx + 1) + '. ' + ex.name),
         musclesLine(ex),
+        ex.slot && altGroupOf(ex.slot) ? h('button', { class: 'alt-btn', type: 'button', onclick: () => altSheet(ex, r) },
+          '🔁 ' + (altPref[ex.slot] && altPref[ex.slot].mode === 'rotar' ? 'Rotando máquinas' : 'Cambiar de máquina')) : null,
         h('div', { class: 'muted small' }, specText(ex)),
         restPicker(ex),
         h('div', { class: 'last small' }, last
