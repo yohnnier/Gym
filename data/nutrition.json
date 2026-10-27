@@ -1307,6 +1307,34 @@
    "carb": 26.7,
    "fat": 8.7,
    "notes": "pollo supuesto pechuga sin piel cocida (con piel o trutro suma ~100-150 kcal); papa sin aceite"
+  },
+  {
+   "id": "2026-10-26-cena",
+   "date": "2026-10-26",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Sándwich de pollo (pan frica ~80 g, pollo ~100 g, algo de mayonesa)",
+     "g": 190,
+     "kcal": 465,
+     "prot": 38.0,
+     "carb": 44.0,
+     "fat": 14.0
+    },
+    {
+     "food": "Nuggets de pollo (6 unidades)",
+     "g": 120,
+     "kcal": 300,
+     "prot": 16.8,
+     "carb": 18.0,
+     "fat": 18.0
+    }
+   ],
+   "kcal": 765,
+   "prot": 54.8,
+   "carb": 62.0,
+   "fat": 32.0,
+   "notes": "estimado sin pesos: sándwich con pollo ~100 g y pan ~80 g; si el pollo era apanado o con más salsa suma ~100-150 kcal y 8-12 g de grasa; nuggets ~20 g c/u"
   }
  ]
 }
