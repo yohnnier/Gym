@@ -2712,9 +2712,9 @@
   "updatedAt": 1793023405987
  },
  {
-  "id": "mvr5n72sx64qc",
+  "id": "mvr5qk3jkjod6",
   "date": "2026-10-27",
-  "createdAt": 1793133929620,
+  "createdAt": 1793134086463,
   "routineId": "dia-cardio",
   "source": "app",
   "entries": [
@@ -2724,8 +2724,22 @@
     "weight": 80,
     "reps": 13,
     "rpe": 9
+   },
+   {
+    "exerciseId": "rotacion-polea",
+    "set": 2,
+    "weight": 80,
+    "reps": 14,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rotacion-polea",
+    "set": 3,
+    "weight": 90,
+    "reps": 13,
+    "rpe": null
    }
   ],
-  "updatedAt": 1793133932502
+  "updatedAt": 1793134100319
  }
 ]
