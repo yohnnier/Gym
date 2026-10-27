@@ -1335,6 +1335,86 @@
    "carb": 62.0,
    "fat": 32.0,
    "notes": "estimado sin pesos: sándwich con pollo ~100 g y pan ~80 g; si el pollo era apanado o con más salsa suma ~100-150 kcal y 8-12 g de grasa; nuggets ~20 g c/u"
+  },
+  {
+   "id": "2026-10-27-desayuno",
+   "date": "2026-10-27",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de trigo (aprox.)",
+     "g": 200,
+     "kcal": 540,
+     "prot": 14.0,
+     "carb": 100.0,
+     "fat": 8.0
+    },
+    {
+     "food": "Kéfir",
+     "g": 200,
+     "kcal": 120,
+     "prot": 6.6,
+     "carb": 8.4,
+     "fat": 6.2
+    }
+   ],
+   "kcal": 803,
+   "prot": 33.2,
+   "carb": 109.1,
+   "fat": 23.7,
+   "notes": "arepa de trigo ~200 g estimada (270 kcal/100 g); kéfir de leche entera supuesto; huevos sin aceite"
+  },
+  {
+   "id": "2026-10-27-almuerzo",
+   "date": "2026-10-27",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 280,
+     "kcal": 462,
+     "prot": 86.8,
+     "carb": 0,
+     "fat": 10.1
+    },
+    {
+     "food": "Patacones fritos en aceite de oliva (4 de 40 g)",
+     "g": 160,
+     "kcal": 400,
+     "prot": 2.4,
+     "carb": 61.0,
+     "fat": 17.6
+    },
+    {
+     "food": "Arroz cocido",
+     "g": 180,
+     "kcal": 234,
+     "prot": 4.9,
+     "carb": 50.4,
+     "fat": 0.5
+    },
+    {
+     "food": "Palta",
+     "g": 30,
+     "kcal": 48,
+     "prot": 0.6,
+     "carb": 2.6,
+     "fat": 4.4
+    }
+   ],
+   "kcal": 1144,
+   "prot": 94.7,
+   "carb": 114.0,
+   "fat": 32.6,
+   "notes": "pollo supuesto pechuga sin piel cocida; patacón frito ~250 kcal/100 g (el aceite absorbido varía ±60 kcal)"
   }
  ]
 }
