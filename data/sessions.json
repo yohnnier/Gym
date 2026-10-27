@@ -2744,9 +2744,16 @@
     "set": 1,
     "weight": null,
     "reps": 15,
-    "rpe": null
+    "rpe": 8
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 2,
+    "weight": null,
+    "reps": 15,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793134532333
+  "updatedAt": 1793134654818
  }
 ]
