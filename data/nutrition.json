@@ -1511,6 +1511,26 @@
    "carb": 100.8,
    "fat": 49.9,
    "notes": "estimado sin pesos: cuarto de pollo ~190 g comestibles con piel (sin piel resta ~100 kcal y 10 g de grasa); maduro ~35 g por tajada; ensalada dulce supuesta con fruta y aderezo; arepitas ~45 g c/u, fritas"
+  },
+  {
+   "id": "2026-10-28-colacion",
+   "date": "2026-10-28",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Papa cocida (1 mediana)",
+     "g": 150,
+     "kcal": 130,
+     "prot": 2.9,
+     "carb": 30.2,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 130,
+   "prot": 2.9,
+   "carb": 30.2,
+   "fat": 0.2,
+   "notes": "papa mediana ~150 g, cocida sin aceite ni sal agregada"
   }
  ]
 }
