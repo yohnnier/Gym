@@ -2895,8 +2895,15 @@
     "weight": 15,
     "reps": 18,
     "rpe": 9
+   },
+   {
+    "exerciseId": "abductores",
+    "set": 3,
+    "weight": 15,
+    "reps": 23,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793202560633
+  "updatedAt": 1793202794857
  }
 ]
