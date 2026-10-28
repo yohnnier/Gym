@@ -1438,19 +1438,19 @@
      "fat": 1.4
     },
     {
-     "food": "Plátano (2 de 135 g con cáscara, ~170 g de pulpa)",
-     "g": 270,
-     "kcal": 151,
-     "prot": 1.9,
-     "carb": 38.9,
-     "fat": 0.6
+     "food": "Plátano (2 en total)",
+     "g": 135,
+     "kcal": 120,
+     "prot": 1.5,
+     "carb": 30.8,
+     "fat": 0.4
     }
    ],
-   "kcal": 400,
-   "prot": 43.5,
-   "carb": 53.3,
-   "fat": 3.4,
-   "notes": "135 g por plátano supuesto con cáscara (~85 g de pulpa); si es solo pulpa suma ~90 kcal y 23 g de carbohidratos"
+   "kcal": 369,
+   "prot": 43.1,
+   "carb": 45.2,
+   "fat": 3.2,
+   "notes": "135 g en total para los 2 plátanos, supuesto pulpa sin cáscara; si pesaban con cáscara resta ~45 kcal y 11 g de carbohidratos"
   }
  ]
 }
