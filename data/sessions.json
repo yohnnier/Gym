@@ -2825,8 +2825,36 @@
     "weight": 77,
     "reps": 14,
     "rpe": 10
+   },
+   {
+    "exerciseId": "pantorrillas-prensa",
+    "set": 1,
+    "weight": 25,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas-prensa",
+    "set": 2,
+    "weight": 25,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas-prensa",
+    "set": 3,
+    "weight": 25,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas-prensa",
+    "set": 4,
+    "weight": 25,
+    "reps": 10,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793200635440
+  "updatedAt": 1793200700097
  }
 ]
