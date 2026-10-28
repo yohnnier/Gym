@@ -1415,6 +1415,42 @@
    "carb": 114.0,
    "fat": 32.6,
    "notes": "pollo supuesto pechuga sin piel cocida; patacón frito ~250 kcal/100 g (el aceite absorbido varía ±60 kcal)"
+  },
+  {
+   "id": "2026-10-28-desayuno",
+   "date": "2026-10-28",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano (2 de 135 g con cáscara, ~170 g de pulpa)",
+     "g": 270,
+     "kcal": 151,
+     "prot": 1.9,
+     "carb": 38.9,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 400,
+   "prot": 43.5,
+   "carb": 53.3,
+   "fat": 3.4,
+   "notes": "135 g por plátano supuesto con cáscara (~85 g de pulpa); si es solo pulpa suma ~90 kcal y 23 g de carbohidratos"
   }
  ]
 }
