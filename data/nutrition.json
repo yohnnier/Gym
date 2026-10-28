@@ -1451,6 +1451,66 @@
    "carb": 45.2,
    "fat": 3.2,
    "notes": "135 g en total para los 2 plátanos, pesados sin cáscara"
+  },
+  {
+   "id": "2026-10-28-almuerzo",
+   "date": "2026-10-28",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Cuarto de pollo (muslo y encuentro, con piel, comestible)",
+     "g": 190,
+     "kcal": 435,
+     "prot": 45.6,
+     "carb": 0,
+     "fat": 26.6
+    },
+    {
+     "food": "Maduro frito (3 tajadas)",
+     "g": 105,
+     "kcal": 242,
+     "prot": 1.1,
+     "carb": 39.9,
+     "fat": 9.5
+    },
+    {
+     "food": "Ensalada dulce",
+     "g": 100,
+     "kcal": 80,
+     "prot": 1.0,
+     "carb": 15.0,
+     "fat": 2.0
+    },
+    {
+     "food": "Arepitas antioqueñas fritas (2)",
+     "g": 90,
+     "kcal": 225,
+     "prot": 3.6,
+     "carb": 31.5,
+     "fat": 9.0
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 1231,
+   "prot": 92.9,
+   "carb": 100.8,
+   "fat": 49.9,
+   "notes": "estimado sin pesos: cuarto de pollo ~190 g comestibles con piel (sin piel resta ~100 kcal y 10 g de grasa); maduro ~35 g por tajada; ensalada dulce supuesta con fruta y aderezo; arepitas ~45 g c/u, fritas"
   }
  ]
 }
