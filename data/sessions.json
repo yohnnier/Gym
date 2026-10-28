@@ -2755,5 +2755,22 @@
    }
   ],
   "updatedAt": 1793134654818
+ },
+ {
+  "id": "mvs7criqy8ztj",
+  "date": "2026-10-28",
+  "createdAt": 1793197268306,
+  "routineId": "dia-piernas",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 1,
+    "weight": 40,
+    "reps": 9,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1793197268307
  }
 ]
