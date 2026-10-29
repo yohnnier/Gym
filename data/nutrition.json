@@ -1567,6 +1567,26 @@
    "carb": 3.1,
    "fat": 13.3,
    "notes": "corte supuesto magro (posta/lomo), 170 g crudos sin aceite; si era más grasa (asado, tapapecho) suma ~100-150 kcal; cafés supuestos sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-28-cena",
+   "date": "2026-10-28",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Kéfir",
+     "g": 200,
+     "kcal": 120,
+     "prot": 6.6,
+     "carb": 8.4,
+     "fat": 6.2
+    }
+   ],
+   "kcal": 120,
+   "prot": 6.6,
+   "carb": 8.4,
+   "fat": 6.2,
+   "notes": "kéfir de leche entera supuesto, 200 ml"
   }
  ]
 }
