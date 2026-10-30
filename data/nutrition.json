@@ -1727,6 +1727,34 @@
    "carb": 37.2,
    "fat": 22.7,
    "notes": "pan supuesto el mismo bajo en grasa y azúcar de la cena anterior; kéfir de leche entera supuesto; cafés sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-30-colacion",
+   "date": "2026-10-30",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano (banana)",
+     "g": 160,
+     "kcal": 142,
+     "prot": 1.8,
+     "carb": 36.5,
+     "fat": 0.5
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 272,
+   "prot": 19.4,
+   "carb": 48.3,
+   "fat": 1.9,
+   "notes": "plátano 160 g supuesto sin cáscara"
   }
  ]
 }
