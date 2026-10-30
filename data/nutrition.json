@@ -1683,6 +1683,50 @@
    "carb": 26.7,
    "fat": 14.4,
    "notes": "pollo supuesto sin piel; huevos sin aceite; pan 2 rebanadas según la etiqueta que ya usamos"
+  },
+  {
+   "id": "2026-10-30-desayuno",
+   "date": "2026-10-30",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Kéfir",
+     "g": 230,
+     "kcal": 138,
+     "prot": 7.6,
+     "carb": 9.7,
+     "fat": 7.1
+    },
+    {
+     "food": "Huevo entero cocido (3)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 19.0,
+     "carb": 1.0,
+     "fat": 15.0
+    },
+    {
+     "food": "Café (2 tazas, sin azúcar ni leche)",
+     "g": 400,
+     "kcal": 5,
+     "prot": 0.5,
+     "carb": 0.5,
+     "fat": 0
+    }
+   ],
+   "kcal": 495,
+   "prot": 34.1,
+   "carb": 37.2,
+   "fat": 22.7,
+   "notes": "pan supuesto el mismo bajo en grasa y azúcar de la cena anterior; kéfir de leche entera supuesto; cafés sin azúcar ni leche"
   }
  ]
 }
