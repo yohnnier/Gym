@@ -1755,6 +1755,42 @@
    "carb": 48.3,
    "fat": 1.9,
    "notes": "plátano 160 g supuesto sin cáscara"
+  },
+  {
+   "id": "2026-10-30-cena",
+   "date": "2026-10-30",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Ensalada César (lechuga, crutones, parmesano, aderezo)",
+     "g": 165,
+     "kcal": 312,
+     "prot": 10.3,
+     "carb": 18.0,
+     "fat": 22.9
+    },
+    {
+     "food": "Pollo a la plancha (pechuga cocida)",
+     "g": 150,
+     "kcal": 248,
+     "prot": 46.5,
+     "carb": 0,
+     "fat": 5.4
+    },
+    {
+     "food": "Factura argentina de panadería (medialuna)",
+     "g": 55,
+     "kcal": 220,
+     "prot": 4.5,
+     "carb": 26.0,
+     "fat": 11.0
+    }
+   ],
+   "kcal": 780,
+   "prot": 61.3,
+   "carb": 44.0,
+   "fat": 39.3,
+   "notes": "estimado sin pesos: ensalada césar ~165 g con ~30 g de aderezo; pollo supuesto a la plancha (si era apanado suma ~150 kcal y 15 g de grasa); factura supuesta una medialuna ~55 g"
   }
  ]
 }
