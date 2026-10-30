@@ -1587,6 +1587,102 @@
    "carb": 8.4,
    "fat": 6.2,
    "notes": "kéfir de leche entera supuesto, 200 ml"
+  },
+  {
+   "id": "2026-10-30-almuerzo",
+   "date": "2026-10-30",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo guisado",
+     "g": 140,
+     "kcal": 245,
+     "prot": 36.4,
+     "carb": 2.8,
+     "fat": 9.8
+    },
+    {
+     "food": "Arroz cocido",
+     "g": 100,
+     "kcal": 130,
+     "prot": 2.7,
+     "carb": 28.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Ensalada (verduras)",
+     "g": 100,
+     "kcal": 30,
+     "prot": 1.0,
+     "carb": 6.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Mayonesa (1 cucharadita)",
+     "g": 5,
+     "kcal": 35,
+     "prot": 0.1,
+     "carb": 0.1,
+     "fat": 3.8
+    },
+    {
+     "food": "Choclo (2, solo granos ~100 g c/u)",
+     "g": 200,
+     "kcal": 192,
+     "prot": 6.8,
+     "carb": 42.0,
+     "fat": 3.0
+    },
+    {
+     "food": "Jalea sin azúcar",
+     "g": 150,
+     "kcal": 10,
+     "prot": 2.0,
+     "carb": 0.5,
+     "fat": 0
+    }
+   ],
+   "kcal": 642,
+   "prot": 49.0,
+   "carb": 79.4,
+   "fat": 17.2,
+   "notes": "pollo guisado supuesto sin piel con poco aceite; 'un dos choclos' interpretado como 2 choclos medianos; ensalada supuesta de verduras, 100 g"
+  },
+  {
+   "id": "2026-10-30-cena",
+   "date": "2026-10-30",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Huevo entero (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 478,
+   "prot": 56.8,
+   "carb": 26.7,
+   "fat": 14.4,
+   "notes": "pollo supuesto sin piel; huevos sin aceite; pan 2 rebanadas según la etiqueta que ya usamos"
   }
  ]
 }
