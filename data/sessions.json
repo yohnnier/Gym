@@ -3017,8 +3017,15 @@
     "weight": 77,
     "reps": 18,
     "rpe": 9
+   },
+   {
+    "exerciseId": "aperturas-peck-deck",
+    "set": 2,
+    "weight": 88,
+    "reps": 18,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793368566427
+  "updatedAt": 1793368919963
  }
 ]
