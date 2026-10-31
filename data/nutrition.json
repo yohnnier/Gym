@@ -1791,6 +1791,86 @@
    "carb": 44.0,
    "fat": 39.3,
    "notes": "estimado sin pesos: ensalada césar ~165 g con ~30 g de aderezo; pollo supuesto a la plancha (si era apanado suma ~150 kcal y 15 g de grasa); factura supuesta una medialuna ~55 g"
+  },
+  {
+   "id": "2026-10-31-desayuno",
+   "date": "2026-10-31",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Café (sin azúcar ni leche)",
+     "g": 200,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0.2,
+     "fat": 0
+    }
+   ],
+   "kcal": 251,
+   "prot": 41.9,
+   "carb": 14.6,
+   "fat": 2.8,
+   "notes": "café supuesto sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-31-almuerzo",
+   "date": "2026-10-31",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Plateada de cerdo/ave Dark Kitchen (3 porciones de 100 g, según etiqueta)",
+     "g": 300,
+     "kcal": 324,
+     "prot": 48.3,
+     "carb": 0.9,
+     "fat": 14.1
+    },
+    {
+     "food": "Plátano maduro frito (3 tajadas, ~105 g)",
+     "g": 105,
+     "kcal": 242,
+     "prot": 1.1,
+     "carb": 39.9,
+     "fat": 9.5
+    },
+    {
+     "food": "Palta",
+     "g": 160,
+     "kcal": 256,
+     "prot": 3.2,
+     "carb": 13.6,
+     "fat": 23.5
+    },
+    {
+     "food": "Mayonesa (1 cucharadita)",
+     "g": 5,
+     "kcal": 35,
+     "prot": 0.1,
+     "carb": 0.1,
+     "fat": 3.8
+    }
+   ],
+   "kcal": 857,
+   "prot": 52.7,
+   "carb": 54.5,
+   "fat": 50.9,
+   "notes": "plateada con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"
   }
  ]
 }
