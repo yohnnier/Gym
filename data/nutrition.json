@@ -1834,12 +1834,12 @@
    "meal": "almuerzo",
    "items": [
     {
-     "food": "Plateada de cerdo/ave Dark Kitchen (3 porciones de 100 g, según etiqueta)",
-     "g": 300,
-     "kcal": 324,
-     "prot": 48.3,
-     "carb": 0.9,
-     "fat": 14.1
+     "food": "Plateada Dark Kitchen (211 g, según etiqueta)",
+     "g": 211,
+     "kcal": 228,
+     "prot": 34.0,
+     "carb": 0.6,
+     "fat": 9.9
     },
     {
      "food": "Plátano maduro frito (3 tajadas, ~105 g)",
@@ -1866,11 +1866,11 @@
      "fat": 3.8
     }
    ],
-   "kcal": 857,
-   "prot": 52.7,
-   "carb": 54.5,
-   "fat": 50.9,
-   "notes": "plateada con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"
+   "kcal": 761,
+   "prot": 38.4,
+   "carb": 54.2,
+   "fat": 46.7,
+   "notes": "plateada 211 g pesados, con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"
   }
  ]
 }
