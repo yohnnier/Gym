@@ -1915,6 +1915,42 @@
    "carb": 48.6,
    "fat": 11.4,
    "notes": "vino blanco seco ~82 kcal/100 ml (~41 g de alcohol, cerca de 285 kcal vienen del alcohol); manjar ~20 g; pan el mismo bajo en grasa y azúcar"
+  },
+  {
+   "id": "2026-11-01-desayuno",
+   "date": "2026-11-01",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 250,
+     "kcal": 162,
+     "prot": 22.0,
+     "carb": 14.8,
+     "fat": 1.8
+    },
+    {
+     "food": "Huevo entero frito sin aceite (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Queso fresco sin lactosa",
+     "g": 65,
+     "kcal": 156,
+     "prot": 11.1,
+     "carb": 1.9,
+     "fat": 11.7
+    }
+   ],
+   "kcal": 461,
+   "prot": 45.7,
+   "carb": 17.4,
+   "fat": 23.0,
+   "notes": "queso fresco supuesto ~240 kcal/100 g (17 g prot, 18 g grasa); huevos fritos sin aceite"
   }
  ]
 }
