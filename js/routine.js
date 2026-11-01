@@ -359,7 +359,7 @@ const CORE = {
     },
     {
       id: 'plancha', name: 'Plancha (segundos)', muscle: 'abdomen', secondary: ['hombros'],
-      sets: 3, repMin: 30, repMax: 60, rest: 60, restText: '60 s',
+      sets: 3, repMin: 30, repMax: 60, rest: 60, restText: '60 s', timed: true,
       unit: 'kg adicional', step: 0, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Las "repeticiones" son segundos de mantención.'
     },

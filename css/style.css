@@ -654,3 +654,9 @@ ul.plain li { margin: 4px 0; }
 .alt-opt input { width: auto; margin-top: 3px; }
 .alt-opt.sub { padding: 6px 10px; }
 .alt-sub { padding-left: 14px; display: flex; flex-direction: column; gap: 4px; }
+
+/* Corregir una sesion pasada (Historial) */
+.edit-row { display: grid; grid-template-columns: 1fr 64px auto 52px auto auto; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line, #e5e7eb); }
+.edit-row input { width: 100%; min-width: 0; padding: 6px; font-size: 16px; }
+.edit-row.del { opacity: .4; text-decoration: line-through; }
+@media (max-width: 380px) { .edit-row { grid-template-columns: 1fr 56px 48px auto; } .edit-row > span.muted.small { display: none; } }

@@ -88,10 +88,19 @@
   const lastBody = () => { const s = bodySorted(); return s.length ? s[s.length - 1] : null; };
   // Estimacion de calorias de una sesion: ~3,2 min por serie (trabajo + descanso), MET 4 para pesas con descansos largos
   function kcalEstimate(nSets) {
-    const lb = lastBody();
-    if (!lb || !lb.peso || !nSets) return null;
+    if (!nSets || !(wlog.entries.length || (lastBody() && lastBody().peso))) return null;
     const minutes = nSets * 3.2;
-    return { minutes: Math.round(minutes), kcal: Math.round(4 * lb.peso * minutes / 60) };
+    return { minutes: Math.round(minutes), kcal: Math.round(4 * curKg() * minutes / 60) };
+  }
+  // Peso actual para todos los calculos de calorias: promedio de los pesos diarios de los ultimos 7 dias;
+  // si no hay, el ultimo peso diario (hasta 30 dias); si no, el del ultimo control; si no, 75 kg
+  function curKg() {
+    const w = wlog.entries.filter((e) => daysSince(e.date) < 7);
+    if (w.length) return w.reduce((t, e) => t + e.kg, 0) / w.length;
+    const ws = wlog.entries.slice().sort((x, y) => (x.date < y.date ? 1 : -1))[0];
+    if (ws && daysSince(ws.date) < 30) return ws.kg;
+    const lb = lastBody();
+    return (lb && lb.peso) || 75;
   }
   // Descanso entre series elegido por ti para cada ejercicio (segundos); si no hay, se usa el del plan
   // Peso "total" o "por lado" por ejercicio: cambia solo la etiqueta (y, si quieres, convierte los registros viejos)
@@ -319,6 +328,17 @@
     return out;
   }
   function lastRecord(exId) { return records(exId, 1)[0] || null; }
+  // Ultimo registro en otra maquina del mismo grupo de alternativas (para ejercicios sin historial propio)
+  function altLast(ex) {
+    const g = altGroupOf(ex.slot || ex.id);
+    let best = null;
+    (g || []).forEach((id) => {
+      if (id === ex.id) return;
+      const r = lastRecord(id);
+      if (r && (!best || r.session.date > best.rec.session.date)) best = { id: id, rec: r };
+    });
+    return best;
+  }
 
   // Resumen de una sesion: peso de trabajo (el maximo valido), series con ese peso y fuerza estimada
   function summarize(rec) {
@@ -410,7 +430,10 @@
 
     // 2. Estancamiento
     const sums = recs.map(summarize);
-    if (!recs.slice(0, 3).some((rc) => rc.sets.some((x) => x.altOrder)) && sums.length >= 4 && sums.every(Boolean)) {
+    // Solo se comparan sesiones con un peso de trabajo parecido (±20 %): si cambiaste de maquina o bajaste el peso
+    // a proposito, una marca con otra carga no cuenta como estancamiento
+    const comparable = sums.length >= 4 && sums.every(Boolean) && sums.slice(0, 4).every((x) => Math.abs(x.W - W) <= W * 0.2);
+    if (!recs.slice(0, 3).some((rc) => rc.sets.some((x) => x.altOrder)) && comparable) {
       const ref = sums[3].e1rm;
       if (Math.max(sums[0].e1rm, sums[1].e1rm, sums[2].e1rm) <= ref) {
         const dw = Math.max(0, Math.min(W - ex.step, Math.round(W * 0.9 / ex.step) * ex.step));
@@ -1546,6 +1569,12 @@
     return md;
   }
 
+  // Copia completa: pesas, cuerpo, cardio, peso diario, abdomen, examenes, dosis y preferencias (maquinas, descansos, unidades)
+  function exportAll() {
+    return Object.assign({}, state, { exportedAt: new Date().toISOString(), body: body, cardio: cardio, weight: wlog, waist: waist, labs: labs, dose: dose,
+      prefs: { alts: altPref, rest: customRest, units: customUnit } });
+  }
+
   function importData(file) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -1556,6 +1585,14 @@
         state = { sessions: data.sessions, deleted: Array.isArray(data.deleted) ? data.deleted : [] };
         if (data.body && Array.isArray(data.body.controls)) { body = data.body; saveBody(); }
         if (data.cardio && Array.isArray(data.cardio.sessions)) { cardio = data.cardio; saveCardio(); }
+        if (data.weight && Array.isArray(data.weight.entries)) { wlog = data.weight; saveW(); }
+        if (data.waist && Array.isArray(data.waist.entries)) { waist = data.waist; saveWaist(); }
+        if (data.labs && Array.isArray(data.labs.records)) { labs = data.labs; saveLabs(); }
+        if (data.dose && data.dose.proxima) { dose = data.dose; saveDose(); }
+        const pf = data.prefs || {};
+        if (pf.alts && typeof pf.alts === 'object') { altPref = pf.alts; saveAlts(); }
+        if (pf.rest && typeof pf.rest === 'object') { customRest = pf.rest; saveRest(); }
+        if (pf.units && typeof pf.units === 'object') { customUnit = pf.units; saveUnits(); Object.keys(customUnit).forEach((id) => { if (exById[id]) setUnit(id, customUnit[id]); }); }
         save(true); render();
       } catch (e) {
         alert('El archivo no es una exportación válida de esta app.');
@@ -1595,7 +1632,7 @@
   }
 
   function specText(ex) {
-    return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + (customRest[ex.id] ? restTxt(customRest[ex.id]) : ex.restText);
+    return (ex.setsText || ex.sets) + ' × ' + ex.repMin + '–' + ex.repMax + (ex.timed ? ' s' : '') + (ex.perLeg ? ' por lado' : '') + ' · descanso ' + (customRest[ex.id] ? restTxt(customRest[ex.id]) : ex.restText);
   }
 
   // A que dia del plan cuenta una sesion de cardio: la guardada desde el dia, o por su tipo si vino de la pagina Cardio
@@ -1727,11 +1764,19 @@
     const nx = planNext();
     return { kind: isWeightDay(nx.id) ? 'pesas' : nx.id === NUTRITION.intervalDay ? 'intervalos' : 'descanso', legs: nx.id === NUTRITION.legsDay, id: nx.id, from: 'siguiente día del plan (' + nx.name.replace(/^Día \d+ · /, '') + ')' };
   }
-  // Calorias netas de una sesion de cardio (por encima del reposo), con tu peso del ultimo control
+  // Calorias netas de una sesion de cardio (por encima del reposo): (MET - 1) x peso actual x horas
   function cardioNetKcal(c) {
     const met = (CARDIO_TYPES.find((t) => t[0] === c.tipo) || [0, 5])[1];
-    const lb = lastBody(), kg = (lb && lb.peso) || 75;
-    return Math.max(0, (met - 1) * kg * (c.min || 0) / 60);
+    return Math.max(0, (met - 1) * curKg() * (c.min || 0) / 60);
+  }
+  // Gasto estimado de un dia (la misma formula que usa Claude en el chat):
+  // basales x 1,55 en dias de pesas (incluye la sesion) o x 1,3 en los demas, + calorias netas del cardio
+  // (en dias de pesas solo suma el cardio extra; el del plan ya va en el 1,55)
+  function daySpend(date, kind, b) {
+    b = b || bmrInfo();
+    if (!b) return null;
+    const cv = cardio.sessions.filter((c) => c.date === date && (kind !== 'pesas' || c.libre)).reduce((k, c) => k + cardioNetKcal(c), 0);
+    return b.kcal * (kind === 'pesas' ? 1.55 : 1.3) + cv;
   }
   function nutTarget(dt, date) {
     const b = NUTRITION.targets[dt.kind];
@@ -1844,7 +1889,7 @@
       const pOk = wk.filter((x) => x.protOk).length;
       parts.push('proteína en meta ' + pOk + ' de ' + wk.length + ' días');
       if (b) {
-        const spend = wk.reduce((s, x) => s + b.kcal * (x.t.kind === 'pesas' ? 1.55 : 1.3) + cardio.sessions.filter((c) => c.date === x.date && (x.t.kind !== 'pesas' || c.libre)).reduce((k, c) => k + cardioNetKcal(c), 0), 0) / wk.length;
+        const spend = wk.reduce((s, x) => s + daySpend(x.date, x.t.kind, b), 0) / wk.length;
         const eat = wk.reduce((s, x) => s + x.tot.kcal, 0) / wk.length;
         const def = Math.round((spend - eat) / 10) * 10;
         parts.push(def >= 0 ? 'déficit promedio de ' + def + ' kcal' : 'superávit promedio de ' + (-def) + ' kcal');
@@ -1970,6 +2015,7 @@
   // Cada maquina guarda su propio historial (los pesos no se comparan entre maquinas).
   let altPref = (function () { try { return JSON.parse(localStorage.getItem(ALT_KEY)) || {}; } catch (e) { return {}; } })();
   function saveAlts() { try { localStorage.setItem(ALT_KEY, JSON.stringify(altPref)); } catch (e) { /* sin almacenamiento */ } }
+  const altNames = (id) => { const g = altGroupOf(id); return g ? g.filter((x) => x !== id && exById[x]).map((x) => exById[x].name).join(', ') : ''; };
   const altGroupOf = (id) => (typeof ALT_GROUPS !== 'undefined' ? ALT_GROUPS.find((g) => g.indexOf(id) !== -1) : null) || null;
   const lastUsedOn = (id) => { const r = lastRecord(id); return r ? r.session.date : ''; };
   // Maquinas que participan en la rotacion: las elegidas, o por defecto las que ya usaste mas la del plan
@@ -2178,6 +2224,7 @@
         restPicker(ex),
         h('div', { class: 'last small' }, last
           ? h('span', {}, h('b', {}, 'Último (' + fmtDate(last.session.date) + '): '), last.sets.map(setStr).join(' · '))
+          : altLast(ex) ? h('span', { class: 'muted' }, 'Sin registro en esta máquina. En ' + exById[altLast(ex).id].name + ' (' + fmtDate(altLast(ex).rec.session.date) + '): ' + altLast(ex).rec.sets.map(setStr).join(' · ') + '. Es otra máquina: el peso no es comparable.')
           : h('span', { class: 'muted' }, 'Sin registro anterior'))),
       h('span', { class: 'badge' + (complete ? ' ok' : '') }, logged.length + '/' + ex.sets));
 
@@ -2191,7 +2238,7 @@
     // Tabla: anterior | hoy
     const table = h('div', { class: 'log' + (hasEq(ex) ? ' has-kg' : '') },
       h('div', { class: 'log-row log-th' },
-        h('span', {}, '#'), h('span', {}, 'Anterior'), h('span', {}, ex.unit), hasEq(ex) ? h('span', {}, eqName(ex) + ' ≈') : null, h('span', {}, 'Reps'), h('span', {})));
+        h('span', {}, '#'), h('span', {}, 'Anterior'), h('span', {}, ex.unit), hasEq(ex) ? h('span', {}, eqName(ex) + ' ≈') : null, h('span', {}, ex.timed ? 'Seg' : 'Reps'), h('span', {})));
     if (!drafts[ex.id]) drafts[ex.id] = {};
     let carry = p.weight;
     for (let i = 0; i < rows; i++) {
@@ -2937,15 +2984,13 @@
     root.append(h('div', { class: 'section-title' }, 'Nueva sesión'), h('section', { class: 'card' }, form));
 
     // Historial
-    const lb = lastBody();
     if (cardio.sessions.length) {
       const list = h('section', { class: 'card' });
       cardio.sessions.slice().sort((x, y) => (x.date < y.date ? 1 : -1)).forEach((c) => {
-        const met = (CARDIO_TYPES.find((t) => t[0] === c.tipo) || [0, 5])[1];
-        const kcal = lb && lb.peso ? Math.round(met * lb.peso * c.min / 60) : null;
+        const kcal = Math.round(cardioNetKcal(c));
         const z = zoneOf(zones, c.hr);
         list.append(h('div', { class: 'ctl-row cardio-row' },
-          h('div', {}, h('strong', {}, c.tipo + (c.libre ? ' · extra' : '')), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal' : '')), detLine(c),
+          h('div', {}, h('strong', {}, c.tipo + (c.libre ? ' · extra' : '')), h('div', { class: 'muted small' }, fmtDate(c.date) + ' · ' + c.min + ' min' + (c.hr ? ' · ' + c.hr + ' lpm' : '') + (c.rondas ? ' · ' + c.rondas + ' rondas' : '') + (kcal ? ' · ≈ ' + kcal + ' kcal netas' : '')), detLine(c),
             z != null ? h('span', { class: 'sugg-tag' + (z === 2 ? '' : ' down') }, z === 0 ? 'Bajo la zona 1' : z === 5 ? 'Sobre la zona 4' : 'Zona ' + z) : null),
           h('button', { class: 'x', type: 'button', 'aria-label': 'Eliminar', onclick: () => {
             if (!confirm('¿Eliminar esta sesión de cardio?')) return;
@@ -3017,7 +3062,7 @@
     try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
     const list = Array.isArray(data) ? data : [data];
     let n = 0;
-    list.forEach((c) => { if (c && isoOk(c.fecha) && +c.abdomen >= 40 && +c.abdomen <= 200) { waist.entries = waist.entries.filter((e) => e.date !== c.fecha).concat({ date: c.fecha, cm: Math.round(+c.abdomen * 10) / 10 }); n++; } });
+    list.forEach((c) => { if (c && isoOk(c.fecha) && +c.abdomen >= 40 && +c.abdomen <= 200) { waist.entries = waist.entries.filter((e) => e.date !== c.fecha).concat(Object.assign({ date: c.fecha, cm: Math.round(+c.abdomen * 10) / 10 }, +c.cadera >= 50 && +c.cadera <= 200 ? { hip: Math.round(+c.cadera * 10) / 10 } : {})); n++; } });
     if (!n) { toast('No encontré medidas en el texto.'); return; }
     saveWaist(); toast(n + ' medida' + (n > 1 ? 's' : '') + ' guardada' + (n > 1 ? 's' : '') + '.'); render();
   }
@@ -3025,20 +3070,28 @@
     const list = waistSorted(), last = list[list.length - 1], prev = list[list.length - 2];
     const due = !last || daysSince(last.date) >= WAIST_DAYS;
     const dateIn = h('input', { type: 'date', value: todayISO(), max: todayISO(), 'aria-label': 'Fecha de la medida' });
-    const inp = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Ej: 84,5', 'aria-label': 'Abdomen en cm' });
+    const inp = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Abdomen, ej: 84,5', 'aria-label': 'Abdomen en cm' });
+    const hipIn = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Cadera (opcional)', 'aria-label': 'Cadera en cm (opcional)' });
+    const lastHip = list.slice().reverse().find((e) => e.hip);
     const card = h('section', { class: 'card dose' + (due ? ' warm' : '') },
       h('div', { class: 'row between' }, h('strong', {}, '📏 Abdomen (semanal)'),
         h('span', { class: 'muted small' }, last ? 'Última: ' + fmt(last.cm) + ' cm · ' + agoText(last.date) : 'Aún sin medidas')));
+    if (lastHip) card.append(h('p', { class: 'muted small', style: 'margin:2px 0 0' }, 'Cadera ' + fmt(lastHip.hip) + ' cm (' + fmtDate(lastHip.date) + ') · cintura/cadera ' + fmt(Math.round(lastHip.cm / lastHip.hip * 100) / 100) + ' (meta: menos de 0,90)'));
     if (due) card.append(h('p', { class: 'small', style: 'margin:4px 0 0' }, last ? 'Toca medirte esta semana.' : 'Anota tu primera medida.',
       ' Pasa la huincha por el ombligo, en ayunas y al final de una exhalación normal, sin apretar ni meter el abdomen.'));
     card.append(h('div', { class: 'row', style: 'gap:8px;margin-top:8px' }, inp,
       h('button', { class: 'btn primary', type: 'button', style: 'white-space:nowrap', onclick: () => {
-        const v = parseNum(inp.value), d = dateIn.value;
+        const v = parseNum(inp.value), d = dateIn.value, hp = hipIn.value.trim() ? parseNum(hipIn.value) : null;
         if (!isoOk(d) || !(v >= 40 && v <= 200)) { toast('Escribe el abdomen en cm (entre 40 y 200).'); return; }
-        waist.entries = waist.entries.filter((e) => e.date !== d).concat({ date: d, cm: Math.round(v * 10) / 10 });
+        if (hp != null && !(hp >= 50 && hp <= 200)) { toast('Escribe la cadera en cm (entre 50 y 200), o déjala vacía.'); return; }
+        const old = waist.entries.find((e) => e.date === d);
+        const n = { date: d, cm: Math.round(v * 10) / 10 };
+        if (hp != null) n.hip = Math.round(hp * 10) / 10; else if (old && old.hip) n.hip = old.hip;
+        waist.entries = waist.entries.filter((e) => e.date !== d).concat(n);
         saveWaist(); toast('Medida guardada.'); render();
       } }, 'Guardar')));
-    card.append(h('div', { class: 'row', style: 'gap:8px;margin-top:6px;align-items:center' }, h('span', { class: 'muted small' }, 'Fecha'), dateIn));
+    card.append(h('div', { class: 'row', style: 'gap:8px;margin-top:6px;align-items:center' }, h('span', { class: 'muted small' }, 'Fecha'), dateIn),
+      h('div', { class: 'row', style: 'margin-top:6px' }, hipIn));
     if (last && prev) {
       const d = Math.round((last.cm - prev.cm) * 10) / 10, tot = Math.round((last.cm - list[0].cm) * 10) / 10;
       card.append(h('p', { class: 'small', style: 'margin:8px 0 0' }, (d > 0 ? '+' : '') + fmt(d) + ' cm vs. la medida anterior (' + fmtDate(prev.date) + ')' +
@@ -3046,10 +3099,10 @@
     }
     if (list.length) {
       const ta = h('textarea', { class: 'body-paste', rows: '2', placeholder: '[{"fecha":"2026-10-25","abdomen":84.5}]', 'aria-label': 'Texto de medidas para importar' });
-      const copy = () => { const t = JSON.stringify(list.map((e) => ({ fecha: e.date, abdomen: e.cm })), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
+      const copy = () => { const t = JSON.stringify(list.map((e) => Object.assign({ fecha: e.date, abdomen: e.cm }, e.hip ? { cadera: e.hip } : {})), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
       card.append(h('details', { class: 'ctl', style: 'margin-top:8px' }, h('summary', {}, h('span', { class: 'muted small' }, 'Historial (' + list.length + ')')),
         list.slice().reverse().map((e) => h('div', { class: 'ctl-row' }, h('span', {}, fmtDate(e.date)),
-          h('span', {}, h('strong', {}, fmt(e.cm) + ' cm '), h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { waist.entries = waist.entries.filter((x) => x.date !== e.date); saveWaist(); render(); } }, '×')))),
+          h('span', {}, h('strong', {}, fmt(e.cm) + ' cm '), e.hip ? h('span', { class: 'muted small' }, 'cadera ' + fmt(e.hip) + ' · ICC ' + fmt(Math.round(e.cm / e.hip * 100) / 100) + ' ') : null, h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { waist.entries = waist.entries.filter((x) => x.date !== e.date); saveWaist(); render(); } }, '×')))),
         h('div', { class: 'hiit-actions', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: copy }, 'Copiar copia de seguridad')),
         ta, h('button', { class: 'btn small', type: 'button', style: 'margin-top:6px', onclick: () => importWaist(ta.value.trim()) }, 'Importar medidas')));
     }
@@ -3290,7 +3343,8 @@
         cards.push(h('section', { class: 'card' },
           h('div', { class: 'row' },
             h('img', { class: 'mini', src: imgSrc(ex, 0), alt: '', loading: 'lazy' }),
-            h('div', {}, h('div', { class: 'ex-name' }, ex.name), h('div', { class: 'muted small' }, 'Peso en ' + ex.unit + ' · ' + rows.length + (rows.length === 1 ? ' sesión' : ' sesiones')))),
+            h('div', {}, h('div', { class: 'ex-name' }, ex.name), h('div', { class: 'muted small' }, 'Peso en ' + ex.unit + ' · ' + rows.length + (rows.length === 1 ? ' sesión' : ' sesiones')),
+              altNames(ex.id) ? h('div', { class: 'muted small' }, 'Alternativa de: ' + altNames(ex.id) + '. Cada máquina lleva su propio historial.') : null)),
           h('p', { class: 'headline' }, progressHeadline(rows, ex.unit)),
           progressChart(rows, ex.unit),
           h('details', { class: 'chart-table' },
@@ -3302,6 +3356,47 @@
       if (cards.length) { any = true; root.append(h('div', { class: 'section-title' }, r.name)); cards.forEach((c) => root.append(c)); }
     });
     if (!any) root.append(h('section', { class: 'card' }, h('p', { class: 'muted' }, 'Cuando registres algunas sesiones verás aquí cómo evolucionan tus pesos.')));
+  }
+
+  // Corregir una sesion pasada (peso, repeticiones o borrar series). Se guarda una copia con fecha de cambio nueva:
+  // al unir con la nube gana esta copia, igual que cualquier sesion editada en la app.
+  function editSessionForm(s) {
+    const rows = s.entries.map((e) => {
+      const ex = exById[e.exerciseId] || { name: e.exerciseId, unit: '' };
+      const w = h('input', { type: 'text', inputmode: 'decimal', value: e.weight == null ? '' : fmt(e.weight), 'aria-label': 'Peso de ' + ex.name + ', serie ' + e.set });
+      const r = h('input', { type: 'text', inputmode: 'numeric', value: String(e.reps), 'aria-label': 'Repeticiones de ' + ex.name + ', serie ' + e.set });
+      const row = h('div', { class: 'edit-row' },
+        h('span', { class: 'small' }, ex.name, h('span', { class: 'muted' }, ' · serie ' + e.set)),
+        w, h('span', { class: 'muted small' }, ex.unit), r, h('span', { class: 'muted small' }, 'reps'),
+        h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar o recuperar esta serie', onclick: () => row.classList.toggle('del') }, '×'));
+      return { e: e, w: w, r: r, row: row, ex: ex };
+    });
+    const apply = () => {
+      const entries = [];
+      for (let i = 0; i < rows.length; i++) {
+        const x = rows[i];
+        if (x.row.classList.contains('del')) continue;
+        const reps = parseInt(x.r.value, 10);
+        const wv = x.w.value.trim() === '' ? null : parseNum(x.w.value);
+        if (!(reps >= 0) || (wv != null && !(wv >= 0))) { toast('Revisa el peso y las reps de ' + x.ex.name + ' (serie ' + x.e.set + ').'); return; }
+        entries.push(Object.assign({}, x.e, { weight: wv, reps: reps }));
+      }
+      if (!entries.length) {
+        if (!confirm('No quedan series. ¿Eliminar la sesión completa?')) return;
+        forget(s); save(true); toast('Sesión eliminada.'); render(); return;
+      }
+      renumber(entries);
+      const n = Object.assign({}, s, { entries: entries, updatedAt: Date.now() });
+      state.sessions = state.sessions.filter((x) => x.id !== s.id);
+      state.sessions.push(n);
+      save(true); toast('Sesión corregida.'); render();
+    };
+    return h('div', {},
+      h('p', { class: 'muted small', style: 'margin:0 0 8px' }, 'Corrige el peso o las reps. × marca una serie para borrarla (tócala de nuevo para recuperarla).'),
+      rows.map((x) => x.row),
+      h('div', { class: 'row wrap', style: 'margin-top:10px' },
+        h('button', { class: 'btn primary small', type: 'button', onclick: apply }, 'Guardar cambios'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => render() }, 'Cancelar')));
   }
 
   function renderHist(root) {
@@ -3322,6 +3417,7 @@
         inner.append(h('div', { class: 'line' }, h('strong', {}, ex.name), h('span', { class: 'muted' }, ' · ' + ex.unit), h('div', {}, parts.join('  ·  '))));
       });
       inner.append(h('div', { class: 'row wrap', style: 'margin-top:10px' },
+        h('button', { class: 'btn small', type: 'button', onclick: () => inner.replaceChildren(editSessionForm(s)) }, '✏️ Corregir'),
         h('button', { class: 'btn small', type: 'button', onclick: () => download('rutina-' + routineOf(s).id + '-' + s.date + '.md', sessionToMd(s), 'text/markdown') }, 'Exportar .md'),
         h('button', {
           class: 'btn small danger', type: 'button',
@@ -3404,7 +3500,7 @@
     root.append(h('section', { class: 'card' },
       h('p', { class: 'muted small', style: 'margin-top:0' }, 'Descarga o carga un archivo con tus registros. Útil como respaldo extra.'),
       h('div', { class: 'row wrap' },
-        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos.json', JSON.stringify(Object.assign({}, state, { body: body, cardio: cardio }), null, 2), 'application/json') }, 'Exportar datos'),
+        h('button', { class: 'btn', type: 'button', onclick: () => download('rutinas-datos-' + todayISO() + '.json', JSON.stringify(exportAll(), null, 2), 'application/json') }, 'Exportar datos'),
         h('button', { class: 'btn', type: 'button', onclick: () => fileInput.click() }, 'Importar datos'),
         h('button', {
           class: 'btn danger', type: 'button',
