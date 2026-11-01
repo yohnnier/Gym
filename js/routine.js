@@ -142,10 +142,10 @@ const ESPALDA = {
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Anota cada lado si difieren.'
     },
     {
-      id: 'pullover-polea', name: 'Pullover en polea', muscle: 'espalda', secondary: ['triceps'],
+      id: 'pullover-polea', name: 'Pullover en polea (barra recta)', muscle: 'espalda', secondary: ['triceps'],
       sets: 3, repMin: 12, repMax: 15, rest: 75, restText: '60–75 s',
       unit: 'lb', step: 5, provisional: true,
-      notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Brazos casi rectos, siente el dorsal.'
+      notes: 'Polea alta con barra recta corta (usa siempre la barra: con cuerda el peso cambia). Torso inclinado 30–45°, codos apenas flexionados y fijos: baja la barra en arco hasta los muslos con la espalda, aprieta 1 s y sube lento hasta estirar el dorsal. Sin balancear ni encoger los hombros.'
     },
     {
       id: 'face-pull', name: 'Face pull', muscle: 'hombros', secondary: ['trapecio', 'espalda'],
