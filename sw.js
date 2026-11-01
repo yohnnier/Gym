@@ -1,10 +1,17 @@
-const CACHE = 'rutinas-v102';
+const CACHE = 'rutinas-v103';
 const ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/routine.js',
-  './js/app.js',
+  './js/app/01-base.js',
+  './js/app/02-medios.js',
+  './js/app/03-nube.js',
+  './js/app/04-inicio.js',
+  './js/app/05-entreno.js',
+  './js/app/06-salud.js',
+  './js/app/07-progreso.js',
+  './js/app/08-arranque.js',
   './manifest.webmanifest',
   './data/sessions.json',
   './data/nutrition.json',

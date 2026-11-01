@@ -73,7 +73,16 @@ Sin guardado en la nube, los registros quedan en el `localStorage` del navegador
 index.html            página principal
 css/style.css         estilos
 js/routine.js         datos de la rutina y sesión de ejemplo
-js/app.js             lógica: registro, progresión, temporizador, historial
+js/app/               lógica, en 8 archivos que se cargan en orden y comparten el ámbito global:
+  01-base.js          constantes, guardado privado, utilidades, estado, progresión, volumen
+  02-medios.js        imágenes, temporizador, banda de pulso, intervalos, cronómetro
+  03-nube.js          guardado en GitHub y copia de seguridad
+  04-inicio.js        navegación, nutrición y pestañas Hoy, Entrenar y Salud
+  05-entreno.js       máquinas alternativas, página de un día, gráfica de progreso
+  06-salud.js         Mi cuerpo, báscula, cardio, peso, abdomen, dosis, exámenes
+  07-progreso.js      pestañas Progreso, Historial y Ajustes
+  08-arranque.js      arranque
+tests/run.js          pruebas automáticas (Playwright): NODE_PATH=$(npm root -g) node tests/run.js
 sw.js                 service worker (modo sin conexión)
 manifest.webmanifest  instalación como app
 icons/icon.svg        icono
