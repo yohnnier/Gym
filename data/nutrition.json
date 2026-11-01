@@ -1871,6 +1871,50 @@
    "carb": 54.2,
    "fat": 46.7,
    "notes": "plateada 211 g pesados, con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"
+  },
+  {
+   "id": "2026-11-01-cena",
+   "date": "2026-11-01",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Plateada Dark Kitchen (200 g, según etiqueta)",
+     "g": 200,
+     "kcal": 216,
+     "prot": 32.2,
+     "carb": 0.6,
+     "fat": 9.4
+    },
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Manjar (1 cucharada)",
+     "g": 20,
+     "kcal": 64,
+     "prot": 1.2,
+     "carb": 11.0,
+     "fat": 1.4
+    },
+    {
+     "food": "Vino blanco (430 ml)",
+     "g": 430,
+     "kcal": 353,
+     "prot": 0.4,
+     "carb": 11.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 770,
+   "prot": 40.8,
+   "carb": 48.6,
+   "fat": 11.4,
+   "notes": "vino blanco seco ~82 kcal/100 ml (~41 g de alcohol, cerca de 285 kcal vienen del alcohol); manjar ~20 g; pan el mismo bajo en grasa y azúcar"
   }
  ]
 }
