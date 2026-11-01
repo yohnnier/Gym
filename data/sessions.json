@@ -3125,5 +3125,22 @@
    }
   ],
   "updatedAt": 1793371521630
+ },
+ {
+  "id": "mvxzdm356jv4f",
+  "date": "2026-11-01",
+  "createdAt": 1793546668049,
+  "routineId": "dia-tiron",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 1,
+    "weight": 40,
+    "reps": 12,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1793546670480
  }
 ]
