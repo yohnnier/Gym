@@ -472,7 +472,7 @@ ul.plain li { margin: 4px 0; }
 /* ---------- navegacion ---------- */
 .tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--line);
@@ -660,3 +660,10 @@ ul.plain li { margin: 4px 0; }
 .edit-row input { width: 100%; min-width: 0; padding: 6px; font-size: 16px; }
 .edit-row.del { opacity: .4; text-decoration: line-through; }
 @media (max-width: 380px) { .edit-row { grid-template-columns: 1fr 56px 48px auto; } .edit-row > span.muted.small { display: none; } }
+
+/* Deficit del dia (tarjeta de nutricion) */
+.deficit { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.deficit .ctl-row b.warn, .warn-text { color: var(--warm); }
+.card.lib > summary { cursor: pointer; list-style: none; }
+.card.lib > summary::-webkit-details-marker { display: none; }
+.card.lib[open] > summary { margin-bottom: 4px; }

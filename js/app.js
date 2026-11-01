@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '45';
+  const VERSION = '46';
   const KEY = 'rutinas.v1';
   const IMG_KEY = 'rutinas.img.v1';
   const REST_KEY = 'rutinas.rest.v1';
@@ -1602,11 +1602,14 @@
   }
 
   // ---------- navegacion ----------
-  // #/  inicio · #/g/<grupo>  pagina del grupo · #/prog · #/hist · #/rutina
+  // Pestañas: #/ (Hoy) · #/entrenar · #/prog · #/salud · #/ajustes
+  // Subpaginas: #/g/<dia> y #/hist y #/cardio (Entrenar) · #/cuerpo y #/examenes (Salud). #/rutina = #/ajustes (enlace antiguo)
+  const TAB_OF = { group: 'entrenar', hist: 'entrenar', cardio: 'entrenar', cuerpo: 'salud', examenes: 'salud' };
   function route() {
     const p = location.hash.replace(/^#\/?/, '').split('/');
     if (p[0] === 'g' && routineById[p[1]]) return { view: 'group', group: routineById[p[1]] };
-    if (p[0] === 'prog' || p[0] === 'hist' || p[0] === 'rutina' || p[0] === 'cuerpo' || p[0] === 'cardio' || p[0] === 'examenes') return { view: p[0] };
+    if (p[0] === 'rutina') return { view: 'ajustes' };
+    if (['entrenar', 'prog', 'salud', 'ajustes', 'hist', 'cuerpo', 'cardio', 'examenes'].indexOf(p[0]) !== -1) return { view: p[0] };
     return { view: 'hoy' };
   }
   function go(hash) {
@@ -1619,7 +1622,7 @@
     const root = $('#app');
     root.replaceChildren();
     $('#sub').textContent = longDate(new Date());
-    const tab = r.view === 'group' ? 'hoy' : (r.view === 'cuerpo' || r.view === 'cardio' || r.view === 'examenes') ? 'prog' : r.view;
+    const tab = TAB_OF[r.view] || r.view;
     document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('active', b.dataset.view === tab));
     if (r.view === 'group') renderGroup(root, r.group);
     else if (r.view === 'prog') renderProg(root);
@@ -1627,7 +1630,9 @@
     else if (r.view === 'cardio') renderCardio(root);
     else if (r.view === 'examenes') renderExamenes(root);
     else if (r.view === 'hist') renderHist(root);
-    else if (r.view === 'rutina') renderRutina(root);
+    else if (r.view === 'entrenar') renderEntrenar(root);
+    else if (r.view === 'salud') renderSalud(root);
+    else if (r.view === 'ajustes') renderRutina(root);
     else renderHome(root);
   }
 
@@ -1823,7 +1828,8 @@
       t.adj ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, (t.adj > 0 ? '+' : '−') + Math.abs(t.adj) + ' kcal de ajuste de hoy' + (t.adjWhy ? ': ' + t.adjWhy : '') + '.') : null);
     if (!d.list.length) {
       card.append(h('p', { class: 'muted small', style: 'margin:6px 0 4px' }, 'Aún no registras comidas hoy. Dímelas en el chat ("desayuno: 3 huevos y un kiwi") y aparecen aquí.'),
-        h('p', { class: 'small', style: 'margin:0' }, 'Meta: ' + fmt(t.kcal) + ' kcal · ' + t.prot + ' g proteína · ' + t.carb + ' g carbohidratos · ' + t.fat + ' g grasa'));
+        h('p', { class: 'small', style: 'margin:0' }, 'Meta: ' + fmt(t.kcal) + ' kcal · ' + t.prot + ' g proteína · ' + t.carb + ' g carbohidratos · ' + t.fat + ' g grasa'),
+        deficitBox(dt, t, 0, today), yesterdayLine());
       return card;
     }
     card.append(nutBar('Calorías', d.tot.kcal, t.kcal, 'kcal'), nutBar('Proteína', d.tot.prot, t.prot, 'g'), nutBar('Carbohidratos', d.tot.carb, t.carb, 'g'), nutBar('Grasa', d.tot.fat, t.fat, 'g'));
@@ -1832,8 +1838,30 @@
       h('summary', {}, h('strong', {}, (e.meal || 'comida').replace(/^./, (c) => c.toUpperCase())), h('span', { class: 'muted small' }, fmt(Math.round(e.kcal || 0)) + ' kcal · ' + fmt(Math.round(e.prot || 0)) + ' g prot')),
       h('div', { class: 'ctl-body' }, (e.items || []).map((it) => h('div', { class: 'ctl-row' }, h('span', {}, it.food + (it.g ? ' · ' + fmt(it.g) + ' g' : '')), h('b', {}, fmt(Math.round(it.kcal || 0)) + ' kcal'))),
         e.notes ? h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Supuestos: ' + e.notes) : null))));
-    card.append(meals);
+    card.append(meals, deficitBox(dt, t, d.tot.kcal, today), yesterdayLine());
     return card;
+  }
+  // Deficit del dia con la formula unica (daySpend): el que tendras si cumples la meta y el de lo comido hasta ahora
+  const DEF_OK = [300, 550], DEF_MAX = 750;
+  function deficitBox(dt, t, eaten, date) {
+    const sp = daySpend(date, dt.kind);
+    if (!sp) return null;
+    const plan = round10(sp - t.kcal), now = round10(sp - eaten);
+    const row = (label, val, cls) => h('div', { class: 'ctl-row' }, h('span', {}, label), h('b', { class: cls || '' }, fmt(val) + ' kcal'));
+    return h('div', { class: 'deficit' },
+      row('🔥 Gasto estimado hoy', round10(sp)),
+      row('Déficit si cumples la meta', plan),
+      eaten ? row('Déficit con lo comido hasta ahora', now) : null,
+      h('p', { class: 'muted small', style: 'margin:4px 0 0' }, 'Basales × ' + (dt.kind === 'pesas' ? '1,55 (día de pesas)' : '1,3') + ' + cardio registrado hoy. Lo ideal es ' + DEF_OK[0] + '–' + DEF_OK[1] + ' kcal; más de ' + DEF_MAX + ' arriesga músculo.'));
+  }
+  // Cierre de ayer: lo comido y el deficit resultante
+  function yesterdayLine() {
+    const y = isoAdd(todayISO(), -1), d = nutDay(y);
+    if (!d.list.length) return null;
+    const dt = dayTypeOf(y), sp = daySpend(y, dt.kind);
+    const def = sp ? round10(sp - d.tot.kcal) : null;
+    return h('p', { class: 'small' + (def != null && def > DEF_MAX ? ' warn-text' : ''), style: 'margin:8px 0 0' },
+      'Ayer: ' + fmt(Math.round(d.tot.kcal)) + ' kcal · ' + Math.round(d.tot.prot) + ' g proteína' + (def != null ? ' · déficit ≈ ' + fmt(def) + ' kcal' : '') + (def != null && def > DEF_MAX ? ' (alto)' : ''));
   }
   // Ultimos 7 dias de nutricion frente a la meta de cada dia
   function nutWeek() {
@@ -1916,28 +1944,37 @@
       h('p', { class: 'muted small', style: 'margin:4px 0 0' }, 'Cruza tus series, comidas registradas (días completos), cardio y controles de la báscula. Objetivo: ' + NUTRITION.goal + '.'));
   }
 
+  // ---------- Hoy: solo lo del dia ----------
   function renderHome(root) {
     const sessions = sortedSessions();
     const last = sessions[0];
-    const monthKey = todayISO().slice(0, 7);
-    const thisMonth = sessions.filter((x) => x.date.slice(0, 7) === monthKey).length;
-    const week = sessions.filter((x) => daysSince(x.date) < 7).length;
-    const sets = sessions.reduce((t, x) => t + x.entries.length, 0);
-
     let msg;
-    if (!last) msg = 'Empecemos con calma. Elige un grupo muscular y registra tu primera serie.';
+    if (!last) msg = 'Empecemos con calma. Elige un día del plan y registra tu primera serie.';
     else if (daysSince(last.date) === 0) msg = 'Hoy ya sumaste. Recuperar también es parte del progreso.';
     else if (daysSince(last.date) > 7) msg = 'Qué bueno verte de nuevo. Retoma con pesos cómodos y ve subiendo.';
-    else msg = 'Cada serie suma. ¿Qué entrenamos hoy?';
-
+    else msg = 'Esto es lo que te toca hoy.';
     root.append(h('section', { class: 'hero' }, h('h2', {}, greeting()), h('p', {}, msg)));
-    root.append(h('div', { class: 'stats' },
-      h('div', { class: 'stat' }, h('b', {}, week), h('span', {}, 'Sesiones en 7 días')),
-      h('div', { class: 'stat' }, h('b', {}, thisMonth), h('span', {}, 'Este mes')),
-      h('div', { class: 'stat' }, h('b', {}, sets), h('span', {}, 'Series en total'))));
 
-    root.append(weightCard(), waistCard(), doseCard());
+    // Lo que toca: el dia en curso o el siguiente del plan
+    const nextDay = planNext(), lastDone = lastDoneByGroup();
+    const inCourse = DAYS.find((d) => (d.cardio && !d.exercises.length) ? cardioToday(d).length : todaySession(d.id, false));
+    const d = inCourse || nextDay;
+    root.append(h('div', { class: 'section-title' }, inCourse ? 'En curso hoy' : 'Te toca'));
+    root.append(h('div', { class: 'days' }, dayButton(d, DAYS.indexOf(d), nextDay, lastDone)));
+    root.append(h('button', { class: 'btn full free-link', type: 'button', onclick: () => go('#/entrenar') }, 'Ver todo el plan, cardio libre e historial ›'));
 
+    // Avisos cortos (solo cuando corresponde)
+    const notes = [];
+    if (dose) {
+      const dd = doseDays();
+      if (dd <= 1) notes.push(h('button', { class: 'card body-link warm', type: 'button', onclick: () => go('#/salud') },
+        h('div', {}, h('strong', {}, '💉 ' + (dose.nombre || 'Aplicación') + (dd === 0 ? ' · toca HOY' : dd === 1 ? ' · mañana' : ' · atrasada ' + (-dd) + (dd === -1 ? ' día' : ' días'))),
+          h('div', { class: 'muted small' }, 'Márcala en Salud cuando te la pongas')), h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    }
+    const wl = waistSorted(), wlast = wl[wl.length - 1];
+    if (!wlast || daysSince(wlast.date) >= WAIST_DAYS) notes.push(h('button', { class: 'card body-link warm', type: 'button', onclick: () => go('#/salud') },
+      h('div', {}, h('strong', {}, '📏 Toca medir el abdomen'), h('div', { class: 'muted small' }, wlast ? 'Última: ' + fmt(wlast.cm) + ' cm · ' + agoText(wlast.date) : 'Aún sin medidas')), h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    notes.forEach((n) => root.append(n));
     // Aviso de control corporal: pasan 5 semanas desde el ultimo
     const lbody = lastBody();
     let snoozed = 0;
@@ -1954,54 +1991,71 @@
           } }, 'Más tarde'))));
     }
 
-    const lastDone = lastDoneByGroup();
-
-    const nextDay = planNext();
-    root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
-    const days = h('div', { class: 'days' });
-    DAYS.forEach((d, i) => {
-      const cardioOnly = !!d.cardio && !d.exercises.length;
-      const cDone = cardioOnly ? cardioToday(d) : [];
-      const today = cardioOnly ? (cDone.length ? cDone[0] : null) : todaySession(d.id, false);
-      const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
-      const status = cDone.length ? 'Hoy: ' + cDone.reduce((t, c) => t + c.min, 0) + ' min registrados'
-        : today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
-        : d.cardio ? (lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) + ' · ' : '') + 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en 7 días'
-        : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
-      // Portada: una imagen por cada grupo principal del dia
-      const covers = (d.covers || []).map((id) => [{ id: id }, 0]);
-      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0].muscle === e.muscle)) covers.push([e, 0]); });
-      // Si el dia trabaja pocos musculos (p. ej. cardio + abdomen), completa con la foto final de otros ejercicios
-      d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0] === e)) covers.push([e, 1]); });
-      days.append(h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
-        h('span', { class: 'day-cover' },
-          covers.map((c) => h('img', { src: imgSrc(c[0], c[1]), alt: '', loading: 'lazy' })),
-          today ? h('span', { class: 'pill live' }, 'Hoy')
-            : d === nextDay ? h('span', { class: 'pill' }, 'Siguiente') : null),
-        h('span', { class: 'day-body' },
-          h('span', { class: 'day-n' }, i + 1),
-          h('span', { class: 'day-txt' },
-            h('strong', {}, d.name.replace(/^Día \d+ · /, '')),
-            h('span', {}, d.focus),
-            h('span', { class: 'day-st' }, status)),
-          h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›'))));
-    });
-    root.append(days);
-    root.append(h('button', { class: 'btn full free-link', type: 'button', onclick: () => go('#/cardio') },
-      freeRun.start || freeRun.acc ? '⏱ Cardio libre en curso · toca para verlo' : '⏱ Cardio libre (opcional): cronómetro, constante o intervalos'));
 
     root.append(h('div', { class: 'section-title' }, 'Nutrición de hoy'), nutritionCard());
+    root.append(h('div', { class: 'section-title' }, 'Peso de hoy'), weightCard());
+  }
+
+  // Boton de un dia del plan (portada, estado y "Siguiente")
+  function dayButton(d, i, nextDay, lastDone) {
+    const cardioOnly = !!d.cardio && !d.exercises.length;
+    const cDone = cardioOnly ? cardioToday(d) : [];
+    const today = cardioOnly ? (cDone.length ? cDone[0] : null) : todaySession(d.id, false);
+    const sets = d.exercises.reduce((t, e) => t + e.sets, 0);
+    const status = cDone.length ? 'Hoy: ' + cDone.reduce((t, c) => t + c.min, 0) + ' min registrados'
+      : today ? 'En curso hoy · ' + today.entries.length + ' de ' + sets + ' series'
+      : d.cardio ? (lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) + ' · ' : '') + 'Cardio: ' + cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en 7 días'
+      : lastDone[d.id] ? 'Último: ' + agoText(lastDone[d.id]) : d.exercises.length + ' ejercicios · ' + sets + ' series';
+    // Portada: una imagen por cada grupo principal del dia
+    const covers = (d.covers || []).map((id) => [{ id: id }, 0]);
+    d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0].muscle === e.muscle)) covers.push([e, 0]); });
+    // Si el dia trabaja pocos musculos (p. ej. cardio + abdomen), completa con la foto final de otros ejercicios
+    d.exercises.forEach((e) => { if (covers.length < 3 && !covers.some((c) => c[0] === e)) covers.push([e, 1]); });
+    return h('button', { class: 'day' + (d === nextDay && !today ? ' next' : ''), type: 'button', onclick: () => go('#/g/' + d.id) },
+      h('span', { class: 'day-cover' },
+        covers.map((c) => h('img', { src: imgSrc(c[0], c[1]), alt: '', loading: 'lazy' })),
+        today ? h('span', { class: 'pill live' }, 'Hoy')
+          : d === nextDay ? h('span', { class: 'pill' }, 'Siguiente') : null),
+      h('span', { class: 'day-body' },
+        h('span', { class: 'day-n' }, i + 1),
+        h('span', { class: 'day-txt' },
+          h('strong', {}, d.name.replace(/^Día \d+ · /, '')),
+          h('span', {}, d.focus),
+          h('span', { class: 'day-st' }, status)),
+        h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+  }
+
+  // ---------- Entrenar: el plan completo, cardio libre, grupos sueltos e historial ----------
+  function renderEntrenar(root) {
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Entrenar'), h('p', {}, 'Tu ' + PLAN.name.toLowerCase() + '. El marcado como "Siguiente" es el que sigue al último que hiciste.')));
+    const nextDay = planNext(), lastDone = lastDoneByGroup();
+    root.append(h('div', { class: 'section-title' }, 'Tu ' + PLAN.name.toLowerCase()));
+    root.append(h('div', { class: 'days' }, DAYS.map((d, i) => dayButton(d, i, nextDay, lastDone))));
+    root.append(h('button', { class: 'btn full free-link', type: 'button', onclick: () => go('#/cardio') },
+      freeRun.start || freeRun.acc ? '⏱ Cardio libre en curso · toca para verlo' : '⏱ Cardio libre (opcional): cronómetro, constante o intervalos'));
     root.append(h('div', { class: 'section-title' }, 'Recuperación muscular'), recoveryCard());
+    root.append(h('div', { class: 'section-title' }, 'Registros'));
+    root.append(linkCard('📅 Historial de pesas', sortedSessions().length + ' sesiones · corrige o borra series pasadas', '#/hist'));
+    root.append(linkCard('🏃 Cardio', cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en los últimos 7 días · historial y zonas', '#/cardio'));
+    root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
+    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Para un día en que quieras entrenar un solo grupo.'));
+    root.append(groupsGrid());
+  }
+  function linkCard(title, sub, hash) {
+    return h('button', { class: 'card body-link', type: 'button', onclick: () => go(hash) },
+      h('div', {}, h('strong', {}, title), h('div', { class: 'muted small' }, sub)), h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›'));
+  }
 
-    const vol = weeklyVolume();
-    // Lumbar y trapecio no estan en el plan: solo se muestran si tienen series
-    const shown = Object.keys(MUSCLES).filter((k) => vol[k] || (k !== 'lumbar' && k !== 'trapecio'));
-    const volCard = h('section', { class: 'card vol' }, volumeIntro(shown, vol));
-    shown.forEach((k) => volCard.append(volumeMeter(k, vol[k])));
-    root.append(h('div', { class: 'section-title' }, 'Meta de la semana'));
-    root.append(volCard);
-
-
+  // ---------- Salud: peso, abdomen, dosis, cuerpo y examenes ----------
+  function renderSalud(root) {
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Salud'), h('p', {}, '🔒 Datos privados: se guardan en tu celular y en tu repositorio privado, nunca en el público.')));
+    root.append(weightCard(), waistCard(), doseCard());
+    const lb = lastBody();
+    root.append(linkCard('🧍 Mi cuerpo', lb
+      ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '') + ' · calorías basales'
+      : 'Guarda tus controles de peso y composición corporal', '#/cuerpo'));
+    const lbs = labSorted(), ll = lbs[lbs.length - 1];
+    root.append(linkCard('🩺 Mis exámenes', ll ? 'Último examen ' + fmtDate(ll.date) + ' · ' + Object.keys(ll.v).length + ' valores' : 'Guarda tus resultados de laboratorio', '#/examenes'));
   }
 
   function elapsedText(s) {
@@ -2546,7 +2600,7 @@
 
   function renderCuerpo(root) {
     root.append(h('div', { class: 'group-head' },
-      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/salud') }),
       h('div', { class: 'grow' }, h('h2', {}, 'Mi cuerpo'), h('div', { class: 'muted small' }, 'Controles de peso y composición corporal'))));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo. No se suben a GitHub ni forman parte del repositorio público.')));
@@ -2925,7 +2979,7 @@
 
   function renderCardio(root) {
     root.append(h('div', { class: 'group-head' },
-      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/entrenar') }),
       h('div', { class: 'grow' }, h('h2', {}, 'Cardio'), h('div', { class: 'muted small' }, 'Zona 2 · quema de grasa'))));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo.')));
@@ -3231,7 +3285,7 @@
   }
   function renderExamenes(root) {
     root.append(h('div', { class: 'group-head' },
-      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/prog') }),
+      h('button', { class: 'back', type: 'button', 'aria-label': 'Volver', onclick: () => go('#/salud') }),
       h('div', { class: 'grow' }, h('h2', {}, 'Mis exámenes'), h('div', { class: 'muted small' }, 'Resultados de laboratorio y su evolución'))));
     $('.back', root).innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     root.append(h('div', { class: 'card soft' }, h('p', { class: 'small', style: 'margin:0' }, '🔒 Estos datos se guardan solo en este dispositivo. No se suben a GitHub ni forman parte del repositorio público. Son informativos: tu médico es quien los interpreta.')));
@@ -3298,25 +3352,22 @@
   }
 
   function renderProg(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.')));
-    const lb = lastBody();
-    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cuerpo') },
-      h('div', {}, h('strong', {}, '🧍 Mi cuerpo'),
-        h('div', { class: 'muted small' }, lb
-          ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '')
-          : 'Guarda tus controles de peso y composición corporal')),
-      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
-    const lbs = labSorted(), ll = lbs[lbs.length - 1];
-    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/examenes') },
-      h('div', {}, h('strong', {}, '🩺 Mis exámenes'),
-        h('div', { class: 'muted small' }, ll ? 'Último examen ' + fmtDate(ll.date) + ' · ' + Object.keys(ll.v).length + ' valores' : 'Guarda tus resultados de laboratorio')),
-      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
-    const cmin = cardioWeekMinutes();
-    root.append(h('button', { class: 'card body-link', type: 'button', onclick: () => go('#/cardio') },
-      h('div', {}, h('strong', {}, '🏃 Cardio'),
-        h('div', { class: 'muted small' }, cmin + ' de ' + CARDIO_GOAL + ' min en los últimos 7 días')),
-      h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Tu progreso'), h('p', {}, 'Cómo vas esta semana y la evolución de tus pesos.')));
+    const all = sortedSessions(), monthKey = todayISO().slice(0, 7);
+    root.append(h('div', { class: 'stats' },
+      h('div', { class: 'stat' }, h('b', {}, all.filter((x) => daysSince(x.date) < 7).length), h('span', {}, 'Sesiones en 7 días')),
+      h('div', { class: 'stat' }, h('b', {}, all.filter((x) => x.date.slice(0, 7) === monthKey).length), h('span', {}, 'Este mes')),
+      h('div', { class: 'stat' }, h('b', {}, all.reduce((t, x) => t + x.entries.length, 0)), h('span', {}, 'Series en total'))));
     root.append(weeklyEvalCard(), nutWeekCard());
+    const vol = weeklyVolume();
+    // Lumbar y trapecio no estan en el plan: solo se muestran si tienen series
+    const shown = Object.keys(MUSCLES).filter((k) => vol[k] || (k !== 'lumbar' && k !== 'trapecio'));
+    const volCard = h('section', { class: 'card vol' }, volumeIntro(shown, vol));
+    shown.forEach((k) => volCard.append(volumeMeter(k, vol[k])));
+    root.append(h('div', { class: 'section-title' }, 'Series por músculo (meta de la semana)'), volCard);
+    root.append(linkCard('🏃 Cardio', cardioWeekMinutes() + ' de ' + CARDIO_GOAL + ' min en los últimos 7 días', '#/cardio'));
+    root.append(h('div', { class: 'section-title' }, 'Fuerza por ejercicio'),
+      h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Cada punto es el peso más alto que usaste en una sesión. Si la línea sube, estás progresando.'));
     const sessions = sortedSessions().reverse(); // de la mas antigua a la mas reciente
     let any = false;
     ROUTINES.forEach((r) => {
@@ -3454,22 +3505,13 @@
   }
 
   function renderRutina(root) {
-    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Rutinas'), h('p', {}, 'Tu ' + PLAN.name.toLowerCase() + ' y los ejercicios de cada grupo. Toca una imagen para cambiarla.')), h('div', { class: 'section-title' }, PLAN.name));
-    DAYS.forEach((d) => {
-      root.append(h('section', { class: 'card' },
-        h('div', { class: 'ex-name' }, d.name),
-        h('div', { class: 'muted small' }, d.focus),
-        d.exercises.length
-          ? h('ul', { class: 'plain' }, d.exercises.map((e) => h('li', {}, e.name + ' — ' + e.sets + ' × ' + e.repMin + '–' + e.repMax)))
-          : h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Solo cardio, sin series con peso. El plan está en la tarjeta del inicio.')));
-    });
-    root.append(h('div', { class: 'section-title' }, 'Grupos sueltos'));
-    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Para un día en que quieras entrenar un solo grupo.'));
-    root.append(groupsGrid());
+    root.append(h('section', { class: 'hero' }, h('h2', {}, 'Ajustes'), h('p', {}, 'Guardado en la nube, copia de seguridad, descansos y las imágenes de cada ejercicio.')));
+    // Biblioteca de ejercicios (imagenes, notas y unidad), plegada al final
+    const lib = h('div', {});
     ROUTINES.forEach((r) => {
-      root.append(h('div', { class: 'section-title' }, r.name));
+      lib.append(h('div', { class: 'section-title' }, r.name));
       r.exercises.forEach((ex, i) => {
-        root.append(h('section', { class: 'card' },
+        lib.append(h('section', { class: 'card' },
           h('div', { class: 'row', style: 'align-items:flex-start;gap:12px' },
             h('button', { class: 'thumb', type: 'button', 'aria-label': 'Ver imagen de ' + ex.name, onclick: () => openSheet(ex) }, h('img', { src: imgSrc(ex, 0), alt: '', loading: 'lazy' })),
             h('div', { class: 'grow' },
@@ -3483,16 +3525,6 @@
     const fileInput = h('input', { type: 'file', accept: 'application/json', style: 'display:none' });
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) importData(fileInput.files[0]); });
 
-    // Descansos de todos los ejercicios en un solo lugar
-    root.append(h('div', { class: 'section-title' }, 'Tiempos de descanso'));
-    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Ajusta cuánto descansas entre series en cada ejercicio. El cronómetro automático usa este tiempo cuando marcas ✓.'));
-    const restCard = h('section', { class: 'card' });
-    DAYS.filter((d) => d.exercises.length).forEach((d) => {
-      restCard.append(h('div', { class: 'rest-day' }, d.name));
-      d.exercises.forEach((ex) => restCard.append(h('div', { class: 'rest-row' }, h('span', { class: 'rest-name' }, ex.name), restPicker(ex))));
-    });
-    restCard.append(h('button', { class: 'btn small', type: 'button', style: 'margin-top:12px', onclick: resetRests }, 'Restaurar los del plan'));
-    root.append(restCard);
 
     root.append(h('div', { class: 'section-title' }, 'Guardado en la nube'));
     root.append(cloudCard());
@@ -3512,6 +3544,18 @@
           }
         }, 'Borrar de este dispositivo')),
       fileInput));
+    // Descansos de todos los ejercicios en un solo lugar
+    root.append(h('div', { class: 'section-title' }, 'Tiempos de descanso'));
+    root.append(h('p', { class: 'muted small', style: 'margin:-4px 4px 10px' }, 'Ajusta cuánto descansas entre series en cada ejercicio. El cronómetro automático usa este tiempo cuando marcas ✓.'));
+    const restCard = h('section', { class: 'card' });
+    DAYS.filter((d) => d.exercises.length).forEach((d) => {
+      restCard.append(h('div', { class: 'rest-day' }, d.name));
+      d.exercises.forEach((ex) => restCard.append(h('div', { class: 'rest-row' }, h('span', { class: 'rest-name' }, ex.name), restPicker(ex))));
+    });
+    restCard.append(h('button', { class: 'btn small', type: 'button', style: 'margin-top:12px', onclick: resetRests }, 'Restaurar los del plan'));
+    root.append(restCard);
+    root.append(h('div', { class: 'section-title' }, 'Ejercicios'));
+    root.append(h('details', { class: 'card lib' }, h('summary', {}, h('strong', {}, 'Ver todos los ejercicios'), h('span', { class: 'muted small' }, ' · técnica, unidad e imágenes (toca una imagen para cambiarla)')), lib));
     root.append(h('p', { class: 'muted small', style: 'text-align:center;margin-top:18px' }, 'Versión ' + VERSION));
   }
 
