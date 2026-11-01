@@ -1951,6 +1951,50 @@
    "carb": 17.4,
    "fat": 23.0,
    "notes": "queso fresco supuesto ~240 kcal/100 g (17 g prot, 18 g grasa); huevos fritos sin aceite"
+  },
+  {
+   "id": "2026-11-01-almuerzo",
+   "date": "2026-11-01",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Ceviche de reineta: pescado (~200 g)",
+     "g": 200,
+     "kcal": 220,
+     "prot": 40.0,
+     "carb": 0,
+     "fat": 6.0
+    },
+    {
+     "food": "Ceviche: cebolla, pimiento, cilantro y limón (~150 g)",
+     "g": 150,
+     "kcal": 45,
+     "prot": 1.5,
+     "carb": 10.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Plátano tostado frito (6 rodajas, ~90 g)",
+     "g": 90,
+     "kcal": 225,
+     "prot": 1.2,
+     "carb": 36.0,
+     "fat": 9.0
+    },
+    {
+     "food": "Sushi Chicken Rolls apanado (10 cortes de ~28 g): pollo, queso crema, palta, salsa agridulce, sésamo",
+     "g": 280,
+     "kcal": 672,
+     "prot": 25.2,
+     "carb": 78.4,
+     "fat": 29.4
+    }
+   ],
+   "kcal": 1162,
+   "prot": 67.9,
+   "carb": 124.4,
+   "fat": 44.7,
+   "notes": "ceviche 350 g supuesto ~200 g de pescado y el resto verduras y jugo de limón, sin aceite; plátano tostado tipo tostón frito ~15 g c/u; sushi apanado (frito) estimado ~240 kcal/100 g"
   }
  ]
 }
