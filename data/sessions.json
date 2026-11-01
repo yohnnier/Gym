@@ -3183,13 +3183,6 @@
     "rpe": 10
    },
    {
-    "exerciseId": "face-pull",
-    "set": 1,
-    "weight": 30,
-    "reps": 18,
-    "rpe": null
-   },
-   {
     "exerciseId": "pullover-polea",
     "set": 1,
     "weight": 100,
@@ -3211,6 +3204,6 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1793550252145
+  "updatedAt": 1793550263139
  }
 ]
