@@ -2047,6 +2047,34 @@
    "carb": 76.1,
    "fat": 17.3,
    "notes": "plátano 160 g supuesto sin cáscara; queso tipo gouda/mantecoso; kéfir de leche entera"
+  },
+  {
+   "id": "2026-11-02-desayuno",
+   "date": "2026-11-02",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 249,
+   "prot": 41.6,
+   "carb": 14.4,
+   "fat": 2.8,
+   "notes": "valores de etiqueta"
   }
  ]
 }
