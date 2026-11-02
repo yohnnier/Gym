@@ -41,13 +41,13 @@ function sess(id, date, routineId, exId, weight, reps) {
   const browser = await chromium.launch();
 
   // Abre la app con un localStorage dado; devuelve la pagina y la lista de errores
-  async function open(storage, hash) {
+  async function open(storage, hash, now) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
-    await page.clock.setFixedTime(new Date(TODAY));
+    await page.clock.setFixedTime(new Date(now || TODAY));
     await page.addInitScript((st) => { Object.keys(st).forEach((k) => localStorage.setItem(k, JSON.stringify(st[k]))); }, storage || {});
     await page.goto(BASE + (hash || '#/'));
     await page.waitForFunction(() => document.querySelector('#app') && document.querySelector('#app').children.length > 0);
@@ -154,6 +154,22 @@ function sess(id, date, routineId, exId, weight, reps) {
     const t = await a.page.locator('#app').innerText();
     check('muestra kg de grasa, sin grasa y el promedio de % de grasa', /18,3 kg de grasa/.test(t) && /57,1 kg sin grasa/.test(t) && /Grasa, promedio de 7 días: 24,4 %/.test(t), t.slice(t.indexOf('Peso'), t.indexOf('Peso') + 400));
     check('sin errores en la tarjeta de peso', a.errors.length === 0, a.errors);
+    await a.close();
+  }
+
+  console.log('Plan del cuerpo mes a mes');
+  {
+    // Datos ficticios: parte con 80 kg y 25 % de grasa (20 kg de grasa, 60 sin grasa)
+    const entries = [{ date: '2026-11-02', kg: 80, grasa: 25 }, { date: '2026-11-03', kg: 79.8, grasa: 24.9 }, { date: '2026-11-04', kg: 79.9, grasa: 24.8 }, { date: '2026-11-05', kg: 79.6, grasa: 24.8 }];
+    const a = await open({ 'rutinas.weight.v1': { entries: entries }, 'rutinas.waist.v1': { entries: [{ date: '2026-11-02', cm: 95 }] }, 'rutinas.body.v1': { profile: { altura: 180 }, controls: [] } }, '#/prog', '2026-11-05T09:00:00-03:00');
+    const r = await a.page.evaluate(() => { const s = bodyPlanStart(); const p = bodyPlanAt('2026-12-03', s); return { start: s.date, kg: p.kg, grasa: p.grasa, fat: p.fat, d20: bodyPlanDateFor(20, s) }; });
+    check('el plan parte del primer peso con % de grasa', r.start === '2026-11-02', r);
+    check('un mes después: −1,6 kg de grasa y −1,2 kg de peso', Math.abs(r.fat - 18.4) < 0.05 && Math.abs(r.kg - 78.8) < 0.05, r);
+    check('calcula cuándo llega al 20 %', /^2027-0[1-3]/.test(r.d20), r.d20);
+    const t = await a.page.locator('#app').innerText();
+    const charts = await a.page.locator('section.card svg.chart').count();
+    check('Progreso muestra el plan con 3 gráficas y la tabla mes a mes', /plan mes a mes/.test(t) && /Mes 1/.test(t) && charts >= 3, { charts: charts });
+    check('sin errores en el plan del cuerpo', a.errors.length === 0, a.errors);
     await a.close();
   }
 
