@@ -287,7 +287,7 @@ function trendChart(o) {
   // Donde deberias estar hoy segun el plan (punto sobre la linea punteada)
   if (o.today && o.planAt && o.planAt(o.today) != null) {
     const px = x(o.today).toFixed(1), py = y(o.planAt(o.today)).toFixed(1);
-    svg += '<circle cx="' + px + '" cy="' + py + '" r="3.5" class="chart-plan-now"/><text x="' + (+px - 6) + '" y="' + (+py + 14) + '" class="chart-date" text-anchor="end">hoy debería: ' + esc(f(o.planAt(o.today))) + '</text>';
+    svg += '<circle cx="' + px + '" cy="' + py + '" r="3.5" class="chart-plan-now"/>';
   }
   o.pts.forEach((p) => {
     const cx = x(p.date).toFixed(1), cy = y(p.v).toFixed(1);
@@ -298,12 +298,17 @@ function trendChart(o) {
     svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="10" class="chart-hit"/><circle cx="' + cx + '" cy="' + cy + '" r="5" class="chart-ctl"/>' + tip(p, 'control mensual') + '</g>' +
       '<text x="' + cx + '" y="' + (+cy - 9).toFixed(1) + '" class="chart-val" text-anchor="middle">' + esc(f(p.v)) + '</text>';
   });
-  if (o.avg.length) { const la = o.avg[o.avg.length - 1]; svg += '<text x="' + x(la.date).toFixed(1) + '" y="' + (y(la.v) + 16).toFixed(1) + '" class="chart-val last" text-anchor="middle">' + esc(f(la.v)) + '</text>'; }
+  // Valor actual: el promedio de 7 dias si existe; si no, el ultimo dato diario
+  const cur = o.avg.length ? o.avg[o.avg.length - 1] : o.pts.length ? o.pts.slice().sort((p1, p2) => (p1.date < p2.date ? -1 : 1)).pop() : null;
+  const planNow = o.today && o.planAt ? o.planAt(o.today) : null;
   if (o.plan.length) { const pe = o.plan[o.plan.length - 1]; svg += '<text x="' + (W - R) + '" y="' + (y(pe.v) + 14).toFixed(1) + '" class="chart-val" text-anchor="end">' + esc(f(pe.v)) + '</text>'; }
   svg += '<text x="' + L + '" y="' + (H - 6) + '" class="chart-date">' + dd(t0) + '</text><text x="' + (W - R) + '" y="' + (H - 6) + '" class="chart-date" text-anchor="end">' + dd(t1) + '</text>';
   svg += '</svg>';
   const box = h('div', { class: 'chart-box' });
   box.innerHTML = svg;
+  // Debajo, en texto: el valor actual y lo que esperaba el plan para hoy (el punto gris)
+  if (cur) box.append(h('p', { class: 'chart-cap small' }, h('b', {}, 'Hoy: ' + f(cur.v) + ' ' + o.unit), o.avg.length ? ' (promedio 7 días)' : '',
+    planNow != null ? h('span', { class: 'muted' }, ' · el plan esperaba ' + f(planNow) + ' ' + o.unit + ' (punto gris)') : null));
   return box;
 }
 function bodyPlanCard() {

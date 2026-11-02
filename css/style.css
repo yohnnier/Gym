@@ -678,3 +678,4 @@ ul.plain li { margin: 4px 0; }
 .chart-ctl { fill: var(--surface); stroke: var(--text); stroke-width: 2; }
 .chart-today { stroke: var(--line); stroke-width: 1; }
 .chart-plan-now { fill: var(--muted); }
+.chart-cap { margin: 2px 4px 0; }
