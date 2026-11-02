@@ -142,6 +142,21 @@ function sess(id, date, routineId, exId, weight, reps) {
     await a.close();
   }
 
+  console.log('Peso y grasa de la báscula diaria');
+  {
+    const a = await open({ 'rutinas.weight.v1': { entries: [{ date: '2026-10-30', kg: 76, grasa: 24.6 }, { date: '2026-10-31', kg: 75.6, grasa: 24.4 }] } });
+    await a.page.fill('input[aria-label="Peso de hoy en kg"]', '75,35');
+    await a.page.fill('input[aria-label="Porcentaje de grasa de hoy (opcional)"]', '24,3');
+    await a.page.locator('input[aria-label="Peso de hoy en kg"]').locator('xpath=..').locator('button').click();
+    await a.page.waitForTimeout(200);
+    const w = await a.page.evaluate(() => JSON.parse(localStorage.getItem('rutinas.weight.v1')).entries.find((e) => e.date === '2026-11-01'));
+    check('guarda peso y % de grasa del día', w && w.kg === 75.4 && w.grasa === 24.3, w);
+    const t = await a.page.locator('#app').innerText();
+    check('muestra kg de grasa, sin grasa y el promedio de % de grasa', /18,3 kg de grasa/.test(t) && /57,1 kg sin grasa/.test(t) && /Grasa, promedio de 7 días: 24,4 %/.test(t), t.slice(t.indexOf('Peso'), t.indexOf('Peso') + 400));
+    check('sin errores en la tarjeta de peso', a.errors.length === 0, a.errors);
+    await a.close();
+  }
+
   console.log('Copia de seguridad');
   {
     const a = await open({ 'rutinas.weight.v1': WEIGHTS, 'rutinas.waist.v1': { entries: [{ date: '2026-10-30', cm: 90, hip: 98 }] } });

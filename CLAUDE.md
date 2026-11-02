@@ -44,7 +44,7 @@ El usuario dice lo que comió (p. ej. "desayuno: 3 huevos, 100 g de yogurt grieg
 - **La app** lee `data/nutrition.json`: "Nutrición de hoy" en el Inicio; "Nutrición · últimos 7 días" y "Evaluación de la semana" (series, proteína, déficit, cardio, peso/grasa, fuerza y sugerencia de ±150 kcal) en Progreso.
 - **Alimentos frecuentes (etiquetas):** yogurt griego 100 g = 65 kcal, 8,8 g prot, 5,9 g carb, 0,7 g grasa (200 g = 130 kcal). Pan 2 rebanadas (64 g) = 137 kcal, 7 g prot, 26 g carb, 0,6 g grasa. Proteína vegana Revitta (soya, arveja, arroz) 1 medida (33 g) = 119 kcal, 24 g prot, 2,6 g carb, 1,4 g grasa. **Evita la avena**: le sube el azúcar; no la sugieras.
 - **Objetivo:** recomposición (perder grasa y ganar músculo).
-- **Datos del cuerpo** (peso, % grasa, basales, peso objetivo): NO están en el repo por privacidad; están en la app (Mi cuerpo). Si los necesitas para calcular, pídeselos al usuario.
+- **Datos del cuerpo** (peso, % grasa, basales, peso objetivo): NO están en el repo por privacidad; están en la app y en `gym-datos`. **Dos básculas, no se mezclan:** la diaria (app "30 días de mejor peso", desde el 2-nov) va en la tarjeta Peso (`weight`: `{date, kg, grasa}`), en ayunas cada mañana; **Fitdays** es el control completo **mensual** en Mi cuerpo (`body.controls`, aviso a los 30 días). Compara % de grasa solo dentro de la misma báscula.
 - `data/nutrition.json` es público (repositorio público); el usuario lo aceptó al pedir este registro.
 
 ## Pendiente / por confirmar con el usuario

@@ -2,14 +2,14 @@
  * Todos los archivos de js/app/ comparten el ámbito global y se cargan en orden (ver index.html). */
 'use strict';
 
-const VERSION = '47';
+const VERSION = '48';
 const KEY = 'rutinas.v1';
 const IMG_KEY = 'rutinas.img.v1';
 const REST_KEY = 'rutinas.rest.v1';
 const UNIT_KEY = 'rutinas.unit.v1'; // ejercicios cuyo peso cambiaste entre "total" y "por lado"
 const PHOTOS_KEY = 'rutinas.photos.v1'; // fotos propias de cada ejercicio (varias), solo en este dispositivo
 const SNOOZE_KEY = 'rutinas.bodysnooze.v1';
-const BODY_REMIND_DAYS = 35; // aviso de nuevo control corporal a las 5 semanas
+const BODY_REMIND_DAYS = 30; // aviso de nuevo control corporal completo (Fitdays) cada mes
 const CARDIO_KEY = 'rutinas.cardio.v1'; // sesiones de cardio: solo en este dispositivo
 const ALT_KEY = 'rutinas.alts.v1'; // maquina elegida para cada lugar del plan (o rotacion automatica)
 const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este dispositivo, nunca se sube a GitHub
