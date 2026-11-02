@@ -2075,6 +2075,50 @@
    "carb": 14.4,
    "fat": 2.8,
    "notes": "valores de etiqueta"
+  },
+  {
+   "id": "2026-11-02-almuerzo",
+   "date": "2026-11-02",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Chapsui: carne de vacuno salteada",
+     "g": 150,
+     "kcal": 300,
+     "prot": 39.0,
+     "carb": 0,
+     "fat": 15.0
+    },
+    {
+     "food": "Chapsui: verduras salteadas",
+     "g": 200,
+     "kcal": 70,
+     "prot": 3.0,
+     "carb": 12.0,
+     "fat": 1.0
+    },
+    {
+     "food": "Chapsui: salsa (soya, maicena) y aceite",
+     "g": 50,
+     "kcal": 160,
+     "prot": 1.0,
+     "carb": 8.0,
+     "fat": 14.0
+    },
+    {
+     "food": "Plátano",
+     "g": 170,
+     "kcal": 151,
+     "prot": 1.9,
+     "carb": 38.8,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 681,
+   "prot": 44.9,
+   "carb": 58.8,
+   "fat": 30.5,
+   "notes": "chapsui supuesto de ~400 g en total (carne ~150 g, verduras y salsa), sin arroz; si fueron 400 g solo de carne suma ~500 kcal y ~65 g de proteína; plátano sin cáscara"
   }
  ]
 }
