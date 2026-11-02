@@ -643,12 +643,14 @@ function wAvg(fromDays, toDays, field) { // promedio de las entradas con antigue
 }
 // Peso diario y, opcional, % de grasa de la bascula diaria (la de cada manana). El control completo y mensual
 // (Fitdays) va en Mi cuerpo: son basculas distintas y no se mezclan.
-function addWeight(date, kg, fat) {
+function addWeight(date, kg, fat, mus) {
   if (!isoOk(date) || !(kg >= 30 && kg <= 250)) { toast('Escribe un peso entre 30 y 250 kg.'); return false; }
   if (fat != null && !(fat >= 3 && fat <= 60)) { toast('Escribe el % de grasa entre 3 y 60, o déjalo vacío.'); return false; }
+  if (mus != null && !(mus >= 15 && mus <= kg)) { toast('Escribe la masa muscular en kg (menor que tu peso), o déjala vacía.'); return false; }
   const old = wlog.entries.find((e) => e.date === date);
   const n = { date: date, kg: Math.round(kg * 10) / 10 };
   if (fat != null) n.grasa = Math.round(fat * 10) / 10; else if (old && old.grasa != null) n.grasa = old.grasa;
+  if (mus != null) n.musculo = Math.round(mus * 10) / 10; else if (old && old.musculo != null) n.musculo = old.musculo;
   wlog.entries = wlog.entries.filter((e) => e.date !== date).concat(n);
   saveW(); return true;
 }
@@ -658,7 +660,7 @@ function importWeights(text) {
   try { data = JSON.parse(text); } catch (e) { toast('El texto no es válido. Pégalo completo.'); return; }
   const list = Array.isArray(data) ? data : [data];
   let n = 0;
-  list.forEach((c) => { if (c && isoOk(c.fecha) && +c.peso >= 30 && +c.peso <= 250) { wlog.entries = wlog.entries.filter((e) => e.date !== c.fecha).concat(Object.assign({ date: c.fecha, kg: Math.round(+c.peso * 10) / 10 }, +c.grasa >= 3 && +c.grasa <= 60 ? { grasa: Math.round(+c.grasa * 10) / 10 } : {})); n++; } });
+  list.forEach((c) => { if (c && isoOk(c.fecha) && +c.peso >= 30 && +c.peso <= 250) { wlog.entries = wlog.entries.filter((e) => e.date !== c.fecha).concat(Object.assign({ date: c.fecha, kg: Math.round(+c.peso * 10) / 10 }, +c.grasa >= 3 && +c.grasa <= 60 ? { grasa: Math.round(+c.grasa * 10) / 10 } : {}, +c.musculo >= 15 && +c.musculo <= 200 ? { musculo: Math.round(+c.musculo * 10) / 10 } : {})); n++; } });
   if (!n) { toast('No encontré pesos en el texto.'); return; }
   saveW(); toast(n + ' peso' + (n > 1 ? 's' : '') + ' guardado' + (n > 1 ? 's' : '') + '.'); render();
 }
@@ -666,15 +668,16 @@ function weightCard() {
   const today = todayISO(), mine = wlog.entries.find((e) => e.date === today);
   const inp = h('input', { type: 'text', inputmode: 'decimal', placeholder: mine ? fmt(mine.kg) : 'Peso, ej: 77,2', 'aria-label': 'Peso de hoy en kg' });
   const fatIn = h('input', { type: 'text', inputmode: 'decimal', placeholder: mine && mine.grasa != null ? fmt(mine.grasa) + ' % grasa' : '% grasa (opcional)', 'aria-label': 'Porcentaje de grasa de hoy (opcional)' });
+  const musIn = h('input', { type: 'text', inputmode: 'decimal', placeholder: mine && mine.musculo != null ? fmt(mine.musculo) + ' kg músculo' : 'Músculo kg (opcional)', 'aria-label': 'Masa muscular de hoy en kg (opcional)' });
   const card = h('section', { class: 'card dose' },
     h('div', { class: 'row between' }, h('strong', {}, '⚖️ Peso'), h('span', { class: 'muted small' }, mine ? 'Hoy: ' + fmt(mine.kg) + ' kg' + (mine.grasa != null ? ' · ' + fmt(mine.grasa) + ' % grasa' : '') : 'Aún no anotas hoy')),
     h('div', { class: 'row', style: 'gap:8px;margin-top:6px' }, inp,
       h('button', { class: 'btn primary', type: 'button', style: 'white-space:nowrap', onclick: () => {
         const kg = inp.value.trim() ? parseNum(inp.value) : (mine ? mine.kg : NaN);
-        if (addWeight(today, kg, fatIn.value.trim() ? parseNum(fatIn.value) : null)) { toast('Peso guardado.'); render(); }
+        if (addWeight(today, kg, fatIn.value.trim() ? parseNum(fatIn.value) : null, musIn.value.trim() ? parseNum(musIn.value) : null)) { toast('Peso guardado.'); render(); }
       } }, mine ? 'Cambiar' : 'Guardar')),
-    h('div', { class: 'row', style: 'margin-top:6px' }, fatIn));
-  if (mine && mine.grasa != null) card.append(h('p', { class: 'small', style: 'margin:8px 0 0' }, 'Hoy: ' + fmt(wFatKg(mine)) + ' kg de grasa · ' + fmt(Math.round((mine.kg - wFatKg(mine)) * 10) / 10) + ' kg sin grasa'));
+    h('div', { class: 'row', style: 'gap:8px;margin-top:6px' }, fatIn, musIn));
+  if (mine && mine.grasa != null) card.append(h('p', { class: 'small', style: 'margin:8px 0 0' }, 'Hoy: ' + fmt(wFatKg(mine)) + ' kg de grasa · ' + fmt(Math.round((mine.kg - wFatKg(mine)) * 10) / 10) + ' kg sin grasa' + (mine.musculo != null ? ' · ' + fmt(mine.musculo) + ' kg de músculo' : '')));
   const w1 = wAvg(7, 0), w0 = wAvg(14, 7);
   if (w1 && w1.n >= 3) {
     const d = w0 && w0.n >= 3 ? w1.avg - w0.avg : null;
@@ -695,10 +698,10 @@ function weightCard() {
   if (wlog.entries.length) {
     const sorted = wSorted().slice().reverse();
     const ta = h('textarea', { class: 'body-paste', rows: '2', placeholder: '[{"fecha":"2026-10-24","peso":75.9}]', 'aria-label': 'Texto de pesos para importar' });
-    const copy = () => { const t = JSON.stringify(wSorted().map((e) => Object.assign({ fecha: e.date, peso: e.kg }, e.grasa != null ? { grasa: e.grasa } : {})), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
+    const copy = () => { const t = JSON.stringify(wSorted().map((e) => Object.assign({ fecha: e.date, peso: e.kg }, e.grasa != null ? { grasa: e.grasa } : {}, e.musculo != null ? { musculo: e.musculo } : {})), null, 1); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiado.'), () => toast('No se pudo copiar.')); else toast('Tu navegador no permite copiar.'); };
     card.append(h('details', { class: 'ctl', style: 'margin-top:8px' }, h('summary', {}, h('span', { class: 'muted small' }, 'Historial (' + sorted.length + ')')),
       sorted.slice(0, 30).map((e) => h('div', { class: 'ctl-row' }, h('span', {}, fmtDate(e.date)),
-        h('span', {}, h('strong', {}, fmt(e.kg) + ' kg '), e.grasa != null ? h('span', { class: 'muted small' }, fmt(e.grasa) + ' % ') : null, h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { wlog.entries = wlog.entries.filter((x) => x.date !== e.date); saveW(); render(); } }, '×')))),
+        h('span', {}, h('strong', {}, fmt(e.kg) + ' kg '), e.grasa != null ? h('span', { class: 'muted small' }, fmt(e.grasa) + ' % ') : null, e.musculo != null ? h('span', { class: 'muted small' }, fmt(e.musculo) + ' kg m ') : null, h('button', { class: 'btn small', type: 'button', 'aria-label': 'Borrar', onclick: () => { wlog.entries = wlog.entries.filter((x) => x.date !== e.date); saveW(); render(); } }, '×')))),
       h('div', { class: 'hiit-actions', style: 'margin-top:8px' }, h('button', { class: 'btn small', type: 'button', onclick: copy }, 'Copiar copia de seguridad')),
       ta, h('button', { class: 'btn small', type: 'button', style: 'margin-top:6px', onclick: () => importWeights(ta.value.trim()) }, 'Importar pesos')));
   }

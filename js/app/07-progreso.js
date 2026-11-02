@@ -216,8 +216,8 @@ const MONTH_DAYS = 30.44;
 // Todos los registros del cuerpo, de las dos basculas: controles mensuales (Mi cuerpo, Fitdays) y pesos diarios
 function bodyRecords() {
   const ctl = body.controls.filter((c) => c.peso).map((c) => ({ date: c.date, kg: c.peso, grasa: c.grasa != null ? c.grasa : null,
-    fatKg: c.masaGrasa != null ? c.masaGrasa : c.grasa != null ? c.peso * c.grasa / 100 : null, src: 'control' }));
-  const day = wlog.entries.map((e) => ({ date: e.date, kg: e.kg, grasa: e.grasa != null ? e.grasa : null, fatKg: e.grasa != null ? e.kg * e.grasa / 100 : null, src: 'diaria' }));
+    fatKg: c.masaGrasa != null ? c.masaGrasa : c.grasa != null ? c.peso * c.grasa / 100 : null, musculo: c.musculo != null ? c.musculo : null, src: 'control' }));
+  const day = wlog.entries.map((e) => ({ date: e.date, kg: e.kg, grasa: e.grasa != null ? e.grasa : null, fatKg: e.grasa != null ? e.kg * e.grasa / 100 : null, musculo: e.musculo != null ? e.musculo : null, src: 'diaria' }));
   return ctl.concat(day).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.src === 'control' ? -1 : 1));
 }
 // Punto de partida del plan: el primer registro con % de grasa desde el inicio del programa (BODY_PLAN.startDate)
@@ -346,6 +346,8 @@ function bodyPlanCard() {
   const blocks = [
     ['% de grasa', trendChart({ range: range, today: today, label: 'Porcentaje de grasa', unit: '%', pts: daily.filter((e) => e.grasa != null).map((e) => ({ date: e.date, v: e.grasa })), marks: ctls.filter((c) => c.grasa != null).map((c) => ({ date: c.date, v: c.grasa })), avg: avgPts('grasa'), plan: planPts((p) => p.grasa), goal: goal1, planAt: pa((p) => p.grasa) })],
     ['Grasa (kg)', trendChart({ range: range, today: today, label: 'Kilos de grasa', unit: 'kg', pts: daily.filter((e) => e.fatKg != null).map((e) => ({ date: e.date, v: e.fatKg })), marks: ctls.filter((c) => c.fatKg != null).map((c) => ({ date: c.date, v: c.fatKg })), avg: avgPts('fatKg'), plan: planPts((p) => p.fat), planAt: pa((p) => p.fat) })],
+    ['Masa muscular (kg)', trendChart({ range: range, today: today, label: 'Masa muscular', unit: 'kg', pts: daily.filter((e) => e.musculo != null).map((e) => ({ date: e.date, v: e.musculo })), marks: ctls.filter((c) => c.musculo != null).map((c) => ({ date: c.date, v: c.musculo })), avg: avgPts('musculo'),
+      plan: S && S.musculo != null ? planPts((p) => S.musculo + (p.lean - (S.kg - S.kg * S.grasa / 100))) : [], planAt: S && S.musculo != null ? pa((p) => S.musculo + (p.lean - (S.kg - S.kg * S.grasa / 100))) : null })],
     ['Peso (kg)', trendChart({ range: range, today: today, label: 'Peso', unit: 'kg', pts: daily.map((e) => ({ date: e.date, v: e.kg })), marks: ctls.map((c) => ({ date: c.date, v: c.kg })), avg: avgPts('kg'), plan: planPts((p) => p.kg), planAt: pa((p) => p.kg) })],
     ['Cintura (cm)', trendChart({ range: range, today: today, label: 'Cintura semanal', unit: 'cm', pts: waistSorted().map((e) => ({ date: e.date, v: e.cm })), avg: [], plan: [], goal: alt ? Math.round(alt / 2) : null })]
   ];
@@ -368,9 +370,9 @@ function bodyPlanCard() {
   // Historial completo de registros, del mas reciente al primero
   const hb = h('tbody');
   recs.slice().reverse().forEach((r) => hb.append(h('tr', {}, h('td', {}, fmtDate(r.date), h('div', { class: 'muted small' }, r.src === 'control' ? 'control mensual' : 'diaria')),
-    h('td', { class: 'num' }, r1(r.kg)), h('td', { class: 'num' }, r.grasa != null ? r1(r.grasa) : '—'), h('td', { class: 'num' }, r.fatKg != null ? r1(r.fatKg) : '—'), h('td', { class: 'num' }, r.fatKg != null ? r1(r.kg - r.fatKg) : '—'))));
+    h('td', { class: 'num' }, r1(r.kg)), h('td', { class: 'num' }, r.grasa != null ? r1(r.grasa) : '—'), h('td', { class: 'num' }, r.fatKg != null ? r1(r.fatKg) : '—'), h('td', { class: 'num' }, r.musculo != null ? r1(r.musculo) : '—'))));
   card.append(h('details', { class: 'chart-table' }, h('summary', { class: 'muted small' }, 'Todos los registros (' + recs.length + ')'),
-    h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso'), h('th', { class: 'num' }, '% grasa'), h('th', { class: 'num' }, 'Grasa kg'), h('th', { class: 'num' }, 'Sin grasa'))), hb)),
+    h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso'), h('th', { class: 'num' }, '% grasa'), h('th', { class: 'num' }, 'Grasa kg'), h('th', { class: 'num' }, 'Músculo'))), hb)),
     h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Es una guía: con menos grasa el ritmo suele bajar. Compara % de grasa dentro de la misma báscula; entre básculas distintas puede haber 2–3 puntos de diferencia.'));
   return card;
 }

@@ -147,10 +147,11 @@ function sess(id, date, routineId, exId, weight, reps) {
     const a = await open({ 'rutinas.weight.v1': { entries: [{ date: '2026-10-30', kg: 76, grasa: 24.6 }, { date: '2026-10-31', kg: 75.6, grasa: 24.4 }] } });
     await a.page.fill('input[aria-label="Peso de hoy en kg"]', '75,35');
     await a.page.fill('input[aria-label="Porcentaje de grasa de hoy (opcional)"]', '24,3');
+    await a.page.fill('input[aria-label="Masa muscular de hoy en kg (opcional)"]', '53,6');
     await a.page.locator('input[aria-label="Peso de hoy en kg"]').locator('xpath=..').locator('button').click();
     await a.page.waitForTimeout(200);
     const w = await a.page.evaluate(() => JSON.parse(localStorage.getItem('rutinas.weight.v1')).entries.find((e) => e.date === '2026-11-01'));
-    check('guarda peso y % de grasa del día', w && w.kg === 75.4 && w.grasa === 24.3, w);
+    check('guarda peso, % de grasa y músculo del día', w && w.kg === 75.4 && w.grasa === 24.3 && w.musculo === 53.6, w);
     const t = await a.page.locator('#app').innerText();
     check('muestra kg de grasa, sin grasa y el promedio de % de grasa', /18,3 kg de grasa/.test(t) && /57,1 kg sin grasa/.test(t) && /Grasa, promedio de 7 días: 24,4 %/.test(t), t.slice(t.indexOf('Peso'), t.indexOf('Peso') + 400));
     check('sin errores en la tarjeta de peso', a.errors.length === 0, a.errors);
@@ -168,7 +169,7 @@ function sess(id, date, routineId, exId, weight, reps) {
     check('calcula cuándo llega al 20 %', /^2027-0[1-3]/.test(r.d20), r.d20);
     const t = await a.page.locator('#app').innerText();
     const charts = await a.page.locator('section.card svg.chart').count();
-    check('Progreso muestra historial y plan: 4 gráficas y "al día de hoy"', /historial y plan/.test(t) && /Al día de hoy/.test(t) && charts >= 4, { charts: charts });
+    check('Progreso muestra historial y plan (con sección de masa muscular) y "al día de hoy"', /historial y plan/.test(t) && /Al día de hoy/.test(t) && /Masa muscular/.test(t) && charts >= 4, { charts: charts });
     check('sin errores en el plan del cuerpo', a.errors.length === 0, a.errors);
     await a.close();
     // Con un control mensual anterior (dentro del programa), el plan parte de ese control y el historial incluye uno más antiguo

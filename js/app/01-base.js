@@ -2,7 +2,7 @@
  * Todos los archivos de js/app/ comparten el ámbito global y se cargan en orden (ver index.html). */
 'use strict';
 
-const VERSION = '51';
+const VERSION = '52';
 const KEY = 'rutinas.v1';
 const IMG_KEY = 'rutinas.img.v1';
 const REST_KEY = 'rutinas.rest.v1';
