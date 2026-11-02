@@ -211,11 +211,18 @@ function renderRutina(root) {
   root.append(h('p', { class: 'muted small', style: 'text-align:center;margin-top:18px' }, 'Versión ' + VERSION));
 }
 
-// ---------- cuerpo: plan mes a mes (peso, % de grasa y cintura frente a BODY_PLAN) ----------
+// ---------- cuerpo: historial completo y plan mes a mes (peso, % de grasa, kg de grasa y cintura) ----------
 const MONTH_DAYS = 30.44;
-// Punto de partida: el primer peso con % de grasa desde BODY_PLAN.startDate (datos privados del celular)
+// Todos los registros del cuerpo, de las dos basculas: controles mensuales (Mi cuerpo, Fitdays) y pesos diarios
+function bodyRecords() {
+  const ctl = body.controls.filter((c) => c.peso).map((c) => ({ date: c.date, kg: c.peso, grasa: c.grasa != null ? c.grasa : null,
+    fatKg: c.masaGrasa != null ? c.masaGrasa : c.grasa != null ? c.peso * c.grasa / 100 : null, src: 'control' }));
+  const day = wlog.entries.map((e) => ({ date: e.date, kg: e.kg, grasa: e.grasa != null ? e.grasa : null, fatKg: e.grasa != null ? e.kg * e.grasa / 100 : null, src: 'diaria' }));
+  return ctl.concat(day).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.src === 'control' ? -1 : 1));
+}
+// Punto de partida del plan: el primer registro con % de grasa desde el inicio del programa (BODY_PLAN.startDate)
 function bodyPlanStart() {
-  return wSorted().find((e) => e.date >= BODY_PLAN.startDate && e.grasa != null) || null;
+  return bodyRecords().find((r) => r.date >= BODY_PLAN.startDate && r.grasa != null) || null;
 }
 // Lo que dice el plan para una fecha: grasa y masa sin grasa cambian a ritmo constante hasta la ultima meta
 function bodyPlanAt(date, s) {
@@ -231,19 +238,33 @@ function bodyPlanDateFor(pct, s) {
   for (let d = 0; d < 1100; d += 1) { const iso = isoAdd(s.date, d); if (bodyPlanAt(iso, s).grasa <= pct + 1e-9) return iso; }
   return null;
 }
-// Promedio movil de 7 dias (con al menos 3 datos en la ventana)
+// Promedio movil de 7 dias de los pesos diarios (con al menos 3 datos en la ventana)
 function avg7(list, field, date) {
   const t = Date.parse(date);
   const v = list.filter((e) => e[field] != null && Date.parse(e.date) <= t && Date.parse(e.date) > t - 7 * DAY).map((e) => e[field]);
   return v.length >= 3 ? v.reduce((a, b) => a + b, 0) / v.length : null;
 }
-// Grafica de una medida en el tiempo: puntos diarios, promedio de 7 dias, plan (punteado) y meta (linea fina)
+// Valor real mas reciente hasta una fecha: promedio de 7 dias de la bascula diaria, o el ultimo registro
+function bodyNow(date) {
+  const day = wlog.entries.map((e) => ({ date: e.date, kg: e.kg, grasa: e.grasa, fatKg: e.grasa != null ? e.kg * e.grasa / 100 : null }));
+  const g = avg7(day, 'grasa', date), k = avg7(day, 'kg', date), fk = avg7(day, 'fatKg', date);
+  const last = bodyRecords().filter((r) => r.date <= date);
+  const lastFat = last.filter((r) => r.grasa != null).pop(), lastKg = last.pop();
+  return {
+    kg: k != null ? k : lastKg ? lastKg.kg : null,
+    grasa: g != null ? g : lastFat ? lastFat.grasa : null,
+    fatKg: fk != null ? fk : lastFat ? lastFat.fatKg : null,
+    avg: g != null, src: g != null ? 'diaria' : lastFat ? lastFat.src : null, date: lastFat ? lastFat.date : null
+  };
+}
+// Grafica en el tiempo: puntos diarios, controles mensuales (anillos), promedio de 7 dias, plan (punteado) y meta
 function trendChart(o) {
-  if (!o.pts.length) return null;
+  const marks = o.marks || [];
+  if (!o.pts.length && !marks.length) return null;
   const W = 320, H = 160, L = 14, R = 14, T = 22, B = 24;
-  const all = o.pts.concat(o.avg, o.plan);
+  const all = o.pts.concat(marks, o.avg, o.plan);
   const ts = all.map((p) => Date.parse(p.date));
-  // Mismo rango de fechas en todas las graficas del plan (o.range), para poder compararlas una bajo otra
+  // Mismo rango de fechas en todas las graficas (o.range), para poder compararlas una bajo otra
   const t0 = o.range ? Math.min(Date.parse(o.range[0]), Math.min.apply(null, ts)) : Math.min.apply(null, ts);
   const t1 = Math.max(o.range ? Date.parse(o.range[1]) : 0, Math.max.apply(null, ts), t0 + DAY);
   const vs = all.map((p) => p.v).concat(o.goal != null ? [o.goal] : []);
@@ -255,19 +276,24 @@ function trendChart(o) {
   const f = (v) => fmt(Math.round(v * 10) / 10);
   const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const line = (pts, cls) => pts.length > 1 ? '<polyline class="' + cls + '" points="' + pts.map((p) => x(p.date).toFixed(1) + ',' + y(p.v).toFixed(1)).join(' ') + '"/>' : '';
-  const dd = (t) => { const p = new Date(t).toISOString().slice(0, 10).split('-'); return p[2] + '/' + p[1]; };
+  const dd = (t) => { const p = new Date(t).toISOString().slice(0, 10).split('-'); return p[2] + '/' + p[1] + '/' + p[0].slice(2); };
+  const tip = (p, src) => '<title>' + fmtDate(p.date) + (src ? ' (' + src + ')' : '') + ': ' + esc(f(p.v) + ' ' + o.unit) + (o.planAt && o.planAt(p.date) != null ? ' · plan ' + esc(f(o.planAt(p.date)) + ' ' + o.unit) : '') + '</title>';
   let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="' + esc(o.label) + '">';
   svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" class="chart-base"/>';
   if (o.goal != null) svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(o.goal).toFixed(1) + '" y2="' + y(o.goal).toFixed(1) + '" class="chart-goal"/>' +
     '<text x="' + L + '" y="' + (y(o.goal) - 4).toFixed(1) + '" class="chart-date">meta ' + esc(f(o.goal) + ' ' + o.unit) + '</text>';
+  if (o.today) svg += '<line x1="' + x(o.today).toFixed(1) + '" x2="' + x(o.today).toFixed(1) + '" y1="' + T + '" y2="' + (H - B) + '" class="chart-today"/>';
   svg += line(o.plan, 'chart-plan') + line(o.avg, 'chart-line');
   o.pts.forEach((p) => {
     const cx = x(p.date).toFixed(1), cy = y(p.v).toFixed(1);
-    svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="10" class="chart-hit"/><circle cx="' + cx + '" cy="' + cy + '" r="3" class="chart-dot-sm"/>' +
-      '<title>' + fmtDate(p.date) + ': ' + esc(f(p.v) + ' ' + o.unit) + (o.planAt && o.planAt(p.date) != null ? ' · plan ' + esc(f(o.planAt(p.date)) + ' ' + o.unit) : '') + '</title></g>';
+    svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="10" class="chart-hit"/><circle cx="' + cx + '" cy="' + cy + '" r="3" class="chart-dot-sm"/>' + tip(p, 'diaria') + '</g>';
   });
-  const ref = o.avg.length ? o.avg : o.pts, lastReal = ref[ref.length - 1];
-  svg += '<text x="' + x(lastReal.date).toFixed(1) + '" y="' + (y(lastReal.v) - 9).toFixed(1) + '" class="chart-val last" text-anchor="middle">' + esc(f(lastReal.v)) + '</text>';
+  marks.forEach((p) => {
+    const cx = x(p.date).toFixed(1), cy = y(p.v).toFixed(1);
+    svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="10" class="chart-hit"/><circle cx="' + cx + '" cy="' + cy + '" r="5" class="chart-ctl"/>' + tip(p, 'control mensual') + '</g>' +
+      '<text x="' + cx + '" y="' + (+cy - 9).toFixed(1) + '" class="chart-val" text-anchor="middle">' + esc(f(p.v)) + '</text>';
+  });
+  if (o.avg.length) { const la = o.avg[o.avg.length - 1]; svg += '<text x="' + x(la.date).toFixed(1) + '" y="' + (y(la.v) + 16).toFixed(1) + '" class="chart-val last" text-anchor="middle">' + esc(f(la.v)) + '</text>'; }
   if (o.plan.length) { const pe = o.plan[o.plan.length - 1]; svg += '<text x="' + (W - R) + '" y="' + (y(pe.v) + 14).toFixed(1) + '" class="chart-val" text-anchor="end">' + esc(f(pe.v)) + '</text>'; }
   svg += '<text x="' + L + '" y="' + (H - 6) + '" class="chart-date">' + dd(t0) + '</text><text x="' + (W - R) + '" y="' + (H - 6) + '" class="chart-date" text-anchor="end">' + dd(t1) + '</text>';
   svg += '</svg>';
@@ -276,44 +302,70 @@ function trendChart(o) {
   return box;
 }
 function bodyPlanCard() {
-  const S = bodyPlanStart(), today = todayISO();
-  const card = h('section', { class: 'card' }, h('strong', {}, '🎯 Recomposición: plan mes a mes'));
-  if (!S) {
-    card.append(h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Anota tu peso con el % de grasa de la báscula diaria (en ayunas) para empezar el plan.'));
+  const S = bodyPlanStart(), today = todayISO(), recs = bodyRecords();
+  const card = h('section', { class: 'card' }, h('strong', {}, '🎯 Recomposición: historial y plan'));
+  if (!recs.length) {
+    card.append(h('p', { class: 'muted small', style: 'margin:6px 0 0' }, 'Anota tu peso (y el % de grasa de la báscula diaria) o un control en Mi cuerpo para ver tu evolución.'));
     return card;
   }
+  const r1 = (v) => fmt(Math.round(v * 10) / 10);
   const goal1 = BODY_PLAN.goals[0], goalN = BODY_PLAN.goals[BODY_PLAN.goals.length - 1];
-  const d1 = bodyPlanDateFor(goal1, S), dN = bodyPlanDateFor(goalN, S);
-  card.append(h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'Cada mes: −' + fmt(BODY_PLAN.fatLossPerMonth) + ' kg de grasa y +' + fmt(BODY_PLAN.leanGainPerMonth) +
-    ' kg sin grasa (≈ −' + fmt(Math.round((BODY_PLAN.fatLossPerMonth - BODY_PLAN.leanGainPerMonth) * 10) / 10) + ' kg de peso). Meta ' + goal1 + ' % ≈ ' + (d1 ? fmtDate(d1) : '—') +
-    ' · ' + goalN + ' % ≈ ' + (dN ? fmtDate(dN) : '—') + '. Báscula diaria, en ayunas.'));
-  // Rango: desde 3 semanas antes del inicio (como mucho 60 dias atras) hasta 2 meses adelante
-  const from = isoAdd(S.date, -21) < isoAdd(today, -60) ? isoAdd(today, -60) : isoAdd(S.date, -21);
-  const to = isoAdd(today, 60);
-  const planPts = (fn) => { const out = []; for (let d = S.date; d <= to; d = isoAdd(d, 7)) out.push({ date: d, v: fn(bodyPlanAt(d, S)) }); return out; };
-  const W = wSorted().filter((e) => e.date >= from), range = [from, to];
-  const avgPts = (field) => W.map((e) => ({ date: e.date, v: avg7(wlog.entries, field, e.date) })).filter((p) => p.v != null);
+  // Al dia de hoy: lo que esperaba el plan frente a lo real
+  if (S) {
+    const p = bodyPlanAt(today, S), now = bodyNow(today);
+    const d1 = bodyPlanDateFor(goal1, S), dN = bodyPlanDateFor(goalN, S);
+    const days = Math.round((Date.parse(today) - Date.parse(S.date)) / DAY);
+    card.append(h('p', { class: 'muted small', style: 'margin:4px 0 8px' }, 'El plan parte del inicio del programa: ' + fmtDate(S.date) + ' (' + (S.src === 'control' ? 'control mensual' : 'báscula diaria') + ': ' + r1(S.kg) + ' kg · ' + r1(S.grasa) + ' %). Cada mes: −' + fmt(BODY_PLAN.fatLossPerMonth) + ' kg de grasa y +' + fmt(BODY_PLAN.leanGainPerMonth) + ' kg sin grasa. Meta ' + goal1 + ' % ≈ ' + (d1 ? fmtDate(d1) : '—') + ' · ' + goalN + ' % ≈ ' + (dN ? fmtDate(dN) : '—') + '.'));
+    const row = (label, plan, real, unit, better) => {
+      const d = real != null ? real - plan : null;
+      return h('tr', {}, h('td', {}, label), h('td', { class: 'num' }, r1(plan) + ' ' + unit), h('td', { class: 'num' }, real != null ? r1(real) + ' ' + unit : '—'),
+        h('td', { class: 'num' + (d != null && better ? (d <= 0.3 ? ' pr' : ' warn-text') : '') }, d != null ? (d > 0 ? '+' : '') + r1(d) : '—'));
+    };
+    card.append(h('div', { class: 'chart-title' }, 'Al día de hoy (' + days + ' días de programa)'),
+      h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, ''), h('th', { class: 'num' }, 'Plan'), h('th', { class: 'num' }, 'Real'), h('th', { class: 'num' }, 'Dif.'))),
+        h('tbody', {},
+          row('% de grasa', p.grasa, now.grasa, '%', true),
+          row('Grasa (kg)', p.fat, now.fatKg, 'kg', true),
+          row('Peso', p.kg, now.kg, 'kg', false))),
+      h('p', { class: 'muted small', style: 'margin:4px 0 0' }, 'Debías bajar ' + r1(S.grasa - p.grasa) + ' puntos de % de grasa y ' + r1(S.kg * S.grasa / 100 - p.fat) + ' kg de grasa desde el inicio. Real: ' +
+        (now.avg ? 'promedio de 7 días de la báscula diaria' : 'último registro (' + (now.src === 'control' ? 'control mensual' : 'báscula diaria') + (now.date ? ', ' + fmtDate(now.date) : '') + ')') +
+        '. Ojo: si el inicio es de una báscula y lo real de otra, la diferencia puede ser de la báscula (±2–3 puntos).'));
+  }
+  // Graficas: desde el primer registro hasta 2 meses adelante
+  const from = [recs[0].date].concat(waist.entries.map((e) => e.date)).sort()[0], to = isoAdd(today, 60), range = [from, to];
+  const planPts = (fn) => { const out = []; if (!S) return out; for (let d = S.date; d <= to; d = isoAdd(d, 7)) out.push({ date: d, v: fn(bodyPlanAt(d, S)) }); return out; };
+  const daily = recs.filter((r) => r.src === 'diaria'), ctls = recs.filter((r) => r.src === 'control');
+  const avgPts = (field) => daily.map((e) => ({ date: e.date, v: avg7(daily, field, e.date) })).filter((p) => p.v != null);
+  const pa = (fn) => (d) => (S && d >= S.date ? fn(bodyPlanAt(d, S)) : null);
   const alt = body.profile && +body.profile.altura;
   const blocks = [
-    ['Peso (kg)', trendChart({ range: range, label: 'Peso diario y plan', unit: 'kg', pts: W.map((e) => ({ date: e.date, v: e.kg })), avg: avgPts('kg'), plan: planPts((p) => p.kg), planAt: (d) => d >= S.date ? bodyPlanAt(d, S).kg : null })],
-    ['Grasa (%)', trendChart({ range: range, label: 'Porcentaje de grasa diario y plan', unit: '%', pts: W.filter((e) => e.grasa != null).map((e) => ({ date: e.date, v: e.grasa })), avg: avgPts('grasa'), plan: planPts((p) => p.grasa), goal: goal1, planAt: (d) => d >= S.date ? bodyPlanAt(d, S).grasa : null })],
-    ['Cintura (cm)', trendChart({ range: range, label: 'Cintura semanal', unit: 'cm', pts: waistSorted().filter((e) => e.date >= from).map((e) => ({ date: e.date, v: e.cm })), avg: [], plan: [], goal: alt ? Math.round(alt / 2) : null })]
+    ['% de grasa', trendChart({ range: range, today: today, label: 'Porcentaje de grasa', unit: '%', pts: daily.filter((e) => e.grasa != null).map((e) => ({ date: e.date, v: e.grasa })), marks: ctls.filter((c) => c.grasa != null).map((c) => ({ date: c.date, v: c.grasa })), avg: avgPts('grasa'), plan: planPts((p) => p.grasa), goal: goal1, planAt: pa((p) => p.grasa) })],
+    ['Grasa (kg)', trendChart({ range: range, today: today, label: 'Kilos de grasa', unit: 'kg', pts: daily.filter((e) => e.fatKg != null).map((e) => ({ date: e.date, v: e.fatKg })), marks: ctls.filter((c) => c.fatKg != null).map((c) => ({ date: c.date, v: c.fatKg })), avg: avgPts('fatKg'), plan: planPts((p) => p.fat), planAt: pa((p) => p.fat) })],
+    ['Peso (kg)', trendChart({ range: range, today: today, label: 'Peso', unit: 'kg', pts: daily.map((e) => ({ date: e.date, v: e.kg })), marks: ctls.map((c) => ({ date: c.date, v: c.kg })), avg: avgPts('kg'), plan: planPts((p) => p.kg), planAt: pa((p) => p.kg) })],
+    ['Cintura (cm)', trendChart({ range: range, today: today, label: 'Cintura semanal', unit: 'cm', pts: waistSorted().map((e) => ({ date: e.date, v: e.cm })), avg: [], plan: [], goal: alt ? Math.round(alt / 2) : null })]
   ];
   blocks.forEach((b) => card.append(h('div', { class: 'chart-title' }, b[0]), b[1] || h('p', { class: 'muted small', style: 'margin:4px 0' }, 'Aún sin datos.')));
-  card.append(h('div', { class: 'chart-legend muted small' }, h('span', {}, '● cada día'), h('span', {}, '━ promedio 7 días'), h('span', {}, '┅ plan'), h('span', {}, '··· meta')));
-  // Tabla mes a mes: plan y lo real (promedio de 7 dias en esa fecha)
-  const tb = h('tbody');
-  for (let i = 0; i <= 8; i++) {
-    const d = isoAdd(S.date, Math.round(i * MONTH_DAYS)), p = bodyPlanAt(d, S);
-    const rk = d <= today ? (i === 0 ? S.kg : avg7(wlog.entries, 'kg', d)) : null, rg = d <= today ? (i === 0 ? S.grasa : avg7(wlog.entries, 'grasa', d)) : null;
-    tb.append(h('tr', {}, h('td', {}, i === 0 ? 'Inicio' : 'Mes ' + i, h('div', { class: 'muted small' }, fmtDate(d))),
-      h('td', { class: 'num' }, fmt(Math.round(p.kg * 10) / 10) + ' kg', h('div', { class: 'muted small' }, fmt(Math.round(p.grasa * 10) / 10) + ' % · ' + fmt(Math.round(p.fat * 10) / 10) + ' kg grasa')),
-      h('td', { class: 'num' }, rk != null ? fmt(Math.round(rk * 10) / 10) + ' kg' : '—',
-        rg != null ? h('div', { class: 'muted small' }, fmt(Math.round(rg * 10) / 10) + ' %' + (i ? (rg <= p.grasa + 0.5 ? ' ✓' : ' · atrasado') : '')) : null)));
-    if (p.grasa <= goalN + 0.05) break;
+  card.append(h('div', { class: 'chart-legend muted small' }, h('span', {}, '◯ control mensual (Fitdays)'), h('span', {}, '● báscula diaria'), h('span', {}, '━ promedio 7 días'), h('span', {}, '┅ plan'), h('span', {}, '│ hoy')));
+  // Tabla mes a mes desde el inicio del programa: plan contra lo real
+  if (S) {
+    const tb = h('tbody');
+    for (let i = 0; i <= 8; i++) {
+      const d = isoAdd(S.date, Math.round(i * MONTH_DAYS)), p = bodyPlanAt(d, S), now = d <= today ? (i === 0 ? { kg: S.kg, grasa: S.grasa } : bodyNow(d)) : null;
+      tb.append(h('tr', {}, h('td', {}, i === 0 ? 'Inicio' : 'Mes ' + i, h('div', { class: 'muted small' }, fmtDate(d))),
+        h('td', { class: 'num' }, r1(p.kg) + ' kg', h('div', { class: 'muted small' }, r1(p.grasa) + ' % · ' + r1(p.fat) + ' kg grasa')),
+        h('td', { class: 'num' }, now && now.kg != null ? r1(now.kg) + ' kg' : '—',
+          now && now.grasa != null ? h('div', { class: 'muted small' }, r1(now.grasa) + ' %' + (i ? (now.grasa <= p.grasa + 0.5 ? ' ✓' : ' · atrasado') : '')) : null)));
+      if (p.grasa <= goalN + 0.05) break;
+    }
+    card.append(h('details', { class: 'chart-table' }, h('summary', { class: 'muted small' }, 'Meta de cada mes'),
+      h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, 'Mes'), h('th', { class: 'num' }, 'Plan'), h('th', { class: 'num' }, 'Real'))), tb)));
   }
-  card.append(h('details', { class: 'chart-table', open: '' }, h('summary', { class: 'muted small' }, 'Meta de cada mes'),
-    h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, 'Mes'), h('th', { class: 'num' }, 'Plan'), h('th', { class: 'num' }, 'Real (7 días)'))), tb)),
-    h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Es una guía: con menos grasa el ritmo suele bajar, y la báscula tiene ±2–3 puntos de error. Lo que importa es que tu línea acompañe a la del plan.'));
+  // Historial completo de registros, del mas reciente al primero
+  const hb = h('tbody');
+  recs.slice().reverse().forEach((r) => hb.append(h('tr', {}, h('td', {}, fmtDate(r.date), h('div', { class: 'muted small' }, r.src === 'control' ? 'control mensual' : 'diaria')),
+    h('td', { class: 'num' }, r1(r.kg)), h('td', { class: 'num' }, r.grasa != null ? r1(r.grasa) : '—'), h('td', { class: 'num' }, r.fatKg != null ? r1(r.fatKg) : '—'), h('td', { class: 'num' }, r.fatKg != null ? r1(r.kg - r.fatKg) : '—'))));
+  card.append(h('details', { class: 'chart-table' }, h('summary', { class: 'muted small' }, 'Todos los registros (' + recs.length + ')'),
+    h('table', { class: 'sets' }, h('thead', {}, h('tr', {}, h('th', {}, 'Fecha'), h('th', { class: 'num' }, 'Peso'), h('th', { class: 'num' }, '% grasa'), h('th', { class: 'num' }, 'Grasa kg'), h('th', { class: 'num' }, 'Sin grasa'))), hb)),
+    h('p', { class: 'muted small', style: 'margin:8px 0 0' }, 'Es una guía: con menos grasa el ritmo suele bajar. Compara % de grasa dentro de la misma báscula; entre básculas distintas puede haber 2–3 puntos de diferencia.'));
   return card;
 }

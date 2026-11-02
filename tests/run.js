@@ -168,9 +168,16 @@ function sess(id, date, routineId, exId, weight, reps) {
     check('calcula cuándo llega al 20 %', /^2027-0[1-3]/.test(r.d20), r.d20);
     const t = await a.page.locator('#app').innerText();
     const charts = await a.page.locator('section.card svg.chart').count();
-    check('Progreso muestra el plan con 3 gráficas y la tabla mes a mes', /plan mes a mes/.test(t) && /Mes 1/.test(t) && charts >= 3, { charts: charts });
+    check('Progreso muestra historial y plan: 4 gráficas y "al día de hoy"', /historial y plan/.test(t) && /Al día de hoy/.test(t) && charts >= 4, { charts: charts });
     check('sin errores en el plan del cuerpo', a.errors.length === 0, a.errors);
     await a.close();
+    // Con un control mensual anterior (dentro del programa), el plan parte de ese control y el historial incluye uno más antiguo
+    const c = await open({ 'rutinas.weight.v1': { entries: entries }, 'rutinas.body.v1': { profile: {}, controls: [{ id: 'v', date: '2026-04-01', peso: 84, grasa: 28 }, { id: 'w', date: '2026-10-20', peso: 81, grasa: 26 }] } }, '#/prog', '2026-11-05T09:00:00-03:00');
+    const rc = await c.page.evaluate(() => { const s = bodyPlanStart(); const p = bodyPlanAt('2026-11-05', s); return { start: s.date, src: s.src, n: bodyRecords().length, first: bodyRecords()[0].date, fat: p.fat }; });
+    check('el plan parte del primer control dentro del programa y el historial empieza en el primer registro', rc.start === '2026-10-20' && rc.src === 'control' && rc.n === 6 && rc.first === '2026-04-01', rc);
+    check('al día de hoy: grasa esperada según los días transcurridos', Math.abs(rc.fat - (81 * 0.26 - 1.6 * 16 / 30.44)) < 0.02, rc.fat);
+    check('sin errores con controles mensuales', c.errors.length === 0, c.errors);
+    await c.close();
   }
 
   console.log('Copia de seguridad');

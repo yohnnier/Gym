@@ -483,9 +483,10 @@ const ALT_GROUPS = [
 ];
 
 // Plan de recomposicion mes a mes. Solo ritmo y metas: el punto de partida (peso y % de grasa) se lee de los
-// datos privados (primer peso con % de grasa desde startDate) y la meta de cintura sale de la altura del perfil.
+// datos privados (primer registro con % de grasa desde startDate, el inicio del programa: la primera sesion
+// registrada en la app) y la meta de cintura sale de la altura del perfil.
 const BODY_PLAN = {
-  startDate: '2026-11-02',
+  startDate: '2026-10-04',
   fatLossPerMonth: 1.6, // kg de grasa por mes
   leanGainPerMonth: 0.4, // kg sin grasa por mes
   goals: [20, 15] // % de grasa: salud y abdomen marcado

@@ -675,3 +675,5 @@ ul.plain li { margin: 4px 0; }
 .chart-dot-sm { fill: var(--accent); opacity: .45; }
 .chart-pt:hover .chart-dot-sm { opacity: 1; r: 5; }
 .chart-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; }
+.chart-ctl { fill: var(--surface); stroke: var(--text); stroke-width: 2; }
+.chart-today { stroke: var(--line); stroke-width: 1; }
