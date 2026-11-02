@@ -3303,5 +3303,29 @@
    }
   ],
   "updatedAt": 1793553873479
+ },
+ {
+  "id": "mvzcuaxrnn1za",
+  "date": "2026-11-02",
+  "createdAt": 1793629747935,
+  "routineId": "dia-cardio",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 1,
+    "weight": 10,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 2,
+    "weight": 10,
+    "reps": 12,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1793629753090
  }
 ]
