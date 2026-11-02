@@ -3331,8 +3331,15 @@
     "weight": 10,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "rollout-rodante",
+    "set": 1,
+    "weight": null,
+    "reps": 12,
+    "rpe": null
    }
   ],
-  "updatedAt": 1793629862559
+  "updatedAt": 1793630129486
  }
 ]
