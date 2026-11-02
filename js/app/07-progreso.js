@@ -281,9 +281,14 @@ function trendChart(o) {
   let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="chart" role="img" aria-label="' + esc(o.label) + '">';
   svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + (H - B) + '" y2="' + (H - B) + '" class="chart-base"/>';
   if (o.goal != null) svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(o.goal).toFixed(1) + '" y2="' + y(o.goal).toFixed(1) + '" class="chart-goal"/>' +
-    '<text x="' + L + '" y="' + (y(o.goal) - 4).toFixed(1) + '" class="chart-date">meta ' + esc(f(o.goal) + ' ' + o.unit) + '</text>';
+    '<text x="' + L + '" y="' + (y(o.goal) - 4).toFixed(1) + '" class="chart-date">meta final ' + esc(f(o.goal) + ' ' + o.unit) + '</text>';
   if (o.today) svg += '<line x1="' + x(o.today).toFixed(1) + '" x2="' + x(o.today).toFixed(1) + '" y1="' + T + '" y2="' + (H - B) + '" class="chart-today"/>';
   svg += line(o.plan, 'chart-plan') + line(o.avg, 'chart-line');
+  // Donde deberias estar hoy segun el plan (punto sobre la linea punteada)
+  if (o.today && o.planAt && o.planAt(o.today) != null) {
+    const px = x(o.today).toFixed(1), py = y(o.planAt(o.today)).toFixed(1);
+    svg += '<circle cx="' + px + '" cy="' + py + '" r="3.5" class="chart-plan-now"/><text x="' + (+px - 6) + '" y="' + (+py + 14) + '" class="chart-date" text-anchor="end">hoy debería: ' + esc(f(o.planAt(o.today))) + '</text>';
+  }
   o.pts.forEach((p) => {
     const cx = x(p.date).toFixed(1), cy = y(p.v).toFixed(1);
     svg += '<g class="chart-pt"><circle cx="' + cx + '" cy="' + cy + '" r="10" class="chart-hit"/><circle cx="' + cx + '" cy="' + cy + '" r="3" class="chart-dot-sm"/>' + tip(p, 'diaria') + '</g>';
