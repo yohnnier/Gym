@@ -1995,6 +1995,58 @@
    "carb": 124.4,
    "fat": 44.7,
    "notes": "ceviche 350 g supuesto ~200 g de pescado y el resto verduras y jugo de limón, sin aceite; plátano tostado tipo tostón frito ~15 g c/u; sushi apanado (frito) estimado ~240 kcal/100 g"
+  },
+  {
+   "id": "2026-11-01-cena",
+   "date": "2026-11-01",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 160,
+     "kcal": 142,
+     "prot": 1.8,
+     "carb": 36.5,
+     "fat": 0.5
+    },
+    {
+     "food": "Pan de molde (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Queso (1 lámina)",
+     "g": 25,
+     "kcal": 88,
+     "prot": 6.3,
+     "carb": 0.5,
+     "fat": 7.0
+    },
+    {
+     "food": "Kéfir",
+     "g": 250,
+     "kcal": 150,
+     "prot": 8.3,
+     "carb": 10.5,
+     "fat": 7.8
+    }
+   ],
+   "kcal": 636,
+   "prot": 47.4,
+   "carb": 76.1,
+   "fat": 17.3,
+   "notes": "plátano 160 g supuesto sin cáscara; queso tipo gouda/mantecoso; kéfir de leche entera"
   }
  ]
 }
