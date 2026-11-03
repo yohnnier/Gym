@@ -3569,8 +3569,15 @@
     "weight": 5,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "hiperextension-45",
+    "set": 3,
+    "weight": 5,
+    "reps": 15,
+    "rpe": null
    }
   ],
-  "updatedAt": 1793722135312
+  "updatedAt": 1793722357404
  }
 ]
