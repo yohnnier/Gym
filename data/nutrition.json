@@ -2267,18 +2267,18 @@
     },
     {
      "food": "Papa cocida",
-     "g": 20,
-     "kcal": 17.4,
-     "prot": 0.4,
-     "carb": 4.0,
-     "fat": 0.0
+     "g": 200,
+     "kcal": 174,
+     "prot": 3.8,
+     "carb": 40.2,
+     "fat": 0.2
     }
    ],
-   "kcal": 926.6,
-   "prot": 75.8,
-   "carb": 33.9,
-   "fat": 56.8,
-   "notes": "palta ~140 g y tomate ~30 g; pollo ~120 g cocido y chunchules ~180 g cocidos, aparte; chunchules en freidora de aire, sin aceite añadido (estimados a ~225 kcal/100 g: varían mucho según la grasa del corte)"
+   "kcal": 1083.2,
+   "prot": 79.2,
+   "carb": 70.1,
+   "fat": 57.0,
+   "notes": "palta ~140 g, tomate ~30 g y papa cocida ~200 g; pollo ~120 g cocido y chunchules ~180 g cocidos, aparte; chunchules en freidora de aire, sin aceite añadido (estimados a ~225 kcal/100 g: varían mucho según la grasa del corte)"
   },
   {
    "id": "2026-11-03-colacion-gym",
