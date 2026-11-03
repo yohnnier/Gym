@@ -2226,19 +2226,19 @@
    "meal": "almuerzo",
    "items": [
     {
-     "food": "Palta (con tomate)",
-     "g": 100,
-     "kcal": 160,
-     "prot": 2.0,
-     "carb": 8.5,
-     "fat": 14.7
+     "food": "Palta",
+     "g": 140,
+     "kcal": 224,
+     "prot": 2.8,
+     "carb": 11.9,
+     "fat": 20.6
     },
     {
      "food": "Tomate",
-     "g": 40,
-     "kcal": 7.2,
-     "prot": 0.4,
-     "carb": 1.6,
+     "g": 30,
+     "kcal": 5.4,
+     "prot": 0.3,
+     "carb": 1.2,
      "fat": 0.1
     },
     {
@@ -2250,12 +2250,12 @@
      "fat": 4.3
     },
     {
-     "food": "Chunchules cocidos (estimado)",
-     "g": 60,
-     "kcal": 150,
-     "prot": 10.8,
+     "food": "Chunchules cocidos en freidora de aire (estimado)",
+     "g": 180,
+     "kcal": 405,
+     "prot": 32.4,
      "carb": 0,
-     "fat": 11.4
+     "fat": 30.6
     },
     {
      "food": "Choclo cocido (granos)",
@@ -2274,11 +2274,11 @@
      "fat": 0.0
     }
    ],
-   "kcal": 609.4,
-   "prot": 53.5,
-   "carb": 30.9,
-   "fat": 31.7,
-   "notes": "supuestos: 140 g de palta con tomate = ~100 g palta + ~40 g tomate (si fueron 140 g solo de palta, suma ~65 kcal); los 180 g cocidos de proteína = ~120 g de pollo + ~60 g de chunchules (estimados a ~250 kcal/100 g: varían mucho según la grasa de la preparación)"
+   "kcal": 926.6,
+   "prot": 75.8,
+   "carb": 33.9,
+   "fat": 56.8,
+   "notes": "palta ~140 g y tomate ~30 g; pollo ~120 g cocido y chunchules ~180 g cocidos, aparte; chunchules en freidora de aire, sin aceite añadido (estimados a ~225 kcal/100 g: varían mucho según la grasa del corte)"
   },
   {
    "id": "2026-11-03-colacion-gym",
