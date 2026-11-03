@@ -3418,8 +3418,15 @@
     "weight": 80,
     "reps": 11,
     "rpe": 10
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 3,
+    "weight": 80,
+    "reps": 12,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1793715974085
+  "updatedAt": 1793716410337
  }
 ]
