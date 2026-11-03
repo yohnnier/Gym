@@ -3480,30 +3480,34 @@
     "set": 1,
     "weight": 65,
     "reps": 15,
-    "rpe": 9
+    "rpe": 9,
+    "altOrder": true
    },
    {
     "exerciseId": "curl-femoral",
     "set": 2,
     "weight": 65,
     "reps": 15,
-    "rpe": 10
+    "rpe": 10,
+    "altOrder": true
    },
    {
     "exerciseId": "curl-femoral",
     "set": 3,
     "weight": 65,
     "reps": 15,
-    "rpe": 10
+    "rpe": 10,
+    "altOrder": true
    },
    {
     "exerciseId": "curl-femoral",
     "set": 4,
     "weight": 65,
     "reps": 15,
-    "rpe": 10
+    "rpe": 10,
+    "altOrder": true
    }
   ],
-  "updatedAt": 1793719225617
+  "updatedAt": 1793719350092
  }
 ]
