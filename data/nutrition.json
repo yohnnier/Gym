@@ -2191,6 +2191,34 @@
    "carb": 20.0,
    "fat": 24.0,
    "notes": "carne 90 g cocida; verduras ~200 g y salsa con aceite como el almuerzo; sin arroz"
+  },
+  {
+   "id": "2026-11-03-desayuno",
+   "date": "2026-11-03",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 210,
+     "kcal": 136.5,
+     "prot": 18.5,
+     "carb": 12.4,
+     "fat": 1.5
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 255.5,
+   "prot": 42.5,
+   "carb": 15.0,
+   "fat": 2.9,
+   "notes": "valores de etiqueta; scoop = 1 medida (33 g), supuesto mezclada con agua"
   }
  ]
 }
