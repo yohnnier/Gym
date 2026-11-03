@@ -2279,6 +2279,26 @@
    "carb": 30.9,
    "fat": 31.7,
    "notes": "supuestos: 140 g de palta con tomate = ~100 g palta + ~40 g tomate (si fueron 140 g solo de palta, suma ~65 kcal); los 180 g cocidos de proteína = ~120 g de pollo + ~60 g de chunchules (estimados a ~250 kcal/100 g: varían mucho según la grasa de la preparación)"
+  },
+  {
+   "id": "2026-11-03-colacion-gym",
+   "date": "2026-11-03",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Powerade sin azúcar (en el gym)",
+     "g": 500,
+     "kcal": 0,
+     "prot": 0,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 0,
+   "prot": 0,
+   "carb": 0,
+   "fat": 0,
+   "notes": "supuesto: botella de 500 ml, versión sin azúcar (~0 kcal, solo electrolitos); no cambia los totales del día"
   }
  ]
 }
