@@ -2219,6 +2219,66 @@
    "carb": 15.0,
    "fat": 2.9,
    "notes": "valores de etiqueta; scoop = 1 medida (33 g), supuesto mezclada con agua"
+  },
+  {
+   "id": "2026-11-03-almuerzo",
+   "date": "2026-11-03",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Palta (con tomate)",
+     "g": 100,
+     "kcal": 160,
+     "prot": 2.0,
+     "carb": 8.5,
+     "fat": 14.7
+    },
+    {
+     "food": "Tomate",
+     "g": 40,
+     "kcal": 7.2,
+     "prot": 0.4,
+     "carb": 1.6,
+     "fat": 0.1
+    },
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Chunchules cocidos (estimado)",
+     "g": 60,
+     "kcal": 150,
+     "prot": 10.8,
+     "carb": 0,
+     "fat": 11.4
+    },
+    {
+     "food": "Choclo cocido (granos)",
+     "g": 80,
+     "kcal": 76.8,
+     "prot": 2.7,
+     "carb": 16.8,
+     "fat": 1.2
+    },
+    {
+     "food": "Papa cocida",
+     "g": 20,
+     "kcal": 17.4,
+     "prot": 0.4,
+     "carb": 4.0,
+     "fat": 0.0
+    }
+   ],
+   "kcal": 609.4,
+   "prot": 53.5,
+   "carb": 30.9,
+   "fat": 31.7,
+   "notes": "supuestos: 140 g de palta con tomate = ~100 g palta + ~40 g tomate (si fueron 140 g solo de palta, suma ~65 kcal); los 180 g cocidos de proteína = ~120 g de pollo + ~60 g de chunchules (estimados a ~250 kcal/100 g: varían mucho según la grasa de la preparación)"
   }
  ]
 }
