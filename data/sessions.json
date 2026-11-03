@@ -3527,8 +3527,15 @@
     "weight": 15,
     "reps": 23,
     "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 1,
+    "weight": 35,
+    "reps": 11,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1793720291714
+  "updatedAt": 1793720767013
  }
 ]
