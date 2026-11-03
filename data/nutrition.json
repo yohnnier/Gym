@@ -2155,6 +2155,42 @@
    "carb": 43.0,
    "fat": 8.2,
    "notes": "kéfir de leche entera supuesto; plátano sin cáscara"
+  },
+  {
+   "id": "2026-11-02-cena",
+   "date": "2026-11-02",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Chapsui: carne de vacuno salteada",
+     "g": 90,
+     "kcal": 180,
+     "prot": 23.4,
+     "carb": 0,
+     "fat": 9.0
+    },
+    {
+     "food": "Chapsui: verduras salteadas",
+     "g": 200,
+     "kcal": 70,
+     "prot": 3.0,
+     "carb": 12.0,
+     "fat": 1.0
+    },
+    {
+     "food": "Chapsui: salsa (soya, maicena) y aceite",
+     "g": 50,
+     "kcal": 160,
+     "prot": 1.0,
+     "carb": 8.0,
+     "fat": 14.0
+    }
+   ],
+   "kcal": 410,
+   "prot": 27.4,
+   "carb": 20.0,
+   "fat": 24.0,
+   "notes": "carne 90 g cocida; verduras ~200 g y salsa con aceite como el almuerzo; sin arroz"
   }
  ]
 }
