@@ -2299,6 +2299,42 @@
    "carb": 0,
    "fat": 0,
    "notes": "supuesto: botella de 500 ml, versión sin azúcar (~0 kcal, solo electrolitos); no cambia los totales del día"
+  },
+  {
+   "id": "2026-11-03-cena",
+   "date": "2026-11-03",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pizza (3 porciones, ~110 g c/u)",
+     "g": 330,
+     "kcal": 810,
+     "prot": 34.5,
+     "carb": 96.0,
+     "fat": 31.5
+    },
+    {
+     "food": "Alitas de pollo (3 pequeñas, parte comestible con piel)",
+     "g": 100,
+     "kcal": 250,
+     "prot": 24.0,
+     "carb": 0,
+     "fat": 16.5
+    },
+    {
+     "food": "Salsa barbacoa de las alitas",
+     "g": 30,
+     "kcal": 40,
+     "prot": 0.3,
+     "carb": 9.5,
+     "fat": 0.1
+    }
+   ],
+   "kcal": 1100,
+   "prot": 58.8,
+   "carb": 105.5,
+   "fat": 48.1,
+   "notes": "supuestos (estimados, sin etiqueta): porción de pizza de ~270 kcal (tipo y relleno no indicados; varía de 220 a 330 kcal); alita pequeña ~33 g comestibles; salsa barbacoa ~10 g por alita"
   }
  ]
 }
