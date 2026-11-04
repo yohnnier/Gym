@@ -2370,12 +2370,12 @@
      "fat": 31.1
     },
     {
-     "food": "Raviolis cocidos (relleno de queso, sin salsa)",
+     "food": "Raviolis de carne cocidos (sin salsa)",
      "g": 350,
-     "kcal": 630,
-     "prot": 26.3,
-     "carb": 91.0,
-     "fat": 17.5
+     "kcal": 665,
+     "prot": 31.5,
+     "carb": 87.5,
+     "fat": 21.0
     },
     {
      "food": "Pollo cocido (pechuga sin piel)",
@@ -2386,11 +2386,11 @@
      "fat": 7.2
     }
    ],
-   "kcal": 1325,
-   "prot": 108.6,
-   "carb": 93.7,
-   "fat": 55.8,
-   "notes": "burrata ~270 kcal/100 g; raviolis supuestos de ricota/queso sin salsa (con salsa crema suma ~150-250 kcal); pollo supuesto sin piel"
+   "kcal": 1360,
+   "prot": 113.8,
+   "carb": 90.2,
+   "fat": 59.3,
+   "notes": "burrata ~270 kcal/100 g; raviolis rellenos de carne ~190 kcal/100 g, sin salsa (con salsa suma ~100-250 kcal); pollo supuesto sin piel"
   }
  ]
 }
