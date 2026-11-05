@@ -2427,6 +2427,42 @@
    "carb": 64.7,
    "fat": 25.7,
    "notes": "arepa de maíz rellena o mezclada con queso, ~260 kcal/100 g, sin mantequilla; huevos sin aceite"
+  },
+  {
+   "id": "2026-11-05-almuerzo",
+   "date": "2026-11-05",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 110,
+     "kcal": 182,
+     "prot": 34.1,
+     "carb": 0,
+     "fat": 4.0
+    },
+    {
+     "food": "Papa cocida",
+     "g": 180,
+     "kcal": 156,
+     "prot": 3.4,
+     "carb": 36.2,
+     "fat": 0.2
+    },
+    {
+     "food": "Queso crema",
+     "g": 30,
+     "kcal": 102,
+     "prot": 1.8,
+     "carb": 1.2,
+     "fat": 10.2
+    }
+   ],
+   "kcal": 440,
+   "prot": 39.3,
+   "carb": 37.4,
+   "fat": 14.4,
+   "notes": "pollo supuesto sin piel; papa cocida sin aceite; '3 porciones' no quedó claro (pendiente de confirmar)"
   }
  ]
 }
