@@ -2,7 +2,7 @@
  * Todos los archivos de js/app/ comparten el ámbito global y se cargan en orden (ver index.html). */
 'use strict';
 
-const VERSION = '53';
+const VERSION = '54';
 const KEY = 'rutinas.v1';
 const IMG_KEY = 'rutinas.img.v1';
 const REST_KEY = 'rutinas.rest.v1';
@@ -16,16 +16,20 @@ const DOSE_KEY = 'rutinas.dose.v1'; // recordatorio de aplicacion: SOLO en este 
 const WEIGHT_KEY = 'rutinas.weight.v1'; // peso diario: SOLO en este dispositivo, nunca se sube a GitHub
 const WAIST_KEY = 'rutinas.waist.v1'; // cintura/abdomen semanal: SOLO en este dispositivo, nunca se sube a GitHub
 const LAB_KEY = 'rutinas.labs.v1'; // examenes de laboratorio: SOLO en este dispositivo, nunca se suben a GitHub
+const TRAIN_KEY = 'rutinas.trainday.v1'; // dias en que dijiste "hoy entreno" (para la meta de comida antes de registrar la sesion)
 const BODY_KEY = 'rutinas.body.v1'; // medidas corporales: SOLO en este dispositivo, nunca se suben a GitHub
 const exById = {};
 ROUTINES.forEach((r) => r.exercises.forEach((e) => { exById[e.id] = e; e.baseUnit = e.unit; }));
 const routineById = {};
 ROUTINES.forEach((r) => { routineById[r.id] = r; });
 // Dias del plan: rutinas armadas con ejercicios de varios grupos (copias, para poder cambiar las series)
-const DAYS = PLAN.days.map((d) => ({
+const toDay = (d) => ({
   id: d.id, name: d.name, focus: d.focus, isDay: true, cardio: d.cardio || null, covers: d.covers || null,
   exercises: d.exercises.map((x) => Object.assign({}, exById[x.id], x.sets ? { sets: x.sets, setsText: null } : {}))
-}));
+});
+const DAYS = PLAN.days.map(toDay);
+// Dias de planes anteriores: solo para que el historial muestre su nombre (no aparecen en el plan)
+(typeof PLAN_ARCHIVE !== 'undefined' ? PLAN_ARCHIVE : []).forEach((d) => { routineById[d.id] = toDay(d); });
 DAYS.forEach((d) => { routineById[d.id] = d; });
 const routineOf = (s) => routineById[(s && s.routineId) || 'piernas'] || ROUTINES[0];
 

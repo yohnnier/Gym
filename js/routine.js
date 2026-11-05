@@ -394,9 +394,46 @@ const CORE = {
  * Cada dia junta ejercicios de varios grupos. sets: series para ese dia (si se omite, usa las del ejercicio).
  * cardio: 'constante' | 'intervalos' | 'suave' muestra el plan de cardio; los dias sin ejercicios son solo de cardio
  * (covers: imagenes img/ex/<id>-0.jpg para la portada). */
+// Plan desde el 5-nov-2026: torso y pierna, 3 a 4 dias por semana (el usuario trabaja; entrena cuando puede).
+// Cada musculo se entrena 2 veces por semana con 4 dias (con 3, rota: el "Siguiente" sigue al ultimo hecho).
+// Cardio: 15-20 min de zona 2 al terminar las pesas (y cardio libre opcional en dias sin gimnasio).
 const PLAN = {
-  name: 'Plan de 6 días',
+  name: 'Plan de 4 días (torso y pierna)',
   days: [
+    {
+      id: 'dia-torso-a', name: 'Día 1 · Torso A', focus: 'Pecho · Espalda · Hombros · Brazos · +15–20 min zona 2',
+      exercises: [
+        { id: 'press-pecho-maquina', sets: 3 }, { id: 'jalon-pecho', sets: 3 }, { id: 'press-hombro-maquina', sets: 3 },
+        { id: 'remo-lineal', sets: 3 }, { id: 'elevaciones-laterales-polea', sets: 3 }, { id: 'curl-polea', sets: 3 }, { id: 'extension-polea', sets: 3 }
+      ]
+    },
+    {
+      id: 'dia-pierna-a', name: 'Día 2 · Pierna A', focus: 'Cuádriceps · Isquios · Pantorrillas · Abdomen · +15–20 min zona 2',
+      exercises: [
+        { id: 'sentadilla-pendular', sets: 3 }, { id: 'prensa', sets: 3 }, { id: 'curl-femoral', sets: 3 },
+        { id: 'hiperextension-45', sets: 3 }, { id: 'pantorrillas-prensa', sets: 3 }, { id: 'crunch-polea', sets: 3 }
+      ]
+    },
+    {
+      id: 'dia-torso-b', name: 'Día 3 · Torso B', focus: 'Pecho alto · Espalda · Hombros · Brazos · +15–20 min zona 2',
+      exercises: [
+        { id: 'press-inclinado', sets: 3 }, { id: 'pullover-polea', sets: 3 }, { id: 'remo-lineal', sets: 3 }, { id: 'aperturas-peck-deck', sets: 2 },
+        { id: 'elevaciones-laterales', sets: 3 }, { id: 'face-pull', sets: 2 }, { id: 'curl-martillo-polea', sets: 3 }, { id: 'extension-polea-sobre-cabeza', sets: 3 }
+      ]
+    },
+    {
+      id: 'dia-pierna-b', name: 'Día 4 · Pierna B', focus: 'Glúteos · Isquios · Cuádriceps · Abdomen · +15–20 min zona 2',
+      exercises: [
+        { id: 'hip-thrust', sets: 3 }, { id: 'extension-cuadriceps', sets: 3 }, { id: 'curl-femoral', sets: 3 }, { id: 'abductores', sets: 2 },
+        { id: 'pantorrillas', sets: 3 }, { id: 'rodillas-silla-romana', sets: 3 }, { id: 'rollout-rodante', sets: 3 }
+      ]
+    }
+  ]
+};
+
+// Plan anterior (6 dias, hasta el 4-nov-2026). No se muestra, pero sus ids estan en los registros: se conserva
+// para que el historial siga mostrando el nombre de cada dia. No renombres estos ids.
+const PLAN_ARCHIVE = [
     {
       id: 'dia-empuje', name: 'Día 1 · Empuje', focus: 'Pecho · Hombros · Tríceps · Abdomen',
       exercises: [
@@ -436,8 +473,7 @@ const PLAN = {
       covers: ['cardio-eliptica', 'cardio-bici', 'cardio-caminadora'],
       exercises: []
     }
-  ]
-};
+  ];
 
 /* Nutricion: metas por tipo de dia (objetivo: recomposicion, perder grasa y ganar musculo).
  * La grasa de la meta es lo que queda de calorias tras proteina y carbohidratos.
@@ -446,14 +482,15 @@ const NUTRITION = {
   goal: 'recomposición (perder grasa y ganar músculo)',
   targets: {
     pesas: { label: 'Día de pesas', kcal: 2100, prot: 155, carb: 230 },
-    descanso: { label: 'Descanso o cardio suave', kcal: 1950, prot: 155, carb: 170 },
+    // Sin pesas (con el plan de 3-4 dias son la mayoria): ~330 kcal de deficit, con la proteina igual
+    descanso: { label: 'Día sin pesas', kcal: 1800, prot: 155, carb: 140 },
     intervalos: { label: 'Día de intervalos', kcal: 2050, prot: 155, carb: 195 } // +100 kcal en carbohidratos para rendir y recuperar
   },
   extraCardioShare: 0.5, // cardio libre extra: la meta sube la mitad de lo quemado, en carbohidratos
   intervalDay: 'dia-cardio-2',
   legsExtra: { kcal: 150, carb: 37 }, // dia de piernas: +150 kcal en carbohidratos
-  weightDays: ['dia-empuje', 'dia-tiron', 'dia-piernas'],
-  legsDay: 'dia-piernas'
+  weightDays: ['dia-torso-a', 'dia-pierna-a', 'dia-torso-b', 'dia-pierna-b', 'dia-empuje', 'dia-tiron', 'dia-piernas'],
+  legsDays: ['dia-pierna-a', 'dia-pierna-b', 'dia-piernas']
 };
 
 /* Nombres de los musculos para el volumen semanal (series directas por semana). */

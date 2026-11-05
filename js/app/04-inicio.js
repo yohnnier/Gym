@@ -160,15 +160,25 @@ function recoveryCard() {
 // ---------- nutricion (registrada desde el chat en data/nutrition.json) ----------
 const MEALS = ['desayuno', 'almuerzo', 'colación', 'cena'];
 const isWeightDay = (id) => NUTRITION.weightDays.indexOf(id) !== -1;
-// Tipo de dia: la sesion de pesas registrada ese dia; si no hay, hoy usa el siguiente dia del plan
+// Tipo de dia: la sesion de pesas registrada ese dia. Si hoy aun no registras, cuenta si marcaste "hoy entreno"
+// (con 3-4 dias de pesas por semana, por defecto un dia es sin pesas).
+const isLegsDay = (id) => (NUTRITION.legsDays || []).indexOf(id) !== -1;
+let trainDays = (function () { try { return JSON.parse(localStorage.getItem(TRAIN_KEY)) || {}; } catch (e) { return {}; } })();
+function setTrainToday(v) {
+  trainDays = { [todayISO()]: v }; // solo importa el dia de hoy
+  try { localStorage.setItem(TRAIN_KEY, JSON.stringify(trainDays)); } catch (e) { /* sin almacenamiento */ }
+  render();
+}
 function dayTypeOf(date) {
   const s = allSessions().filter((x) => x.date === date && x.entries.length && isWeightDay(x.routineId));
-  if (s.length) { const id = s.some((x) => x.routineId === NUTRITION.legsDay) ? NUTRITION.legsDay : s[0].routineId; return { kind: 'pesas', legs: id === NUTRITION.legsDay, id: id, from: 'sesión registrada' }; }
+  if (s.length) { const legs = s.find((x) => isLegsDay(x.routineId)); const id = legs ? legs.routineId : s[0].routineId; return { kind: 'pesas', legs: !!legs, id: id, from: 'sesión registrada' }; }
   const cs = cardio.sessions.filter((c) => c.date === date && !c.libre);
-  if (cs.some((c) => c.dia === NUTRITION.intervalDay || c.tipo === 'Intervalos')) return { kind: 'intervalos', legs: false, id: NUTRITION.intervalDay, from: 'cardio registrado' };
-  if (date !== todayISO() || cs.length || allSessions().some((x) => x.date === date && x.entries.length)) return { kind: 'descanso', legs: false, id: null, from: date === todayISO() ? 'lo registrado hoy' : 'registro' };
-  const nx = planNext();
-  return { kind: isWeightDay(nx.id) ? 'pesas' : nx.id === NUTRITION.intervalDay ? 'intervalos' : 'descanso', legs: nx.id === NUTRITION.legsDay, id: nx.id, from: 'siguiente día del plan (' + nx.name.replace(/^Día \d+ · /, '') + ')' };
+  if (cs.some((c) => c.dia === NUTRITION.intervalDay)) return { kind: 'intervalos', legs: false, id: NUTRITION.intervalDay, from: 'cardio registrado' };
+  if (date === todayISO() && trainDays[date] === true) {
+    const nx = planNext();
+    return { kind: 'pesas', legs: isLegsDay(nx.id), id: nx.id, from: 'hoy entrenas (' + nx.name.replace(/^Día \d+ · /, '') + ')', ask: true };
+  }
+  return { kind: 'descanso', legs: false, id: null, from: date === todayISO() ? 'hoy sin pesas' : 'sin sesión de pesas', ask: date === todayISO() };
 }
 // Calorias netas de una sesion de cardio (por encima del reposo): (MET - 1) x peso actual x horas
 function cardioNetKcal(c) {
@@ -226,7 +236,10 @@ function nutritionCard() {
   const card = h('section', { class: 'card' },
     h('div', { class: 'row between' }, h('strong', {}, '🍽️ ' + t.label), h('span', { class: 'muted small' }, 'según ' + dt.from)),
     t.extra ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, '+' + t.extra + ' kcal por tu cardio extra de hoy (en carbohidratos).') : null,
-    t.adj ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, (t.adj > 0 ? '+' : '−') + Math.abs(t.adj) + ' kcal de ajuste de hoy' + (t.adjWhy ? ': ' + t.adjWhy : '') + '.') : null);
+    t.adj ? h('p', { class: 'muted small', style: 'margin:2px 0 0' }, (t.adj > 0 ? '+' : '−') + Math.abs(t.adj) + ' kcal de ajuste de hoy' + (t.adjWhy ? ': ' + t.adjWhy : '') + '.') : null,
+    dt.ask ? h('div', { class: 'row', style: 'gap:6px;margin-top:8px;align-items:center' }, h('span', { class: 'small' }, '¿Hoy entrenas pesas?'),
+      h('button', { class: 'btn small' + (dt.kind === 'pesas' ? ' primary' : ''), type: 'button', onclick: () => setTrainToday(true) }, 'Sí'),
+      h('button', { class: 'btn small' + (dt.kind !== 'pesas' ? ' primary' : ''), type: 'button', onclick: () => setTrainToday(false) }, 'No')) : null);
   if (!d.list.length) {
     card.append(h('p', { class: 'muted small', style: 'margin:6px 0 4px' }, 'Aún no registras comidas hoy. Dímelas en el chat ("desayuno: 3 huevos y un kiwi") y aparecen aquí.'),
       h('p', { class: 'small', style: 'margin:0' }, 'Meta: ' + fmt(t.kcal) + ' kcal · ' + t.prot + ' g proteína · ' + t.carb + ' g carbohidratos · ' + t.fat + ' g grasa'),

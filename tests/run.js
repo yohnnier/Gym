@@ -61,7 +61,7 @@ function sess(id, date, routineId, exId, weight, reps) {
   {
     const a = await open({ 'rutinas.body.v1': BODY, 'rutinas.weight.v1': WEIGHTS });
     for (const [hash, tab] of [['#/', 'Hoy'], ['#/entrenar', 'Entrenar'], ['#/prog', 'Progreso'], ['#/salud', 'Salud'], ['#/ajustes', 'Ajustes'],
-      ['#/hist', 'Entrenar'], ['#/cardio', 'Entrenar'], ['#/cuerpo', 'Salud'], ['#/examenes', 'Salud'], ['#/g/dia-empuje', 'Entrenar'], ['#/rutina', 'Ajustes']]) {
+      ['#/hist', 'Entrenar'], ['#/cardio', 'Entrenar'], ['#/cuerpo', 'Salud'], ['#/examenes', 'Salud'], ['#/g/dia-torso-a', 'Entrenar'], ['#/g/dia-empuje', 'Entrenar'], ['#/rutina', 'Ajustes']]) {
       await a.page.goto(BASE + hash); await a.page.waitForTimeout(250);
       const active = (await a.page.locator('.tabs button.active').innerText()).trim();
       const n = await a.page.locator('#app > *').count();
@@ -88,10 +88,15 @@ function sess(id, date, routineId, exId, weight, reps) {
 
   console.log('Siguiente día del plan');
   {
-    const a = await open({ 'rutinas.v1': { sessions: [sess('e', '2026-10-31', 'dia-empuje', 'press-pecho-maquina', 30, [12, 12, 12])], deleted: [] },
-      'rutinas.cardio.v1': { sessions: [{ id: 'b', date: '2026-10-31', tipo: 'Bicicleta', min: 30, libre: true }] } });
+    const a = await open({ 'rutinas.v1': { sessions: [sess('o', '2026-10-28', 'dia-empuje', 'press-pecho-maquina', 30, [12, 12, 12]), sess('e', '2026-10-31', 'dia-torso-a', 'press-pecho-maquina', 30, [12, 12, 12])], deleted: [] },
+      'rutinas.cardio.v1': { sessions: [{ id: 'b', date: '2026-10-31', tipo: 'Bicicleta', min: 30, libre: true }, { id: 'c', date: '2026-10-31', tipo: 'Caminata inclinada', min: 20 }] } });
     const nx = await a.page.evaluate(() => planNext().id);
-    check('después de Empuje (y bici extra) toca Día 2', nx === 'dia-cardio-2', nx);
+    check('después de Torso A (y cardio) toca Pierna A', nx === 'dia-pierna-a', nx);
+    const old = await a.page.evaluate(() => routineOf({ routineId: 'dia-empuje' }).name);
+    check('el historial del plan anterior conserva el nombre del día', old === 'Día 1 · Empuje', old);
+    const r = await a.page.evaluate(() => { const d0 = dayTypeOf(todayISO()); setTrainToday(true); const d1 = dayTypeOf(todayISO()); return { d0: d0.kind, d1: d1.kind, legs: d1.legs, t: nutTarget(d1, todayISO()).kcal }; });
+    check('sin sesión hoy: día sin pesas; con "hoy entreno": meta de pesas (Pierna A = +150)', r.d0 === 'descanso' && r.d1 === 'pesas' && r.legs === true && r.t === 2250, r);
+    check('sin errores con el plan nuevo', a.errors.length === 0, a.errors);
     await a.close();
   }
 
