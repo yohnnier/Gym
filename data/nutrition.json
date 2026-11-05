@@ -2391,6 +2391,42 @@
    "carb": 90.2,
    "fat": 59.3,
    "notes": "burrata ~270 kcal/100 g; raviolis rellenos de carne ~190 kcal/100 g, sin salsa (con salsa suma ~100-250 kcal); pollo supuesto sin piel"
+  },
+  {
+   "id": "2026-11-05-desayuno",
+   "date": "2026-11-05",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero frito sin aceite (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de maíz con queso",
+     "g": 150,
+     "kcal": 390,
+     "prot": 10.5,
+     "carb": 54.0,
+     "fat": 15.0
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 170,
+     "kcal": 111,
+     "prot": 15.0,
+     "carb": 10.0,
+     "fat": 1.2
+    }
+   ],
+   "kcal": 644,
+   "prot": 38.1,
+   "carb": 64.7,
+   "fat": 25.7,
+   "notes": "arepa de maíz rellena o mezclada con queso, ~260 kcal/100 g, sin mantequilla; huevos sin aceite"
   }
  ]
 }
