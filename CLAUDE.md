@@ -31,7 +31,7 @@ El usuario volvió a trabajar: entrena cuando puede (fines de semana y algún d�
 - **Comida:** días de pesas 2.100 kcal (piernas +150); **días sin pesas 1.800 kcal · 155 g prot · 140 g carb**. Si hoy aún no hay sesión registrada, la tarjeta de nutrición pregunta "¿Hoy entrenas pesas?" (`setTrainToday`, `TRAIN_KEY`); por defecto el día es sin pesas.
 - **Plan anterior** (6 días: Empuje, cardio intervalos, Tirón, cardio + core, Piernas, cardio suave; hasta el 4-nov) quedó en `PLAN_ARCHIVE` (`js/routine.js`) solo para que el historial muestre los nombres. Los ids de día (`dia-empuje`, `dia-cardio-2`, `dia-torso-a`…) están guardados en los registros: **no los renombres ni los borres**.
 - El indicador de recuperación por músculo está en Entrenar (`recovery()`/`recoveryCard()`: grandes 72 h, pequeños 48 h, indirecto un día menos).
-- **Cintura:** hasta el 2-nov se midió con una cinta defectuosa que empezaba en 5 cm (marcaba 5 cm de más); esas medidas (y la cadera del 30-oct) se corrigieron −5 cm en `gym-datos` y llevan `cintaVieja: true`. Desde el 5-nov, cinta nueva.
+- **Cintura:** hasta el 2-nov se midió con otra cinta (las medidas quedan como el usuario las anotó, sin corregir); desde el 5-nov usa una cinta nueva. Compara la cintura solo desde el 5-nov.
 
 ## Nutrición: se registra desde el chat
 El usuario dice lo que comió (p. ej. "desayuno: 3 huevos, 100 g de yogurt griego y un kiwi"). Tú:
