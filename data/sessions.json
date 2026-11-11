@@ -3628,8 +3628,22 @@
     "weight": 20,
     "reps": 15,
     "rpe": 10
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 1,
+    "weight": 45,
+    "reps": 8,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 2,
+    "weight": 45,
+    "reps": 8,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1794407435500
+  "updatedAt": 1794408111567
  }
 ]
