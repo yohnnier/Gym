@@ -3718,5 +3718,22 @@
    }
   ],
   "updatedAt": 1794409651063
+ },
+ {
+  "id": "mwdznp8t8nil8",
+  "date": "2026-11-12",
+  "createdAt": 1794514597517,
+  "routineId": "dia-pierna-a",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "prensa",
+    "set": 1,
+    "weight": 90,
+    "reps": 6,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1794514597517
  }
 ]
