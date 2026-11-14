@@ -3921,11 +3921,11 @@
    {
     "exerciseId": "face-pull",
     "set": 3,
-    "weight": 50,
-    "reps": 14,
+    "weight": 40,
+    "reps": 18,
     "rpe": 9
    }
   ],
-  "updatedAt": 1794672335504
+  "updatedAt": 1794672658471
  }
 ]
