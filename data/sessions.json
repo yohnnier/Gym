@@ -3823,11 +3823,18 @@
    {
     "exerciseId": "pullover-polea",
     "set": 1,
-    "weight": 100,
+    "weight": 130,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "pullover-polea",
+    "set": 2,
+    "weight": 130,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1794668974328
+  "updatedAt": 1794669114836
  }
 ]
