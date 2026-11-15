@@ -86,6 +86,21 @@ function sess(id, date, routineId, exId, weight, reps) {
   p = await planFor([sess('s0', '2026-10-09', 'dia-empuje', EX, 90, [10, 10, 10])].concat(['2026-10-16', '2026-10-23', '2026-10-30'].map((d, i) => sess('t' + i, d, 'dia-empuje', EX, 50, [12, 12, 12]))));
   check('una marca con otro peso (cambio de máquina) no dispara descarga', p.trend !== 'deload', p);
 
+  console.log('Meta de cada serie');
+  {
+    const a = await open({ 'rutinas.v1': { sessions: [sess('a', '2026-10-30', 'dia-pierna-a', 'curl-femoral', 65, [13, 13, 13])], deleted: [] } }, '#/', '2026-11-05T09:00:00-03:00');
+    const r = await a.page.evaluate(() => {
+      const ex = exById['curl-femoral'], p = plan(ex);
+      const s = todaySession('dia-pierna-a', true);
+      s.entries.push({ exerciseId: 'curl-femoral', set: 1, weight: p.weight - ex.step, reps: p.reps[0] + 3, rpe: 9 });
+      s.entries.push({ exerciseId: 'curl-femoral', set: 2, weight: p.weight - ex.step, reps: p.reps[0] - 1, rpe: 9 });
+      const g = goalStats(ex, 'dia-pierna-a');
+      return { w: p.weight, r: p.reps[0], rows: g.rows.map((x) => x.hit) };
+    });
+    check('menos peso con más reps cuenta si la fuerza estimada es igual o mayor; con menos reps no', r.rows[0] === true && r.rows[1] === false, r);
+    await a.close();
+  }
+
   console.log('Siguiente día del plan');
   {
     const a = await open({ 'rutinas.v1': { sessions: [sess('o', '2026-10-28', 'dia-empuje', 'press-pecho-maquina', 30, [12, 12, 12]), sess('e', '2026-10-31', 'dia-torso-a', 'press-pecho-maquina', 30, [12, 12, 12])], deleted: [] },

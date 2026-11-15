@@ -2,7 +2,7 @@
  * Todos los archivos de js/app/ comparten el ámbito global y se cargan en orden (ver index.html). */
 'use strict';
 
-const VERSION = '54';
+const VERSION = '55';
 const KEY = 'rutinas.v1';
 const IMG_KEY = 'rutinas.img.v1';
 const REST_KEY = 'rutinas.rest.v1';
@@ -498,7 +498,11 @@ function goalStats(ex, routineId) {
     // Hipertrofia: la carga manda mientras la serie siga dentro del rango de repeticiones.
     // Con mas peso que la meta basta llegar al minimo del rango; con el peso de la meta hay que igualar las reps.
     const heavier = work && p.weight != null && e.weight != null && e.weight > p.weight;
-    const hit = work && (heavier ? e.reps >= ex.repMin : e.reps >= tr && (p.weight == null || e.weight == null || e.weight >= p.weight));
+    // Con un poco menos de peso pero mas reps tambien vale si la fuerza estimada (Epley) iguala o supera la de la meta
+    // (p. ej. meta 67,5 x 11 y haces 65 x 14), siempre que no te pases mucho del tope de reps.
+    const e1 = (w, r) => w * (1 + r / 30);
+    const lighterOk = work && p.weight != null && e.weight != null && e.weight < p.weight && e.reps <= ex.repMax + EXTRA_REPS && e1(e.weight, e.reps) >= e1(p.weight, tr);
+    const hit = work && (heavier ? e.reps >= ex.repMin : lighterOk || (e.reps >= tr && (p.weight == null || e.weight == null || e.weight >= p.weight)));
     return { work: work, hit: hit, up: hit && heavier && e.reps < tr, target: tr };
   });
   return { rows: rows, work: rows.filter((x) => x.work).length, hit: rows.filter((x) => x.hit).length, plan: p };
