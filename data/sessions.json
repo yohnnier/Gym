@@ -4104,8 +4104,22 @@
     "weight": null,
     "reps": 19,
     "rpe": 10
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 1,
+    "weight": 10,
+    "reps": 10,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "rodillas-silla-romana",
+    "set": 2,
+    "weight": 10,
+    "reps": 10,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1794760253763
+  "updatedAt": 1794760462105
  }
 ]
