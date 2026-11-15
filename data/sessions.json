@@ -4048,13 +4048,6 @@
     "rpe": 10
    },
    {
-    "exerciseId": "extension-cuadriceps",
-    "set": 1,
-    "weight": 100,
-    "reps": 14,
-    "rpe": 10
-   },
-   {
     "exerciseId": "abductores",
     "set": 1,
     "weight": 15,
@@ -4071,6 +4064,6 @@
     "altOrder": true
    }
   ],
-  "updatedAt": 1794759305905
+  "updatedAt": 1794759353387
  }
 ]
