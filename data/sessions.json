@@ -3990,8 +3990,22 @@
     "weight": 35,
     "reps": 12,
     "rpe": 10
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 3,
+    "weight": 35,
+    "reps": 12,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 4,
+    "weight": 20,
+    "reps": 12,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1794756506303
+  "updatedAt": 1794756531604
  }
 ]
