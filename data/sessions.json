@@ -4011,8 +4011,15 @@
     "weight": 71.5,
     "reps": 11,
     "rpe": 9
+   },
+   {
+    "exerciseId": "curl-femoral",
+    "set": 2,
+    "weight": 65,
+    "reps": 14,
+    "rpe": null
    }
   ],
-  "updatedAt": 1794756842706
+  "updatedAt": 1794756862364
  }
 ]
