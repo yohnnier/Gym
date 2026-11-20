@@ -4177,8 +4177,22 @@
     "weight": 20,
     "reps": 20,
     "rpe": 8
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 2,
+    "weight": 30,
+    "reps": 15,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-hombro-maquina",
+    "set": 3,
+    "weight": 30,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1795205759139
+  "updatedAt": 1795206363188
  }
 ]
