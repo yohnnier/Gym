@@ -1,1 +1,2496 @@
-{"entries": [{"id": "2026-10-18-desayuno", "date": "2026-10-18", "meal": "desayuno", "items": [{"food": "Huevo entero (3 unidades)", "g": 150, "kcal": 215, "prot": 18.9, "carb": 1.1, "fat": 14.3}, {"food": "Pan dulce", "g": 75, "kcal": 270, "prot": 5.3, "carb": 41.3, "fat": 9.0}, {"food": "Queso crema", "g": 25, "kcal": 86, "prot": 1.5, "carb": 1.0, "fat": 8.5}, {"food": "Café de grano filtrado", "g": 250, "kcal": 2, "prot": 0.3, "carb": 0, "fat": 0}, {"food": "Yogurt griego", "g": 100, "kcal": 65, "prot": 8.8, "carb": 4.0, "fat": 1.5}], "kcal": 638, "prot": 34.8, "carb": 47.4, "fat": 33.3, "notes": "huevos sin aceite añadido (fritos en aceite suman ~45 kcal por cucharadita); pan dulce + queso crema = 100 g en total, supuesto 75 g de pan y 25 g de queso crema normal; café sin azúcar ni leche"}, {"id": "2026-10-18-almuerzo", "date": "2026-10-18", "meal": "almuerzo", "items": [{"food": "Salmón en freidora de aire", "g": 220, "kcal": 458, "prot": 44.9, "carb": 0, "fat": 29.5}, {"food": "Aceite de oliva (1 cucharada, salmón)", "g": 13.5, "kcal": 119, "prot": 0, "carb": 0, "fat": 13.5}, {"food": "Palta", "g": 180, "kcal": 288, "prot": 3.6, "carb": 15.3, "fat": 26.5}, {"food": "Tomate", "g": 80, "kcal": 14, "prot": 0.7, "carb": 3.1, "fat": 0.2}, {"food": "Patacones fritos en aceite de oliva (4)", "g": 72, "kcal": 222, "prot": 1.1, "carb": 35.3, "fat": 8.5}, {"food": "Yuca cocida", "g": 60, "kcal": 67, "prot": 0.8, "carb": 16.0, "fat": 0.2}, {"food": "Ceviche de reineta (copa)", "g": 120, "kcal": 105, "prot": 17.5, "carb": 3.5, "fat": 2.3}], "kcal": 1273, "prot": 68.6, "carb": 73.2, "fat": 80.7, "notes": "salmón 220 g en crudo (si era el peso ya cocido, suma ~90 kcal y ~9 g de proteína); palta 180 g más ~80 g de tomate; patacones con el aceite que absorben al freír; yuca cocida (no frita); ceviche ≈ 90 g de reineta + cebolla y limón"}, {"id": "2026-10-18-cena", "date": "2026-10-18", "meal": "cena", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Plátano", "g": 67, "kcal": 60, "prot": 0.7, "carb": 15.3, "fat": 0.2}], "kcal": 190, "prot": 18.3, "carb": 27.1, "fat": 1.6, "notes": "plátano 67 g de pulpa (sin cáscara)"}, {"id": "2026-10-19-desayuno", "date": "2026-10-19", "meal": "desayuno", "items": [{"food": "Huevo entero (4 unidades)", "g": 200, "kcal": 286, "prot": 25.2, "carb": 1.4, "fat": 19.0}, {"food": "Pan (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}], "kcal": 553, "prot": 49.8, "carb": 39.2, "fat": 21.0, "notes": "huevos ~50 g c/u, sin aceite; pan y yogurt según etiqueta"}, {"id": "2026-10-19-almuerzo", "date": "2026-10-19", "meal": "almuerzo", "items": [{"food": "Salmón cocido", "g": 139, "kcal": 286, "prot": 30.7, "carb": 0, "fat": 17.2}, {"food": "Arroz blanco cocido", "g": 120, "kcal": 156, "prot": 3.2, "carb": 33.8, "fat": 0.4}, {"food": "Palta", "g": 90, "kcal": 144, "prot": 1.8, "carb": 7.7, "fat": 13.2}, {"food": "Tomate", "g": 180, "kcal": 32, "prot": 1.6, "carb": 7.0, "fat": 0.4}, {"food": "Plátano maduro barraganete cocido", "g": 90, "kcal": 104, "prot": 0.7, "carb": 28.1, "fat": 0.2}], "kcal": 722, "prot": 38.0, "carb": 76.6, "fat": 31.4, "notes": "salmón 139 g pesado ya cocido, sin aceite; maduro cocido (no frito); palta en pulpa"}, {"id": "2026-10-19-colacion-1", "date": "2026-10-19", "meal": "colación", "items": [{"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4, "notes": "según etiqueta; en agua (si fue con leche u otra bebida, avisar)"}, {"id": "2026-10-19-cena", "date": "2026-10-19", "meal": "cena", "items": [{"food": "Pollo al jugo (pechuga sin piel)", "g": 120, "kcal": 198, "prot": 37.2, "carb": 0, "fat": 4.3}, {"food": "Arroz blanco cocido", "g": 80, "kcal": 104, "prot": 2.2, "carb": 22.6, "fat": 0.2}, {"food": "Huevo duro", "g": 50, "kcal": 78, "prot": 6.3, "carb": 0.6, "fat": 5.3}, {"food": "Agua con limón (1 vaso)", "g": 250, "kcal": 3, "prot": 0, "carb": 1.0, "fat": 0}], "kcal": 383, "prot": 45.7, "carb": 24.2, "fat": 9.8, "notes": "pollo 120 g cocido, pechuga sin piel (si era trutro o con piel, suma ~60–90 kcal de grasa); limón ~15 ml sin azúcar"}, {"id": "2026-10-19-colacion-2", "date": "2026-10-19", "meal": "colación", "items": [{"food": "Plátano", "g": 66, "kcal": 59, "prot": 0.7, "carb": 15.1, "fat": 0.2}], "kcal": 59, "prot": 0.7, "carb": 15.1, "fat": 0.2, "notes": "plátano 66 g de pulpa (sin cáscara)"}, {"id": "2026-10-20-desayuno", "date": "2026-10-20", "meal": "desayuno", "items": [{"food": "Huevo entero (2 unidades)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Queso fresco", "g": 30, "kcal": 63, "prot": 4.8, "carb": 0.9, "fat": 4.5}, {"food": "Plátano", "g": 70, "kcal": 62, "prot": 0.8, "carb": 16.0, "fat": 0.2}, {"food": "Café de grano filtrado con endulzante", "g": 250, "kcal": 2, "prot": 0.3, "carb": 0, "fat": 0}], "kcal": 400, "prot": 36.1, "carb": 29.4, "fat": 15.6, "notes": "huevos sin aceite; queso fresco tipo chileno (~210 kcal/100 g); plátano 70 g de pulpa; endulzante sin calorías"}, {"id": "2026-10-20-colacion-1", "date": "2026-10-20", "meal": "colación", "items": [{"food": "Monster Ultra Paradise sin azúcar (1 lata)", "g": 473, "kcal": 10, "prot": 0, "carb": 3.0, "fat": 0}], "kcal": 10, "prot": 0, "carb": 3.0, "fat": 0, "notes": "según etiqueta; 150 mg de cafeína"}, {"id": "2026-10-20-colacion-2", "date": "2026-10-20", "meal": "colación", "items": [{"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4, "notes": "según etiqueta; diluida en agua"}, {"id": "2026-10-20-almuerzo", "date": "2026-10-20", "meal": "almuerzo", "items": [{"food": "Lentejas cocidas", "g": 230, "kcal": 267, "prot": 20.7, "carb": 46.2, "fat": 0.9}, {"food": "Pernil de pollo cocido (con piel y hueso; ~70 % comestible)", "g": 133, "kcal": 213, "prot": 22.3, "carb": 0, "fat": 13.0}], "kcal": 480, "prot": 43.0, "carb": 46.2, "fat": 13.9, "notes": "pernil 133 g con piel y hueso: se estimó ~93 g comestibles (carne + piel); lentejas cocidas sin aceite ni tocino"}, {"id": "2026-10-20-colacion-3", "date": "2026-10-20", "meal": "colación", "items": [{"food": "Yogurt griego", "g": 150, "kcal": 98, "prot": 13.2, "carb": 8.9, "fat": 1.1}], "kcal": 98, "prot": 13.2, "carb": 8.9, "fat": 1.1, "notes": "según etiqueta (65 kcal/100 g)"}, {"id": "2026-10-20-cena", "date": "2026-10-20", "meal": "cena", "items": [{"food": "Pandebono colombiano con queso (3)", "g": 210, "kcal": 649, "prot": 22.7, "carb": 75.6, "fat": 28.4}], "kcal": 649, "prot": 22.7, "carb": 75.6, "fat": 28.4, "notes": "3 pandebonos de ~70 g c/u con bastante queso (supuesto: ~310 kcal/100 g)"}, {"id": "2026-10-21-desayuno", "date": "2026-10-21", "meal": "desayuno", "items": [{"food": "Huevo entero (3 unidades)", "g": 150, "kcal": 215, "prot": 18.9, "carb": 1.1, "fat": 14.3}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Pan de molde zero (1 rodaja)", "g": 30, "kcal": 70, "prot": 4.0, "carb": 8.0, "fat": 1.5}, {"food": "Queso crema", "g": 15, "kcal": 50, "prot": 0.9, "carb": 0.6, "fat": 5.0}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Café de grano filtrado", "g": 250, "kcal": 2, "prot": 0.3, "carb": 0, "fat": 0}], "kcal": 586, "prot": 65.7, "carb": 24.1, "fat": 23.6, "notes": "huevos sin aceite; pan zero supuesto 30 g (~70 kcal) y queso crema 1 cucharada (15 g): pendiente confirmar con etiqueta; proteína diluida en agua; café sin azúcar"}, {"id": "2026-10-21-almuerzo", "date": "2026-10-21", "meal": "almuerzo", "items": [{"food": "Carne molida cocida", "g": 130, "kcal": 306, "prot": 33.8, "carb": 0, "fat": 17.6}, {"food": "Pasta cocida", "g": 180, "kcal": 284, "prot": 10.4, "carb": 55.6, "fat": 1.6}, {"food": "Plátano (3 unidades, postre)", "g": 201, "kcal": 180, "prot": 2.1, "carb": 45.9, "fat": 0.6}], "kcal": 770, "prot": 46.3, "carb": 101.5, "fat": 19.8, "notes": "carne molida 130 g ya cocida (~12 % grasa) y pasta 180 g cocida, sin aceite ni salsa; plátanos 67 g de pulpa c/u"}, {"id": "2026-10-21-cena", "date": "2026-10-21", "meal": "cena", "items": [{"food": "Hamburguesa de carne cocida", "g": 140, "kcal": 350, "prot": 36.3, "carb": 0, "fat": 21.0}, {"food": "Lentejas cocidas", "g": 120, "kcal": 139, "prot": 10.8, "carb": 24.1, "fat": 0.5}], "kcal": 489, "prot": 47.1, "carb": 24.1, "fat": 21.5, "notes": "hamburguesa 140 g ya cocida (~15 % grasa), sin pan ni aceite extra; lentejas cocidas sin aceite ni tocino"}, {"id": "2026-10-22-desayuno", "date": "2026-10-22", "meal": "desayuno", "items": [{"food": "Huevo duro (2 unidades)", "g": 100, "kcal": 155, "prot": 12.6, "carb": 1.1, "fat": 10.6}, {"food": "Pan de molde zero (1 rodaja)", "g": 30, "kcal": 70, "prot": 4.0, "carb": 8.0, "fat": 1.5}, {"food": "Queso crema", "g": 15, "kcal": 50, "prot": 0.9, "carb": 0.6, "fat": 5.0}, {"food": "Proteína vegana Revitta (2 medidas)", "g": 66, "kcal": 238, "prot": 48.0, "carb": 5.2, "fat": 2.8}, {"food": "Café", "g": 250, "kcal": 2, "prot": 0.3, "carb": 0, "fat": 0}], "kcal": 515, "prot": 65.8, "carb": 14.9, "fat": 19.9, "notes": "pan zero 30 g y queso crema 15 g supuestos; proteína en agua; café sin azúcar"}, {"id": "2026-10-22-almuerzo", "date": "2026-10-22", "meal": "almuerzo", "items": [{"food": "Papa cocida", "g": 200, "kcal": 174, "prot": 3.8, "carb": 40.2, "fat": 0.2}, {"food": "Mayonesa (~1 cucharada)", "g": 20, "kcal": 136, "prot": 0.3, "carb": 0.6, "fat": 14.8}, {"food": "Carne de vacuno magra, en freidora de aire", "g": 180, "kcal": 342, "prot": 52.2, "carb": 0, "fat": 13.5}, {"food": "Huevo frito", "g": 50, "kcal": 72, "prot": 6.3, "carb": 0.4, "fat": 4.8}, {"food": "Aceite de oliva (½ cucharadita)", "g": 2.5, "kcal": 20, "prot": 0, "carb": 0, "fat": 2.3}, {"food": "Cerveza Sol", "g": 450, "kcal": 180, "prot": 1.8, "carb": 14.4, "fat": 0}], "kcal": 924, "prot": 64.4, "carb": 55.6, "fat": 35.6, "notes": "papa y carne cocidas; mayonesa supuesta 20 g (1 cucharada); carne sin aceite; cerveza 450 ml (~4,5 % alcohol, ~16 g de alcohol que aportan ~112 kcal)"}, {"id": "2026-10-22-cena", "date": "2026-10-22", "meal": "cena", "items": [{"food": "Pollo asado (cuarto, con piel; parte comestible)", "g": 200, "kcal": 458, "prot": 48.0, "carb": 0, "fat": 28.0}, {"food": "Yuca cocida", "g": 200, "kcal": 223, "prot": 2.7, "carb": 53.4, "fat": 0.6}, {"food": "Vino tinto (1 copa)", "g": 150, "kcal": 127, "prot": 0.1, "carb": 3.9, "fat": 0}], "kcal": 808, "prot": 50.8, "carb": 57.3, "fat": 28.6, "notes": "cuarto de pollo asado con piel y hueso: se estimaron ~200 g comestibles; yuca cocida (no frita); copa de vino de ~150 ml (~17 g de alcohol, ~120 kcal)"}, {"id": "2026-10-22-colacion-1", "date": "2026-10-22", "meal": "colación", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Proteína vegana Revitta (½ medida)", "g": 16.5, "kcal": 60, "prot": 12.0, "carb": 1.3, "fat": 0.7}], "kcal": 190, "prot": 29.6, "carb": 13.1, "fat": 2.1, "notes": "según etiqueta"}, {"id": "2026-10-23-desayuno", "date": "2026-10-23", "meal": "desayuno", "items": [{"food": "Huevo entero (2 unidades)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Pollo cocido (pechuga)", "g": 100, "kcal": 165, "prot": 31.0, "carb": 0, "fat": 3.6}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Plátano (3 unidades)", "g": 201, "kcal": 180, "prot": 2.1, "carb": 45.9, "fat": 0.6}], "kcal": 618, "prot": 63.3, "carb": 58.4, "fat": 15.1, "notes": "huevos sin aceite; pollo 100 g cocido, pechuga sin piel; plátanos 67 g de pulpa c/u"}, {"id": "2026-10-23-almuerzo", "date": "2026-10-23", "meal": "almuerzo", "items": [{"food": "Arroz blanco cocido", "g": 180, "kcal": 234, "prot": 4.9, "carb": 50.8, "fat": 0.5}, {"food": "Palta", "g": 50, "kcal": 80, "prot": 1.0, "carb": 4.3, "fat": 7.3}, {"food": "Carne de vacuno magra cocida", "g": 200, "kcal": 380, "prot": 58.0, "carb": 0, "fat": 15.0}], "kcal": 694, "prot": 63.9, "carb": 55.1, "fat": 22.8, "notes": "carne supuesta magra (posta/lomo), cocida y sin aceite; si era molida o con grasa suma ~60-100 kcal"}, {"id": "2026-10-23-cena", "date": "2026-10-23", "meal": "cena", "items": [{"food": "Pan (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}, {"food": "Jamón (1 lámina)", "g": 20, "kcal": 22, "prot": 3.6, "carb": 0.4, "fat": 0.7}, {"food": "Queso gouda (1 rebanada)", "g": 20, "kcal": 71, "prot": 5.0, "carb": 0.5, "fat": 5.5}, {"food": "Coca-Cola Zero (1 lata)", "g": 350, "kcal": 0, "prot": 0, "carb": 0, "fat": 0}], "kcal": 230, "prot": 15.6, "carb": 26.9, "fat": 6.8, "notes": "pan según etiqueta (64 g las 2 rebanadas); jamón de pierna ~20 g y gouda ~20 g supuestos; bebida sin calorías"}, {"id": "2026-10-23-colacion-1", "date": "2026-10-23", "meal": "colación", "items": [{"food": "Yuca cocida", "g": 150, "kcal": 168, "prot": 2.0, "carb": 40.1, "fat": 0.5}], "kcal": 168, "prot": 2.0, "carb": 40.1, "fat": 0.5, "notes": "yuca cocida (no frita)"}, {"id": "2026-10-23-cena-2", "date": "2026-10-23", "meal": "cena", "items": [{"food": "Yogurt griego", "g": 180, "kcal": 117, "prot": 15.8, "carb": 10.6, "fat": 1.3}, {"food": "Proteína vegana Revitta (½ medida)", "g": 16.5, "kcal": 60, "prot": 12.0, "carb": 1.3, "fat": 0.7}], "kcal": 177, "prot": 27.8, "carb": 11.9, "fat": 2.0, "notes": "según etiqueta; proteína en agua"}, {"id": "2026-10-24-desayuno", "date": "2026-10-24", "meal": "desayuno", "items": [{"food": "Huevo entero (2 unidades)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Arepa de harina de trigo", "g": 100, "kcal": 240, "prot": 7.0, "carb": 48.0, "fat": 2.5}], "kcal": 383, "prot": 19.6, "carb": 48.7, "fat": 12.0, "notes": "huevos sin aceite; arepa de harina de trigo ~100 g ya hecha (~240 kcal/100 g), sin mantequilla ni relleno"}, {"id": "2026-10-24-almuerzo", "date": "2026-10-24", "meal": "almuerzo", "items": [{"food": "Arroz blanco cocido", "g": 200, "kcal": 260, "prot": 5.5, "carb": 56.4, "fat": 0.6}, {"food": "Carne de res guisada cocida", "g": 180, "kcal": 378, "prot": 48.6, "carb": 0, "fat": 19.8}, {"food": "Papa cocida", "g": 140, "kcal": 122, "prot": 2.7, "carb": 28.1, "fat": 0.1}, {"food": "Choclo", "g": 40, "kcal": 38, "prot": 1.3, "carb": 8.4, "fat": 0.5}, {"food": "Plátano (postre)", "g": 70, "kcal": 62, "prot": 0.8, "carb": 16.0, "fat": 0.2}], "kcal": 860, "prot": 58.9, "carb": 108.9, "fat": 21.2, "notes": "carne guisada supuesta de corte medio (~210 kcal/100 g), sin contar aceite ni salsa extra del guiso; papa, choclo y arroz cocidos"}, {"id": "2026-10-24-colacion-1", "date": "2026-10-24", "meal": "colación", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Plátano", "g": 70, "kcal": 62, "prot": 0.8, "carb": 16.0, "fat": 0.2}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 311, "prot": 42.4, "carb": 30.4, "fat": 3.0, "notes": "según etiqueta; proteína en el yogurt o en agua"}, {"id": "2026-10-24-cena", "date": "2026-10-24", "meal": "cena", "items": [{"food": "Contramuslo de pollo asado (con piel y hueso; ~75 % comestible)", "g": 188, "kcal": 430, "prot": 45.1, "carb": 0, "fat": 26.3}], "kcal": 430, "prot": 45.1, "carb": 0, "fat": 26.3, "notes": "250 g de contramuslo asado con piel y hueso: se estimaron ~188 g comestibles; si era sin piel resta ~100 kcal y ~12 g de grasa"}, {"id": "2026-10-24-colacion-2", "date": "2026-10-24", "meal": "colación", "items": [{"food": "Plátano", "g": 110, "kcal": 98, "prot": 1.2, "carb": 25.1, "fat": 0.3}], "kcal": 98, "prot": 1.2, "carb": 25.1, "fat": 0.3, "notes": "plátano 110 g de pulpa (sin cáscara)"}, {"id": "2026-10-25-desayuno", "date": "2026-10-25", "meal": "desayuno", "items": [{"food": "Huevo entero (2 unidades)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Contramuslo de pollo (con piel y hueso; ~75 % comestible)", "g": 112, "kcal": 257, "prot": 26.9, "carb": 0, "fat": 15.7}], "kcal": 400, "prot": 39.5, "carb": 0.7, "fat": 25.2, "notes": "huevos sin aceite; contramuslo 150 g con piel y hueso: ~112 g comestibles (sin piel resta ~60 kcal y ~7 g de grasa)"}, {"id": "2026-10-25-almuerzo", "date": "2026-10-25", "meal": "almuerzo", "items": [{"food": "Tomate", "g": 150, "kcal": 27, "prot": 1.4, "carb": 5.9, "fat": 0.3}, {"food": "Choclo", "g": 40, "kcal": 38, "prot": 1.3, "carb": 8.4, "fat": 0.5}, {"food": "Mayonesa (~1 cucharada)", "g": 20, "kcal": 136, "prot": 0.3, "carb": 0.6, "fat": 14.8}, {"food": "Brisket de vacuno cocido", "g": 250, "kcal": 675, "prot": 67.5, "carb": 0, "fat": 43.8}], "kcal": 876, "prot": 70.5, "carb": 14.9, "fat": 59.4, "notes": "brisket 250 g cocido, supuesto con grasa media (~270 kcal/100 g; si era corte magro resta ~150 kcal y ~15 g de grasa); tomate ~150 g; mayonesa ~20 g"}, {"id": "2026-10-25-colacion-1", "date": "2026-10-25", "meal": "colación", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Plátano", "g": 60, "kcal": 54, "prot": 0.7, "carb": 13.7, "fat": 0.2}], "kcal": 184, "prot": 18.3, "carb": 25.5, "fat": 1.6, "notes": "yogurt según etiqueta; plátano 60 g de pulpa"}, {"id": "2026-10-25-colacion-2", "date": "2026-10-25", "meal": "colación", "items": [{"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Leche semidescremada deslactosada", "g": 200, "kcal": 92, "prot": 6.6, "carb": 9.6, "fat": 3.0}], "kcal": 211, "prot": 30.6, "carb": 12.2, "fat": 4.4, "notes": "proteína según etiqueta; leche 200 ml (~46 kcal/100 ml)"}, {"id": "2026-10-26-desayuno", "date": "2026-10-26", "meal": "desayuno", "items": [{"food": "Huevo entero (3 unidades)", "g": 150, "kcal": 215, "prot": 18.9, "carb": 1.1, "fat": 14.3}, {"food": "Kéfir", "g": 200, "kcal": 110, "prot": 6.8, "carb": 8.6, "fat": 3.2}, {"food": "Papa cocida", "g": 40, "kcal": 35, "prot": 0.8, "carb": 8.0, "fat": 0.1}], "kcal": 360, "prot": 26.5, "carb": 17.7, "fat": 17.6, "notes": "huevos sin aceite; kéfir natural sin azúcar (~55 kcal/100 ml); papa cocida sin aceite"}, {"id": "2026-10-26-almuerzo", "date": "2026-10-26", "meal": "almuerzo", "items": [{"food": "Pollo cocido (pechuga)", "g": 200, "kcal": 330, "prot": 62.0, "carb": 0, "fat": 7.2}, {"food": "Papa cocida", "g": 120, "kcal": 104, "prot": 2.3, "carb": 24.1, "fat": 0.1}, {"food": "Proteína vegana Revitta (1 medida, en agua)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 553, "prot": 88.3, "carb": 26.7, "fat": 8.7, "notes": "pollo supuesto pechuga sin piel cocida (con piel o trutro suma ~100-150 kcal); papa sin aceite"}, {"id": "2026-10-26-cena", "date": "2026-10-26", "meal": "cena", "items": [{"food": "Sándwich de pollo (pan frica ~80 g, pollo ~100 g, algo de mayonesa)", "g": 190, "kcal": 465, "prot": 38.0, "carb": 44.0, "fat": 14.0}, {"food": "Nuggets de pollo (6 unidades)", "g": 120, "kcal": 300, "prot": 16.8, "carb": 18.0, "fat": 18.0}], "kcal": 765, "prot": 54.8, "carb": 62.0, "fat": 32.0, "notes": "estimado sin pesos: sándwich con pollo ~100 g y pan ~80 g; si el pollo era apanado o con más salsa suma ~100-150 kcal y 8-12 g de grasa; nuggets ~20 g c/u"}, {"id": "2026-10-27-desayuno", "date": "2026-10-27", "meal": "desayuno", "items": [{"food": "Huevo entero (2)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Arepa de trigo (aprox.)", "g": 200, "kcal": 540, "prot": 14.0, "carb": 100.0, "fat": 8.0}, {"food": "Kéfir", "g": 200, "kcal": 120, "prot": 6.6, "carb": 8.4, "fat": 6.2}], "kcal": 803, "prot": 33.2, "carb": 109.1, "fat": 23.7, "notes": "arepa de trigo ~200 g estimada (270 kcal/100 g); kéfir de leche entera supuesto; huevos sin aceite"}, {"id": "2026-10-27-almuerzo", "date": "2026-10-27", "meal": "almuerzo", "items": [{"food": "Pollo cocido (pechuga sin piel)", "g": 280, "kcal": 462, "prot": 86.8, "carb": 0, "fat": 10.1}, {"food": "Patacones fritos en aceite de oliva (4 de 40 g)", "g": 160, "kcal": 400, "prot": 2.4, "carb": 61.0, "fat": 17.6}, {"food": "Arroz cocido", "g": 180, "kcal": 234, "prot": 4.9, "carb": 50.4, "fat": 0.5}, {"food": "Palta", "g": 30, "kcal": 48, "prot": 0.6, "carb": 2.6, "fat": 4.4}], "kcal": 1144, "prot": 94.7, "carb": 114.0, "fat": 32.6, "notes": "pollo supuesto pechuga sin piel cocida; patacón frito ~250 kcal/100 g (el aceite absorbido varía ±60 kcal)"}, {"id": "2026-10-28-desayuno", "date": "2026-10-28", "meal": "desayuno", "items": [{"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Plátano (2 en total)", "g": 135, "kcal": 120, "prot": 1.5, "carb": 30.8, "fat": 0.4}], "kcal": 369, "prot": 43.1, "carb": 45.2, "fat": 3.2, "notes": "135 g en total para los 2 plátanos, pesados sin cáscara"}, {"id": "2026-10-28-almuerzo", "date": "2026-10-28", "meal": "almuerzo", "items": [{"food": "Cuarto de pollo (muslo y encuentro, con piel, comestible)", "g": 190, "kcal": 435, "prot": 45.6, "carb": 0, "fat": 26.6}, {"food": "Maduro frito (3 tajadas)", "g": 105, "kcal": 242, "prot": 1.1, "carb": 39.9, "fat": 9.5}, {"food": "Ensalada dulce", "g": 100, "kcal": 80, "prot": 1.0, "carb": 15.0, "fat": 2.0}, {"food": "Arepitas antioqueñas fritas (2)", "g": 90, "kcal": 225, "prot": 3.6, "carb": 31.5, "fat": 9.0}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}], "kcal": 1231, "prot": 92.9, "carb": 100.8, "fat": 49.9, "notes": "estimado sin pesos: cuarto de pollo ~190 g comestibles con piel (sin piel resta ~100 kcal y 10 g de grasa); maduro ~35 g por tajada; ensalada dulce supuesta con fruta y aderezo; arepitas ~45 g c/u, fritas"}, {"id": "2026-10-28-colacion", "date": "2026-10-28", "meal": "colación", "items": [{"food": "Papa cocida (1 mediana)", "g": 150, "kcal": 130, "prot": 2.9, "carb": 30.2, "fat": 0.2}], "kcal": 130, "prot": 2.9, "carb": 30.2, "fat": 0.2, "notes": "papa mediana ~150 g, cocida sin aceite ni sal agregada"}, {"id": "2026-10-29-desayuno", "date": "2026-10-29", "meal": "desayuno", "items": [{"food": "Carne de vacuno magra cruda, en freidora de aire", "g": 170, "kcal": 255, "prot": 35.7, "carb": 0, "fat": 11.9}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Café (2, sin azúcar ni leche)", "g": 400, "kcal": 5, "prot": 0.5, "carb": 0.5, "fat": 0}], "kcal": 379, "prot": 60.2, "carb": 3.1, "fat": 13.3, "notes": "corte supuesto magro (posta/lomo), 170 g crudos sin aceite; si era más grasa (asado, tapapecho) suma ~100-150 kcal; cafés supuestos sin azúcar ni leche"}, {"id": "2026-10-28-cena", "date": "2026-10-28", "meal": "cena", "items": [{"food": "Kéfir", "g": 200, "kcal": 120, "prot": 6.6, "carb": 8.4, "fat": 6.2}], "kcal": 120, "prot": 6.6, "carb": 8.4, "fat": 6.2, "notes": "kéfir de leche entera supuesto, 200 ml"}, {"id": "2026-10-29-almuerzo", "date": "2026-10-29", "meal": "almuerzo", "items": [{"food": "Pollo guisado", "g": 140, "kcal": 245, "prot": 36.4, "carb": 2.8, "fat": 9.8}, {"food": "Arroz cocido", "g": 100, "kcal": 130, "prot": 2.7, "carb": 28.0, "fat": 0.3}, {"food": "Ensalada (verduras)", "g": 100, "kcal": 30, "prot": 1.0, "carb": 6.0, "fat": 0.3}, {"food": "Mayonesa (1 cucharadita)", "g": 5, "kcal": 35, "prot": 0.1, "carb": 0.1, "fat": 3.8}, {"food": "Choclo (2, solo granos ~100 g c/u)", "g": 200, "kcal": 192, "prot": 6.8, "carb": 42.0, "fat": 3.0}, {"food": "Jalea sin azúcar", "g": 150, "kcal": 10, "prot": 2.0, "carb": 0.5, "fat": 0}], "kcal": 642, "prot": 49.0, "carb": 79.4, "fat": 17.2, "notes": "pollo guisado supuesto sin piel con poco aceite; 'un dos choclos' interpretado como 2 choclos medianos; ensalada supuesta de verduras, 100 g"}, {"id": "2026-10-29-cena", "date": "2026-10-29", "meal": "cena", "items": [{"food": "Pollo cocido (pechuga sin piel)", "g": 120, "kcal": 198, "prot": 37.2, "carb": 0, "fat": 4.3}, {"food": "Huevo entero (2)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}], "kcal": 478, "prot": 56.8, "carb": 26.7, "fat": 14.4, "notes": "pollo supuesto sin piel; huevos sin aceite; pan 2 rebanadas según la etiqueta que ya usamos"}, {"id": "2026-10-30-desayuno", "date": "2026-10-30", "meal": "desayuno", "items": [{"food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}, {"food": "Kéfir", "g": 230, "kcal": 138, "prot": 7.6, "carb": 9.7, "fat": 7.1}, {"food": "Huevo entero cocido (3)", "g": 150, "kcal": 215, "prot": 19.0, "carb": 1.0, "fat": 15.0}, {"food": "Café (2 tazas, sin azúcar ni leche)", "g": 400, "kcal": 5, "prot": 0.5, "carb": 0.5, "fat": 0}], "kcal": 495, "prot": 34.1, "carb": 37.2, "fat": 22.7, "notes": "pan supuesto el mismo bajo en grasa y azúcar de la cena anterior; kéfir de leche entera supuesto; cafés sin azúcar ni leche"}, {"id": "2026-10-30-colacion", "date": "2026-10-30", "meal": "colación", "items": [{"food": "Plátano (banana)", "g": 160, "kcal": 142, "prot": 1.8, "carb": 36.5, "fat": 0.5}, {"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}], "kcal": 272, "prot": 19.4, "carb": 48.3, "fat": 1.9, "notes": "plátano 160 g supuesto sin cáscara"}, {"id": "2026-10-30-cena", "date": "2026-10-30", "meal": "cena", "items": [{"food": "Ensalada César (lechuga, crutones, parmesano, aderezo)", "g": 165, "kcal": 312, "prot": 10.3, "carb": 18.0, "fat": 22.9}, {"food": "Pollo a la plancha (pechuga cocida)", "g": 150, "kcal": 248, "prot": 46.5, "carb": 0, "fat": 5.4}, {"food": "Factura argentina de panadería (medialuna)", "g": 55, "kcal": 220, "prot": 4.5, "carb": 26.0, "fat": 11.0}], "kcal": 780, "prot": 61.3, "carb": 44.0, "fat": 39.3, "notes": "estimado sin pesos: ensalada césar ~165 g con ~30 g de aderezo; pollo supuesto a la plancha (si era apanado suma ~150 kcal y 15 g de grasa); factura supuesta una medialuna ~55 g"}, {"id": "2026-10-31-desayuno", "date": "2026-10-31", "meal": "desayuno", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Café (sin azúcar ni leche)", "g": 200, "kcal": 2, "prot": 0.3, "carb": 0.2, "fat": 0}], "kcal": 251, "prot": 41.9, "carb": 14.6, "fat": 2.8, "notes": "café supuesto sin azúcar ni leche"}, {"id": "2026-10-31-almuerzo", "date": "2026-10-31", "meal": "almuerzo", "items": [{"food": "Plateada Dark Kitchen (211 g, según etiqueta)", "g": 211, "kcal": 228, "prot": 34.0, "carb": 0.6, "fat": 9.9}, {"food": "Plátano maduro frito (3 tajadas, ~105 g)", "g": 105, "kcal": 242, "prot": 1.1, "carb": 39.9, "fat": 9.5}, {"food": "Palta", "g": 160, "kcal": 256, "prot": 3.2, "carb": 13.6, "fat": 23.5}, {"food": "Mayonesa (1 cucharadita)", "g": 5, "kcal": 35, "prot": 0.1, "carb": 0.1, "fat": 3.8}], "kcal": 761, "prot": 38.4, "carb": 54.2, "fat": 46.7, "notes": "plateada 211 g pesados, con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"}, {"id": "2026-10-31-cena", "date": "2026-10-31", "meal": "cena", "items": [{"food": "Plateada Dark Kitchen (200 g, según etiqueta)", "g": 200, "kcal": 216, "prot": 32.2, "carb": 0.6, "fat": 9.4}, {"food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}, {"food": "Manjar (1 cucharada)", "g": 20, "kcal": 64, "prot": 1.2, "carb": 11.0, "fat": 1.4}, {"food": "Vino blanco (430 ml)", "g": 430, "kcal": 353, "prot": 0.4, "carb": 11.0, "fat": 0}], "kcal": 770, "prot": 40.8, "carb": 48.6, "fat": 11.4, "notes": "vino blanco seco ~82 kcal/100 ml (~41 g de alcohol, cerca de 285 kcal vienen del alcohol); manjar ~20 g; pan el mismo bajo en grasa y azúcar"}, {"id": "2026-11-01-desayuno", "date": "2026-11-01", "meal": "desayuno", "items": [{"food": "Yogurt griego", "g": 250, "kcal": 162, "prot": 22.0, "carb": 14.8, "fat": 1.8}, {"food": "Huevo entero frito sin aceite (2)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Queso fresco sin lactosa", "g": 65, "kcal": 156, "prot": 11.1, "carb": 1.9, "fat": 11.7}], "kcal": 461, "prot": 45.7, "carb": 17.4, "fat": 23.0, "notes": "queso fresco supuesto ~240 kcal/100 g (17 g prot, 18 g grasa); huevos fritos sin aceite"}, {"id": "2026-11-01-almuerzo", "date": "2026-11-01", "meal": "almuerzo", "items": [{"food": "Ceviche de reineta: pescado (~200 g)", "g": 200, "kcal": 220, "prot": 40.0, "carb": 0, "fat": 6.0}, {"food": "Ceviche: cebolla, pimiento, cilantro y limón (~150 g)", "g": 150, "kcal": 45, "prot": 1.5, "carb": 10.0, "fat": 0.3}, {"food": "Plátano tostado frito (6 rodajas, ~90 g)", "g": 90, "kcal": 225, "prot": 1.2, "carb": 36.0, "fat": 9.0}, {"food": "Sushi Chicken Rolls apanado (10 cortes de ~28 g): pollo, queso crema, palta, salsa agridulce, sésamo", "g": 280, "kcal": 672, "prot": 25.2, "carb": 78.4, "fat": 29.4}], "kcal": 1162, "prot": 67.9, "carb": 124.4, "fat": 44.7, "notes": "ceviche 350 g supuesto ~200 g de pescado y el resto verduras y jugo de limón, sin aceite; plátano tostado tipo tostón frito ~15 g c/u; sushi apanado (frito) estimado ~240 kcal/100 g"}, {"id": "2026-11-01-cena", "date": "2026-11-01", "meal": "cena", "items": [{"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}, {"food": "Plátano", "g": 160, "kcal": 142, "prot": 1.8, "carb": 36.5, "fat": 0.5}, {"food": "Pan de molde (2 rebanadas)", "g": 64, "kcal": 137, "prot": 7.0, "carb": 26.0, "fat": 0.6}, {"food": "Queso (1 lámina)", "g": 25, "kcal": 88, "prot": 6.3, "carb": 0.5, "fat": 7.0}, {"food": "Kéfir", "g": 250, "kcal": 150, "prot": 8.3, "carb": 10.5, "fat": 7.8}], "kcal": 636, "prot": 47.4, "carb": 76.1, "fat": 17.3, "notes": "plátano 160 g supuesto sin cáscara; queso tipo gouda/mantecoso; kéfir de leche entera"}, {"id": "2026-11-02-desayuno", "date": "2026-11-02", "meal": "desayuno", "items": [{"food": "Yogurt griego", "g": 200, "kcal": 130, "prot": 17.6, "carb": 11.8, "fat": 1.4}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 249, "prot": 41.6, "carb": 14.4, "fat": 2.8, "notes": "valores de etiqueta"}, {"id": "2026-11-02-almuerzo", "date": "2026-11-02", "meal": "almuerzo", "items": [{"food": "Chapsui: carne de vacuno salteada", "g": 150, "kcal": 300, "prot": 39.0, "carb": 0, "fat": 15.0}, {"food": "Chapsui: verduras salteadas", "g": 200, "kcal": 70, "prot": 3.0, "carb": 12.0, "fat": 1.0}, {"food": "Chapsui: salsa (soya, maicena) y aceite", "g": 50, "kcal": 160, "prot": 1.0, "carb": 8.0, "fat": 14.0}, {"food": "Plátano", "g": 170, "kcal": 151, "prot": 1.9, "carb": 38.8, "fat": 0.5}], "kcal": 681, "prot": 44.9, "carb": 58.8, "fat": 30.5, "notes": "chapsui supuesto de ~400 g en total (carne ~150 g, verduras y salsa), sin arroz; si fueron 400 g solo de carne suma ~500 kcal y ~65 g de proteína; plátano sin cáscara"}, {"id": "2026-11-02-colacion", "date": "2026-11-02", "meal": "colación", "items": [{"food": "Kéfir", "g": 215, "kcal": 129, "prot": 7.1, "carb": 9.0, "fat": 6.7}, {"food": "Proteína vegana Revitta (3/4 de medida)", "g": 25, "kcal": 89, "prot": 18.0, "carb": 2.0, "fat": 1.1}, {"food": "Plátano (banano)", "g": 140, "kcal": 125, "prot": 1.5, "carb": 32.0, "fat": 0.4}], "kcal": 343, "prot": 26.6, "carb": 43.0, "fat": 8.2, "notes": "kéfir de leche entera supuesto; plátano sin cáscara"}, {"id": "2026-11-02-cena", "date": "2026-11-02", "meal": "cena", "items": [{"food": "Chapsui: carne de vacuno salteada", "g": 90, "kcal": 180, "prot": 23.4, "carb": 0, "fat": 9.0}, {"food": "Chapsui: verduras salteadas", "g": 200, "kcal": 70, "prot": 3.0, "carb": 12.0, "fat": 1.0}, {"food": "Chapsui: salsa (soya, maicena) y aceite", "g": 50, "kcal": 160, "prot": 1.0, "carb": 8.0, "fat": 14.0}], "kcal": 410, "prot": 27.4, "carb": 20.0, "fat": 24.0, "notes": "carne 90 g cocida; verduras ~200 g y salsa con aceite como el almuerzo; sin arroz"}, {"id": "2026-11-03-desayuno", "date": "2026-11-03", "meal": "desayuno", "items": [{"food": "Yogurt griego", "g": 210, "kcal": 136.5, "prot": 18.5, "carb": 12.4, "fat": 1.5}, {"food": "Proteína vegana Revitta (1 medida)", "g": 33, "kcal": 119, "prot": 24.0, "carb": 2.6, "fat": 1.4}], "kcal": 255.5, "prot": 42.5, "carb": 15.0, "fat": 2.9, "notes": "valores de etiqueta; scoop = 1 medida (33 g), supuesto mezclada con agua"}, {"id": "2026-11-03-almuerzo", "date": "2026-11-03", "meal": "almuerzo", "items": [{"food": "Palta", "g": 140, "kcal": 224, "prot": 2.8, "carb": 11.9, "fat": 20.6}, {"food": "Tomate", "g": 30, "kcal": 5.4, "prot": 0.3, "carb": 1.2, "fat": 0.1}, {"food": "Pollo cocido (pechuga sin piel)", "g": 120, "kcal": 198, "prot": 37.2, "carb": 0, "fat": 4.3}, {"food": "Chunchules cocidos en freidora de aire (estimado)", "g": 180, "kcal": 405, "prot": 32.4, "carb": 0, "fat": 30.6}, {"food": "Choclo cocido (granos)", "g": 80, "kcal": 76.8, "prot": 2.7, "carb": 16.8, "fat": 1.2}, {"food": "Papa cocida", "g": 200, "kcal": 174, "prot": 3.8, "carb": 40.2, "fat": 0.2}], "kcal": 1083.2, "prot": 79.2, "carb": 70.1, "fat": 57.0, "notes": "palta ~140 g, tomate ~30 g y papa cocida ~200 g; pollo ~120 g cocido y chunchules ~180 g cocidos, aparte; chunchules en freidora de aire, sin aceite añadido (estimados a ~225 kcal/100 g: varían mucho según la grasa del corte)"}, {"id": "2026-11-03-colacion-gym", "date": "2026-11-03", "meal": "colación", "items": [{"food": "Powerade sin azúcar (en el gym)", "g": 500, "kcal": 0, "prot": 0, "carb": 0, "fat": 0}], "kcal": 0, "prot": 0, "carb": 0, "fat": 0, "notes": "supuesto: botella de 500 ml, versión sin azúcar (~0 kcal, solo electrolitos); no cambia los totales del día"}, {"id": "2026-11-03-cena", "date": "2026-11-03", "meal": "cena", "items": [{"food": "Pizza (3 porciones, ~110 g c/u)", "g": 330, "kcal": 810, "prot": 34.5, "carb": 96.0, "fat": 31.5}, {"food": "Alitas de pollo (3 pequeñas, parte comestible con piel)", "g": 100, "kcal": 250, "prot": 24.0, "carb": 0, "fat": 16.5}, {"food": "Salsa barbacoa de las alitas", "g": 30, "kcal": 40, "prot": 0.3, "carb": 9.5, "fat": 0.1}], "kcal": 1100, "prot": 58.8, "carb": 105.5, "fat": 48.1, "notes": "supuestos (estimados, sin etiqueta): porción de pizza de ~270 kcal (tipo y relleno no indicados; varía de 220 a 330 kcal); alita pequeña ~33 g comestibles; salsa barbacoa ~10 g por alita"}, {"id": "2026-11-04-desayuno", "date": "2026-11-04", "meal": "desayuno", "items": [{"food": "Yogurt griego", "g": 150, "kcal": 98, "prot": 13.2, "carb": 8.9, "fat": 1.1}], "kcal": 98, "prot": 13.2, "carb": 8.9, "fat": 1.1, "notes": "valores de etiqueta"}, {"id": "2026-11-04-almuerzo", "date": "2026-11-04", "meal": "almuerzo", "items": [{"food": "Burrata", "g": 135, "kcal": 365, "prot": 20.3, "carb": 2.7, "fat": 31.1}, {"food": "Raviolis de carne cocidos (sin salsa)", "g": 350, "kcal": 665, "prot": 31.5, "carb": 87.5, "fat": 21.0}, {"food": "Pollo cocido (pechuga sin piel)", "g": 200, "kcal": 330, "prot": 62.0, "carb": 0, "fat": 7.2}], "kcal": 1360, "prot": 113.8, "carb": 90.2, "fat": 59.3, "notes": "burrata ~270 kcal/100 g; raviolis rellenos de carne ~190 kcal/100 g, sin salsa (con salsa suma ~100-250 kcal); pollo supuesto sin piel"}, {"id": "2026-11-05-desayuno", "date": "2026-11-05", "meal": "desayuno", "items": [{"food": "Huevo entero frito sin aceite (2)", "g": 100, "kcal": 143, "prot": 12.6, "carb": 0.7, "fat": 9.5}, {"food": "Arepa de maíz con queso", "g": 150, "kcal": 390, "prot": 10.5, "carb": 54.0, "fat": 15.0}, {"food": "Yogurt griego", "g": 170, "kcal": 111, "prot": 15.0, "carb": 10.0, "fat": 1.2}], "kcal": 644, "prot": 38.1, "carb": 64.7, "fat": 25.7, "notes": "arepa de maíz rellena o mezclada con queso, ~260 kcal/100 g, sin mantequilla; huevos sin aceite"}, {"id": "2026-11-05-almuerzo", "date": "2026-11-05", "meal": "almuerzo", "items": [{"food": "Pollo cocido (pechuga sin piel)", "g": 110, "kcal": 182, "prot": 34.1, "carb": 0, "fat": 4.0}, {"food": "Papa cocida", "g": 180, "kcal": 156, "prot": 3.4, "carb": 36.2, "fat": 0.2}, {"food": "Queso crema", "g": 30, "kcal": 102, "prot": 1.8, "carb": 1.2, "fat": 10.2}, {"food": "Sopa Mixta Martini (3 porciones de 45 g en seco, según etiqueta)", "g": 135, "kcal": 462, "prot": 23.1, "carb": 84.6, "fat": 2.4}], "kcal": 902, "prot": 62.4, "carb": 122.0, "fat": 16.8, "notes": "pollo supuesto sin piel; papa cocida sin aceite; sopa mixta (arvejas, cebada, lentejas, fideos, chuchoca) 3 porciones según etiqueta, supuesta sin mantequilla (con 1 cucharada suma ~100 kcal)"}, {"id": "2026-11-20-desayuno", "date": "2026-11-20", "meal": "desayuno", "items": [{"food": "Pan amasado aliñado con queso (tipo colombiano)", "g": 180, "kcal": 585, "prot": 17, "carb": 88, "fat": 18}], "kcal": 585, "prot": 17, "carb": 88, "fat": 18, "notes": "supuestos: pan de trigo con mantequilla/manteca y algo de queso (~325 kcal/100 g)"}]}
+{
+ "entries": [
+  {
+   "id": "2026-10-18-desayuno",
+   "date": "2026-10-18",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (3 unidades)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 18.9,
+     "carb": 1.1,
+     "fat": 14.3
+    },
+    {
+     "food": "Pan dulce",
+     "g": 75,
+     "kcal": 270,
+     "prot": 5.3,
+     "carb": 41.3,
+     "fat": 9.0
+    },
+    {
+     "food": "Queso crema",
+     "g": 25,
+     "kcal": 86,
+     "prot": 1.5,
+     "carb": 1.0,
+     "fat": 8.5
+    },
+    {
+     "food": "Café de grano filtrado",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 100,
+     "kcal": 65,
+     "prot": 8.8,
+     "carb": 4.0,
+     "fat": 1.5
+    }
+   ],
+   "kcal": 638,
+   "prot": 34.8,
+   "carb": 47.4,
+   "fat": 33.3,
+   "notes": "huevos sin aceite añadido (fritos en aceite suman ~45 kcal por cucharadita); pan dulce + queso crema = 100 g en total, supuesto 75 g de pan y 25 g de queso crema normal; café sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-18-almuerzo",
+   "date": "2026-10-18",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Salmón en freidora de aire",
+     "g": 220,
+     "kcal": 458,
+     "prot": 44.9,
+     "carb": 0,
+     "fat": 29.5
+    },
+    {
+     "food": "Aceite de oliva (1 cucharada, salmón)",
+     "g": 13.5,
+     "kcal": 119,
+     "prot": 0,
+     "carb": 0,
+     "fat": 13.5
+    },
+    {
+     "food": "Palta",
+     "g": 180,
+     "kcal": 288,
+     "prot": 3.6,
+     "carb": 15.3,
+     "fat": 26.5
+    },
+    {
+     "food": "Tomate",
+     "g": 80,
+     "kcal": 14,
+     "prot": 0.7,
+     "carb": 3.1,
+     "fat": 0.2
+    },
+    {
+     "food": "Patacones fritos en aceite de oliva (4)",
+     "g": 72,
+     "kcal": 222,
+     "prot": 1.1,
+     "carb": 35.3,
+     "fat": 8.5
+    },
+    {
+     "food": "Yuca cocida",
+     "g": 60,
+     "kcal": 67,
+     "prot": 0.8,
+     "carb": 16.0,
+     "fat": 0.2
+    },
+    {
+     "food": "Ceviche de reineta (copa)",
+     "g": 120,
+     "kcal": 105,
+     "prot": 17.5,
+     "carb": 3.5,
+     "fat": 2.3
+    }
+   ],
+   "kcal": 1273,
+   "prot": 68.6,
+   "carb": 73.2,
+   "fat": 80.7,
+   "notes": "salmón 220 g en crudo (si era el peso ya cocido, suma ~90 kcal y ~9 g de proteína); palta 180 g más ~80 g de tomate; patacones con el aceite que absorben al freír; yuca cocida (no frita); ceviche ≈ 90 g de reineta + cebolla y limón"
+  },
+  {
+   "id": "2026-10-18-cena",
+   "date": "2026-10-18",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 67,
+     "kcal": 60,
+     "prot": 0.7,
+     "carb": 15.3,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 190,
+   "prot": 18.3,
+   "carb": 27.1,
+   "fat": 1.6,
+   "notes": "plátano 67 g de pulpa (sin cáscara)"
+  },
+  {
+   "id": "2026-10-19-desayuno",
+   "date": "2026-10-19",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (4 unidades)",
+     "g": 200,
+     "kcal": 286,
+     "prot": 25.2,
+     "carb": 1.4,
+     "fat": 19.0
+    },
+    {
+     "food": "Pan (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 553,
+   "prot": 49.8,
+   "carb": 39.2,
+   "fat": 21.0,
+   "notes": "huevos ~50 g c/u, sin aceite; pan y yogurt según etiqueta"
+  },
+  {
+   "id": "2026-10-19-almuerzo",
+   "date": "2026-10-19",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Salmón cocido",
+     "g": 139,
+     "kcal": 286,
+     "prot": 30.7,
+     "carb": 0,
+     "fat": 17.2
+    },
+    {
+     "food": "Arroz blanco cocido",
+     "g": 120,
+     "kcal": 156,
+     "prot": 3.2,
+     "carb": 33.8,
+     "fat": 0.4
+    },
+    {
+     "food": "Palta",
+     "g": 90,
+     "kcal": 144,
+     "prot": 1.8,
+     "carb": 7.7,
+     "fat": 13.2
+    },
+    {
+     "food": "Tomate",
+     "g": 180,
+     "kcal": 32,
+     "prot": 1.6,
+     "carb": 7.0,
+     "fat": 0.4
+    },
+    {
+     "food": "Plátano maduro barraganete cocido",
+     "g": 90,
+     "kcal": 104,
+     "prot": 0.7,
+     "carb": 28.1,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 722,
+   "prot": 38.0,
+   "carb": 76.6,
+   "fat": 31.4,
+   "notes": "salmón 139 g pesado ya cocido, sin aceite; maduro cocido (no frito); palta en pulpa"
+  },
+  {
+   "id": "2026-10-19-colacion-1",
+   "date": "2026-10-19",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 119,
+   "prot": 24.0,
+   "carb": 2.6,
+   "fat": 1.4,
+   "notes": "según etiqueta; en agua (si fue con leche u otra bebida, avisar)"
+  },
+  {
+   "id": "2026-10-19-cena",
+   "date": "2026-10-19",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo al jugo (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Arroz blanco cocido",
+     "g": 80,
+     "kcal": 104,
+     "prot": 2.2,
+     "carb": 22.6,
+     "fat": 0.2
+    },
+    {
+     "food": "Huevo duro",
+     "g": 50,
+     "kcal": 78,
+     "prot": 6.3,
+     "carb": 0.6,
+     "fat": 5.3
+    },
+    {
+     "food": "Agua con limón (1 vaso)",
+     "g": 250,
+     "kcal": 3,
+     "prot": 0,
+     "carb": 1.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 383,
+   "prot": 45.7,
+   "carb": 24.2,
+   "fat": 9.8,
+   "notes": "pollo 120 g cocido, pechuga sin piel (si era trutro o con piel, suma ~60–90 kcal de grasa); limón ~15 ml sin azúcar"
+  },
+  {
+   "id": "2026-10-19-colacion-2",
+   "date": "2026-10-19",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano",
+     "g": 66,
+     "kcal": 59,
+     "prot": 0.7,
+     "carb": 15.1,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 59,
+   "prot": 0.7,
+   "carb": 15.1,
+   "fat": 0.2,
+   "notes": "plátano 66 g de pulpa (sin cáscara)"
+  },
+  {
+   "id": "2026-10-20-desayuno",
+   "date": "2026-10-20",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Queso fresco",
+     "g": 30,
+     "kcal": 63,
+     "prot": 4.8,
+     "carb": 0.9,
+     "fat": 4.5
+    },
+    {
+     "food": "Plátano",
+     "g": 70,
+     "kcal": 62,
+     "prot": 0.8,
+     "carb": 16.0,
+     "fat": 0.2
+    },
+    {
+     "food": "Café de grano filtrado con endulzante",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 400,
+   "prot": 36.1,
+   "carb": 29.4,
+   "fat": 15.6,
+   "notes": "huevos sin aceite; queso fresco tipo chileno (~210 kcal/100 g); plátano 70 g de pulpa; endulzante sin calorías"
+  },
+  {
+   "id": "2026-10-20-colacion-1",
+   "date": "2026-10-20",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Monster Ultra Paradise sin azúcar (1 lata)",
+     "g": 473,
+     "kcal": 10,
+     "prot": 0,
+     "carb": 3.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 10,
+   "prot": 0,
+   "carb": 3.0,
+   "fat": 0,
+   "notes": "según etiqueta; 150 mg de cafeína"
+  },
+  {
+   "id": "2026-10-20-colacion-2",
+   "date": "2026-10-20",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 119,
+   "prot": 24.0,
+   "carb": 2.6,
+   "fat": 1.4,
+   "notes": "según etiqueta; diluida en agua"
+  },
+  {
+   "id": "2026-10-20-almuerzo",
+   "date": "2026-10-20",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Lentejas cocidas",
+     "g": 230,
+     "kcal": 267,
+     "prot": 20.7,
+     "carb": 46.2,
+     "fat": 0.9
+    },
+    {
+     "food": "Pernil de pollo cocido (con piel y hueso; ~70 % comestible)",
+     "g": 133,
+     "kcal": 213,
+     "prot": 22.3,
+     "carb": 0,
+     "fat": 13.0
+    }
+   ],
+   "kcal": 480,
+   "prot": 43.0,
+   "carb": 46.2,
+   "fat": 13.9,
+   "notes": "pernil 133 g con piel y hueso: se estimó ~93 g comestibles (carne + piel); lentejas cocidas sin aceite ni tocino"
+  },
+  {
+   "id": "2026-10-20-colacion-3",
+   "date": "2026-10-20",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 150,
+     "kcal": 98,
+     "prot": 13.2,
+     "carb": 8.9,
+     "fat": 1.1
+    }
+   ],
+   "kcal": 98,
+   "prot": 13.2,
+   "carb": 8.9,
+   "fat": 1.1,
+   "notes": "según etiqueta (65 kcal/100 g)"
+  },
+  {
+   "id": "2026-10-20-cena",
+   "date": "2026-10-20",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pandebono colombiano con queso (3)",
+     "g": 210,
+     "kcal": 649,
+     "prot": 22.7,
+     "carb": 75.6,
+     "fat": 28.4
+    }
+   ],
+   "kcal": 649,
+   "prot": 22.7,
+   "carb": 75.6,
+   "fat": 28.4,
+   "notes": "3 pandebonos de ~70 g c/u con bastante queso (supuesto: ~310 kcal/100 g)"
+  },
+  {
+   "id": "2026-10-21-desayuno",
+   "date": "2026-10-21",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (3 unidades)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 18.9,
+     "carb": 1.1,
+     "fat": 14.3
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Pan de molde zero (1 rodaja)",
+     "g": 30,
+     "kcal": 70,
+     "prot": 4.0,
+     "carb": 8.0,
+     "fat": 1.5
+    },
+    {
+     "food": "Queso crema",
+     "g": 15,
+     "kcal": 50,
+     "prot": 0.9,
+     "carb": 0.6,
+     "fat": 5.0
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Café de grano filtrado",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 586,
+   "prot": 65.7,
+   "carb": 24.1,
+   "fat": 23.6,
+   "notes": "huevos sin aceite; pan zero supuesto 30 g (~70 kcal) y queso crema 1 cucharada (15 g): pendiente confirmar con etiqueta; proteína diluida en agua; café sin azúcar"
+  },
+  {
+   "id": "2026-10-21-almuerzo",
+   "date": "2026-10-21",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Carne molida cocida",
+     "g": 130,
+     "kcal": 306,
+     "prot": 33.8,
+     "carb": 0,
+     "fat": 17.6
+    },
+    {
+     "food": "Pasta cocida",
+     "g": 180,
+     "kcal": 284,
+     "prot": 10.4,
+     "carb": 55.6,
+     "fat": 1.6
+    },
+    {
+     "food": "Plátano (3 unidades, postre)",
+     "g": 201,
+     "kcal": 180,
+     "prot": 2.1,
+     "carb": 45.9,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 770,
+   "prot": 46.3,
+   "carb": 101.5,
+   "fat": 19.8,
+   "notes": "carne molida 130 g ya cocida (~12 % grasa) y pasta 180 g cocida, sin aceite ni salsa; plátanos 67 g de pulpa c/u"
+  },
+  {
+   "id": "2026-10-21-cena",
+   "date": "2026-10-21",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Hamburguesa de carne cocida",
+     "g": 140,
+     "kcal": 350,
+     "prot": 36.3,
+     "carb": 0,
+     "fat": 21.0
+    },
+    {
+     "food": "Lentejas cocidas",
+     "g": 120,
+     "kcal": 139,
+     "prot": 10.8,
+     "carb": 24.1,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 489,
+   "prot": 47.1,
+   "carb": 24.1,
+   "fat": 21.5,
+   "notes": "hamburguesa 140 g ya cocida (~15 % grasa), sin pan ni aceite extra; lentejas cocidas sin aceite ni tocino"
+  },
+  {
+   "id": "2026-10-22-desayuno",
+   "date": "2026-10-22",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo duro (2 unidades)",
+     "g": 100,
+     "kcal": 155,
+     "prot": 12.6,
+     "carb": 1.1,
+     "fat": 10.6
+    },
+    {
+     "food": "Pan de molde zero (1 rodaja)",
+     "g": 30,
+     "kcal": 70,
+     "prot": 4.0,
+     "carb": 8.0,
+     "fat": 1.5
+    },
+    {
+     "food": "Queso crema",
+     "g": 15,
+     "kcal": 50,
+     "prot": 0.9,
+     "carb": 0.6,
+     "fat": 5.0
+    },
+    {
+     "food": "Proteína vegana Revitta (2 medidas)",
+     "g": 66,
+     "kcal": 238,
+     "prot": 48.0,
+     "carb": 5.2,
+     "fat": 2.8
+    },
+    {
+     "food": "Café",
+     "g": 250,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 515,
+   "prot": 65.8,
+   "carb": 14.9,
+   "fat": 19.9,
+   "notes": "pan zero 30 g y queso crema 15 g supuestos; proteína en agua; café sin azúcar"
+  },
+  {
+   "id": "2026-10-22-almuerzo",
+   "date": "2026-10-22",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Papa cocida",
+     "g": 200,
+     "kcal": 174,
+     "prot": 3.8,
+     "carb": 40.2,
+     "fat": 0.2
+    },
+    {
+     "food": "Mayonesa (~1 cucharada)",
+     "g": 20,
+     "kcal": 136,
+     "prot": 0.3,
+     "carb": 0.6,
+     "fat": 14.8
+    },
+    {
+     "food": "Carne de vacuno magra, en freidora de aire",
+     "g": 180,
+     "kcal": 342,
+     "prot": 52.2,
+     "carb": 0,
+     "fat": 13.5
+    },
+    {
+     "food": "Huevo frito",
+     "g": 50,
+     "kcal": 72,
+     "prot": 6.3,
+     "carb": 0.4,
+     "fat": 4.8
+    },
+    {
+     "food": "Aceite de oliva (½ cucharadita)",
+     "g": 2.5,
+     "kcal": 20,
+     "prot": 0,
+     "carb": 0,
+     "fat": 2.3
+    },
+    {
+     "food": "Cerveza Sol",
+     "g": 450,
+     "kcal": 180,
+     "prot": 1.8,
+     "carb": 14.4,
+     "fat": 0
+    }
+   ],
+   "kcal": 924,
+   "prot": 64.4,
+   "carb": 55.6,
+   "fat": 35.6,
+   "notes": "papa y carne cocidas; mayonesa supuesta 20 g (1 cucharada); carne sin aceite; cerveza 450 ml (~4,5 % alcohol, ~16 g de alcohol que aportan ~112 kcal)"
+  },
+  {
+   "id": "2026-10-22-cena",
+   "date": "2026-10-22",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo asado (cuarto, con piel; parte comestible)",
+     "g": 200,
+     "kcal": 458,
+     "prot": 48.0,
+     "carb": 0,
+     "fat": 28.0
+    },
+    {
+     "food": "Yuca cocida",
+     "g": 200,
+     "kcal": 223,
+     "prot": 2.7,
+     "carb": 53.4,
+     "fat": 0.6
+    },
+    {
+     "food": "Vino tinto (1 copa)",
+     "g": 150,
+     "kcal": 127,
+     "prot": 0.1,
+     "carb": 3.9,
+     "fat": 0
+    }
+   ],
+   "kcal": 808,
+   "prot": 50.8,
+   "carb": 57.3,
+   "fat": 28.6,
+   "notes": "cuarto de pollo asado con piel y hueso: se estimaron ~200 g comestibles; yuca cocida (no frita); copa de vino de ~150 ml (~17 g de alcohol, ~120 kcal)"
+  },
+  {
+   "id": "2026-10-22-colacion-1",
+   "date": "2026-10-22",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (½ medida)",
+     "g": 16.5,
+     "kcal": 60,
+     "prot": 12.0,
+     "carb": 1.3,
+     "fat": 0.7
+    }
+   ],
+   "kcal": 190,
+   "prot": 29.6,
+   "carb": 13.1,
+   "fat": 2.1,
+   "notes": "según etiqueta"
+  },
+  {
+   "id": "2026-10-23-desayuno",
+   "date": "2026-10-23",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Pollo cocido (pechuga)",
+     "g": 100,
+     "kcal": 165,
+     "prot": 31.0,
+     "carb": 0,
+     "fat": 3.6
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano (3 unidades)",
+     "g": 201,
+     "kcal": 180,
+     "prot": 2.1,
+     "carb": 45.9,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 618,
+   "prot": 63.3,
+   "carb": 58.4,
+   "fat": 15.1,
+   "notes": "huevos sin aceite; pollo 100 g cocido, pechuga sin piel; plátanos 67 g de pulpa c/u"
+  },
+  {
+   "id": "2026-10-23-almuerzo",
+   "date": "2026-10-23",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Arroz blanco cocido",
+     "g": 180,
+     "kcal": 234,
+     "prot": 4.9,
+     "carb": 50.8,
+     "fat": 0.5
+    },
+    {
+     "food": "Palta",
+     "g": 50,
+     "kcal": 80,
+     "prot": 1.0,
+     "carb": 4.3,
+     "fat": 7.3
+    },
+    {
+     "food": "Carne de vacuno magra cocida",
+     "g": 200,
+     "kcal": 380,
+     "prot": 58.0,
+     "carb": 0,
+     "fat": 15.0
+    }
+   ],
+   "kcal": 694,
+   "prot": 63.9,
+   "carb": 55.1,
+   "fat": 22.8,
+   "notes": "carne supuesta magra (posta/lomo), cocida y sin aceite; si era molida o con grasa suma ~60-100 kcal"
+  },
+  {
+   "id": "2026-10-23-cena",
+   "date": "2026-10-23",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pan (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Jamón (1 lámina)",
+     "g": 20,
+     "kcal": 22,
+     "prot": 3.6,
+     "carb": 0.4,
+     "fat": 0.7
+    },
+    {
+     "food": "Queso gouda (1 rebanada)",
+     "g": 20,
+     "kcal": 71,
+     "prot": 5.0,
+     "carb": 0.5,
+     "fat": 5.5
+    },
+    {
+     "food": "Coca-Cola Zero (1 lata)",
+     "g": 350,
+     "kcal": 0,
+     "prot": 0,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 230,
+   "prot": 15.6,
+   "carb": 26.9,
+   "fat": 6.8,
+   "notes": "pan según etiqueta (64 g las 2 rebanadas); jamón de pierna ~20 g y gouda ~20 g supuestos; bebida sin calorías"
+  },
+  {
+   "id": "2026-10-23-colacion-1",
+   "date": "2026-10-23",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yuca cocida",
+     "g": 150,
+     "kcal": 168,
+     "prot": 2.0,
+     "carb": 40.1,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 168,
+   "prot": 2.0,
+   "carb": 40.1,
+   "fat": 0.5,
+   "notes": "yuca cocida (no frita)"
+  },
+  {
+   "id": "2026-10-23-cena-2",
+   "date": "2026-10-23",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 180,
+     "kcal": 117,
+     "prot": 15.8,
+     "carb": 10.6,
+     "fat": 1.3
+    },
+    {
+     "food": "Proteína vegana Revitta (½ medida)",
+     "g": 16.5,
+     "kcal": 60,
+     "prot": 12.0,
+     "carb": 1.3,
+     "fat": 0.7
+    }
+   ],
+   "kcal": 177,
+   "prot": 27.8,
+   "carb": 11.9,
+   "fat": 2.0,
+   "notes": "según etiqueta; proteína en agua"
+  },
+  {
+   "id": "2026-10-24-desayuno",
+   "date": "2026-10-24",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de harina de trigo",
+     "g": 100,
+     "kcal": 240,
+     "prot": 7.0,
+     "carb": 48.0,
+     "fat": 2.5
+    }
+   ],
+   "kcal": 383,
+   "prot": 19.6,
+   "carb": 48.7,
+   "fat": 12.0,
+   "notes": "huevos sin aceite; arepa de harina de trigo ~100 g ya hecha (~240 kcal/100 g), sin mantequilla ni relleno"
+  },
+  {
+   "id": "2026-10-24-almuerzo",
+   "date": "2026-10-24",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Arroz blanco cocido",
+     "g": 200,
+     "kcal": 260,
+     "prot": 5.5,
+     "carb": 56.4,
+     "fat": 0.6
+    },
+    {
+     "food": "Carne de res guisada cocida",
+     "g": 180,
+     "kcal": 378,
+     "prot": 48.6,
+     "carb": 0,
+     "fat": 19.8
+    },
+    {
+     "food": "Papa cocida",
+     "g": 140,
+     "kcal": 122,
+     "prot": 2.7,
+     "carb": 28.1,
+     "fat": 0.1
+    },
+    {
+     "food": "Choclo",
+     "g": 40,
+     "kcal": 38,
+     "prot": 1.3,
+     "carb": 8.4,
+     "fat": 0.5
+    },
+    {
+     "food": "Plátano (postre)",
+     "g": 70,
+     "kcal": 62,
+     "prot": 0.8,
+     "carb": 16.0,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 860,
+   "prot": 58.9,
+   "carb": 108.9,
+   "fat": 21.2,
+   "notes": "carne guisada supuesta de corte medio (~210 kcal/100 g), sin contar aceite ni salsa extra del guiso; papa, choclo y arroz cocidos"
+  },
+  {
+   "id": "2026-10-24-colacion-1",
+   "date": "2026-10-24",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 70,
+     "kcal": 62,
+     "prot": 0.8,
+     "carb": 16.0,
+     "fat": 0.2
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 311,
+   "prot": 42.4,
+   "carb": 30.4,
+   "fat": 3.0,
+   "notes": "según etiqueta; proteína en el yogurt o en agua"
+  },
+  {
+   "id": "2026-10-24-cena",
+   "date": "2026-10-24",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Contramuslo de pollo asado (con piel y hueso; ~75 % comestible)",
+     "g": 188,
+     "kcal": 430,
+     "prot": 45.1,
+     "carb": 0,
+     "fat": 26.3
+    }
+   ],
+   "kcal": 430,
+   "prot": 45.1,
+   "carb": 0,
+   "fat": 26.3,
+   "notes": "250 g de contramuslo asado con piel y hueso: se estimaron ~188 g comestibles; si era sin piel resta ~100 kcal y ~12 g de grasa"
+  },
+  {
+   "id": "2026-10-24-colacion-2",
+   "date": "2026-10-24",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano",
+     "g": 110,
+     "kcal": 98,
+     "prot": 1.2,
+     "carb": 25.1,
+     "fat": 0.3
+    }
+   ],
+   "kcal": 98,
+   "prot": 1.2,
+   "carb": 25.1,
+   "fat": 0.3,
+   "notes": "plátano 110 g de pulpa (sin cáscara)"
+  },
+  {
+   "id": "2026-10-25-desayuno",
+   "date": "2026-10-25",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Contramuslo de pollo (con piel y hueso; ~75 % comestible)",
+     "g": 112,
+     "kcal": 257,
+     "prot": 26.9,
+     "carb": 0,
+     "fat": 15.7
+    }
+   ],
+   "kcal": 400,
+   "prot": 39.5,
+   "carb": 0.7,
+   "fat": 25.2,
+   "notes": "huevos sin aceite; contramuslo 150 g con piel y hueso: ~112 g comestibles (sin piel resta ~60 kcal y ~7 g de grasa)"
+  },
+  {
+   "id": "2026-10-25-almuerzo",
+   "date": "2026-10-25",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Tomate",
+     "g": 150,
+     "kcal": 27,
+     "prot": 1.4,
+     "carb": 5.9,
+     "fat": 0.3
+    },
+    {
+     "food": "Choclo",
+     "g": 40,
+     "kcal": 38,
+     "prot": 1.3,
+     "carb": 8.4,
+     "fat": 0.5
+    },
+    {
+     "food": "Mayonesa (~1 cucharada)",
+     "g": 20,
+     "kcal": 136,
+     "prot": 0.3,
+     "carb": 0.6,
+     "fat": 14.8
+    },
+    {
+     "food": "Brisket de vacuno cocido",
+     "g": 250,
+     "kcal": 675,
+     "prot": 67.5,
+     "carb": 0,
+     "fat": 43.8
+    }
+   ],
+   "kcal": 876,
+   "prot": 70.5,
+   "carb": 14.9,
+   "fat": 59.4,
+   "notes": "brisket 250 g cocido, supuesto con grasa media (~270 kcal/100 g; si era corte magro resta ~150 kcal y ~15 g de grasa); tomate ~150 g; mayonesa ~20 g"
+  },
+  {
+   "id": "2026-10-25-colacion-1",
+   "date": "2026-10-25",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 60,
+     "kcal": 54,
+     "prot": 0.7,
+     "carb": 13.7,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 184,
+   "prot": 18.3,
+   "carb": 25.5,
+   "fat": 1.6,
+   "notes": "yogurt según etiqueta; plátano 60 g de pulpa"
+  },
+  {
+   "id": "2026-10-25-colacion-2",
+   "date": "2026-10-25",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Leche semidescremada deslactosada",
+     "g": 200,
+     "kcal": 92,
+     "prot": 6.6,
+     "carb": 9.6,
+     "fat": 3.0
+    }
+   ],
+   "kcal": 211,
+   "prot": 30.6,
+   "carb": 12.2,
+   "fat": 4.4,
+   "notes": "proteína según etiqueta; leche 200 ml (~46 kcal/100 ml)"
+  },
+  {
+   "id": "2026-10-26-desayuno",
+   "date": "2026-10-26",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (3 unidades)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 18.9,
+     "carb": 1.1,
+     "fat": 14.3
+    },
+    {
+     "food": "Kéfir",
+     "g": 200,
+     "kcal": 110,
+     "prot": 6.8,
+     "carb": 8.6,
+     "fat": 3.2
+    },
+    {
+     "food": "Papa cocida",
+     "g": 40,
+     "kcal": 35,
+     "prot": 0.8,
+     "carb": 8.0,
+     "fat": 0.1
+    }
+   ],
+   "kcal": 360,
+   "prot": 26.5,
+   "carb": 17.7,
+   "fat": 17.6,
+   "notes": "huevos sin aceite; kéfir natural sin azúcar (~55 kcal/100 ml); papa cocida sin aceite"
+  },
+  {
+   "id": "2026-10-26-almuerzo",
+   "date": "2026-10-26",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga)",
+     "g": 200,
+     "kcal": 330,
+     "prot": 62.0,
+     "carb": 0,
+     "fat": 7.2
+    },
+    {
+     "food": "Papa cocida",
+     "g": 120,
+     "kcal": 104,
+     "prot": 2.3,
+     "carb": 24.1,
+     "fat": 0.1
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida, en agua)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 553,
+   "prot": 88.3,
+   "carb": 26.7,
+   "fat": 8.7,
+   "notes": "pollo supuesto pechuga sin piel cocida (con piel o trutro suma ~100-150 kcal); papa sin aceite"
+  },
+  {
+   "id": "2026-10-26-cena",
+   "date": "2026-10-26",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Sándwich de pollo (pan frica ~80 g, pollo ~100 g, algo de mayonesa)",
+     "g": 190,
+     "kcal": 465,
+     "prot": 38.0,
+     "carb": 44.0,
+     "fat": 14.0
+    },
+    {
+     "food": "Nuggets de pollo (6 unidades)",
+     "g": 120,
+     "kcal": 300,
+     "prot": 16.8,
+     "carb": 18.0,
+     "fat": 18.0
+    }
+   ],
+   "kcal": 765,
+   "prot": 54.8,
+   "carb": 62.0,
+   "fat": 32.0,
+   "notes": "estimado sin pesos: sándwich con pollo ~100 g y pan ~80 g; si el pollo era apanado o con más salsa suma ~100-150 kcal y 8-12 g de grasa; nuggets ~20 g c/u"
+  },
+  {
+   "id": "2026-10-27-desayuno",
+   "date": "2026-10-27",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de trigo (aprox.)",
+     "g": 200,
+     "kcal": 540,
+     "prot": 14.0,
+     "carb": 100.0,
+     "fat": 8.0
+    },
+    {
+     "food": "Kéfir",
+     "g": 200,
+     "kcal": 120,
+     "prot": 6.6,
+     "carb": 8.4,
+     "fat": 6.2
+    }
+   ],
+   "kcal": 803,
+   "prot": 33.2,
+   "carb": 109.1,
+   "fat": 23.7,
+   "notes": "arepa de trigo ~200 g estimada (270 kcal/100 g); kéfir de leche entera supuesto; huevos sin aceite"
+  },
+  {
+   "id": "2026-10-27-almuerzo",
+   "date": "2026-10-27",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 280,
+     "kcal": 462,
+     "prot": 86.8,
+     "carb": 0,
+     "fat": 10.1
+    },
+    {
+     "food": "Patacones fritos en aceite de oliva (4 de 40 g)",
+     "g": 160,
+     "kcal": 400,
+     "prot": 2.4,
+     "carb": 61.0,
+     "fat": 17.6
+    },
+    {
+     "food": "Arroz cocido",
+     "g": 180,
+     "kcal": 234,
+     "prot": 4.9,
+     "carb": 50.4,
+     "fat": 0.5
+    },
+    {
+     "food": "Palta",
+     "g": 30,
+     "kcal": 48,
+     "prot": 0.6,
+     "carb": 2.6,
+     "fat": 4.4
+    }
+   ],
+   "kcal": 1144,
+   "prot": 94.7,
+   "carb": 114.0,
+   "fat": 32.6,
+   "notes": "pollo supuesto pechuga sin piel cocida; patacón frito ~250 kcal/100 g (el aceite absorbido varía ±60 kcal)"
+  },
+  {
+   "id": "2026-10-28-desayuno",
+   "date": "2026-10-28",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano (2 en total)",
+     "g": 135,
+     "kcal": 120,
+     "prot": 1.5,
+     "carb": 30.8,
+     "fat": 0.4
+    }
+   ],
+   "kcal": 369,
+   "prot": 43.1,
+   "carb": 45.2,
+   "fat": 3.2,
+   "notes": "135 g en total para los 2 plátanos, pesados sin cáscara"
+  },
+  {
+   "id": "2026-10-28-almuerzo",
+   "date": "2026-10-28",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Cuarto de pollo (muslo y encuentro, con piel, comestible)",
+     "g": 190,
+     "kcal": 435,
+     "prot": 45.6,
+     "carb": 0,
+     "fat": 26.6
+    },
+    {
+     "food": "Maduro frito (3 tajadas)",
+     "g": 105,
+     "kcal": 242,
+     "prot": 1.1,
+     "carb": 39.9,
+     "fat": 9.5
+    },
+    {
+     "food": "Ensalada dulce",
+     "g": 100,
+     "kcal": 80,
+     "prot": 1.0,
+     "carb": 15.0,
+     "fat": 2.0
+    },
+    {
+     "food": "Arepitas antioqueñas fritas (2)",
+     "g": 90,
+     "kcal": 225,
+     "prot": 3.6,
+     "carb": 31.5,
+     "fat": 9.0
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 1231,
+   "prot": 92.9,
+   "carb": 100.8,
+   "fat": 49.9,
+   "notes": "estimado sin pesos: cuarto de pollo ~190 g comestibles con piel (sin piel resta ~100 kcal y 10 g de grasa); maduro ~35 g por tajada; ensalada dulce supuesta con fruta y aderezo; arepitas ~45 g c/u, fritas"
+  },
+  {
+   "id": "2026-10-28-colacion",
+   "date": "2026-10-28",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Papa cocida (1 mediana)",
+     "g": 150,
+     "kcal": 130,
+     "prot": 2.9,
+     "carb": 30.2,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 130,
+   "prot": 2.9,
+   "carb": 30.2,
+   "fat": 0.2,
+   "notes": "papa mediana ~150 g, cocida sin aceite ni sal agregada"
+  },
+  {
+   "id": "2026-10-29-desayuno",
+   "date": "2026-10-29",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Carne de vacuno magra cruda, en freidora de aire",
+     "g": 170,
+     "kcal": 255,
+     "prot": 35.7,
+     "carb": 0,
+     "fat": 11.9
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Café (2, sin azúcar ni leche)",
+     "g": 400,
+     "kcal": 5,
+     "prot": 0.5,
+     "carb": 0.5,
+     "fat": 0
+    }
+   ],
+   "kcal": 379,
+   "prot": 60.2,
+   "carb": 3.1,
+   "fat": 13.3,
+   "notes": "corte supuesto magro (posta/lomo), 170 g crudos sin aceite; si era más grasa (asado, tapapecho) suma ~100-150 kcal; cafés supuestos sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-28-cena",
+   "date": "2026-10-28",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Kéfir",
+     "g": 200,
+     "kcal": 120,
+     "prot": 6.6,
+     "carb": 8.4,
+     "fat": 6.2
+    }
+   ],
+   "kcal": 120,
+   "prot": 6.6,
+   "carb": 8.4,
+   "fat": 6.2,
+   "notes": "kéfir de leche entera supuesto, 200 ml"
+  },
+  {
+   "id": "2026-10-29-almuerzo",
+   "date": "2026-10-29",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo guisado",
+     "g": 140,
+     "kcal": 245,
+     "prot": 36.4,
+     "carb": 2.8,
+     "fat": 9.8
+    },
+    {
+     "food": "Arroz cocido",
+     "g": 100,
+     "kcal": 130,
+     "prot": 2.7,
+     "carb": 28.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Ensalada (verduras)",
+     "g": 100,
+     "kcal": 30,
+     "prot": 1.0,
+     "carb": 6.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Mayonesa (1 cucharadita)",
+     "g": 5,
+     "kcal": 35,
+     "prot": 0.1,
+     "carb": 0.1,
+     "fat": 3.8
+    },
+    {
+     "food": "Choclo (2, solo granos ~100 g c/u)",
+     "g": 200,
+     "kcal": 192,
+     "prot": 6.8,
+     "carb": 42.0,
+     "fat": 3.0
+    },
+    {
+     "food": "Jalea sin azúcar",
+     "g": 150,
+     "kcal": 10,
+     "prot": 2.0,
+     "carb": 0.5,
+     "fat": 0
+    }
+   ],
+   "kcal": 642,
+   "prot": 49.0,
+   "carb": 79.4,
+   "fat": 17.2,
+   "notes": "pollo guisado supuesto sin piel con poco aceite; 'un dos choclos' interpretado como 2 choclos medianos; ensalada supuesta de verduras, 100 g"
+  },
+  {
+   "id": "2026-10-29-cena",
+   "date": "2026-10-29",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Huevo entero (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    }
+   ],
+   "kcal": 478,
+   "prot": 56.8,
+   "carb": 26.7,
+   "fat": 14.4,
+   "notes": "pollo supuesto sin piel; huevos sin aceite; pan 2 rebanadas según la etiqueta que ya usamos"
+  },
+  {
+   "id": "2026-10-30-desayuno",
+   "date": "2026-10-30",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Kéfir",
+     "g": 230,
+     "kcal": 138,
+     "prot": 7.6,
+     "carb": 9.7,
+     "fat": 7.1
+    },
+    {
+     "food": "Huevo entero cocido (3)",
+     "g": 150,
+     "kcal": 215,
+     "prot": 19.0,
+     "carb": 1.0,
+     "fat": 15.0
+    },
+    {
+     "food": "Café (2 tazas, sin azúcar ni leche)",
+     "g": 400,
+     "kcal": 5,
+     "prot": 0.5,
+     "carb": 0.5,
+     "fat": 0
+    }
+   ],
+   "kcal": 495,
+   "prot": 34.1,
+   "carb": 37.2,
+   "fat": 22.7,
+   "notes": "pan supuesto el mismo bajo en grasa y azúcar de la cena anterior; kéfir de leche entera supuesto; cafés sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-30-colacion",
+   "date": "2026-10-30",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Plátano (banana)",
+     "g": 160,
+     "kcal": 142,
+     "prot": 1.8,
+     "carb": 36.5,
+     "fat": 0.5
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 272,
+   "prot": 19.4,
+   "carb": 48.3,
+   "fat": 1.9,
+   "notes": "plátano 160 g supuesto sin cáscara"
+  },
+  {
+   "id": "2026-10-30-cena",
+   "date": "2026-10-30",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Ensalada César (lechuga, crutones, parmesano, aderezo)",
+     "g": 165,
+     "kcal": 312,
+     "prot": 10.3,
+     "carb": 18.0,
+     "fat": 22.9
+    },
+    {
+     "food": "Pollo a la plancha (pechuga cocida)",
+     "g": 150,
+     "kcal": 248,
+     "prot": 46.5,
+     "carb": 0,
+     "fat": 5.4
+    },
+    {
+     "food": "Factura argentina de panadería (medialuna)",
+     "g": 55,
+     "kcal": 220,
+     "prot": 4.5,
+     "carb": 26.0,
+     "fat": 11.0
+    }
+   ],
+   "kcal": 780,
+   "prot": 61.3,
+   "carb": 44.0,
+   "fat": 39.3,
+   "notes": "estimado sin pesos: ensalada césar ~165 g con ~30 g de aderezo; pollo supuesto a la plancha (si era apanado suma ~150 kcal y 15 g de grasa); factura supuesta una medialuna ~55 g"
+  },
+  {
+   "id": "2026-10-31-desayuno",
+   "date": "2026-10-31",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Café (sin azúcar ni leche)",
+     "g": 200,
+     "kcal": 2,
+     "prot": 0.3,
+     "carb": 0.2,
+     "fat": 0
+    }
+   ],
+   "kcal": 251,
+   "prot": 41.9,
+   "carb": 14.6,
+   "fat": 2.8,
+   "notes": "café supuesto sin azúcar ni leche"
+  },
+  {
+   "id": "2026-10-31-almuerzo",
+   "date": "2026-10-31",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Plateada Dark Kitchen (211 g, según etiqueta)",
+     "g": 211,
+     "kcal": 228,
+     "prot": 34.0,
+     "carb": 0.6,
+     "fat": 9.9
+    },
+    {
+     "food": "Plátano maduro frito (3 tajadas, ~105 g)",
+     "g": 105,
+     "kcal": 242,
+     "prot": 1.1,
+     "carb": 39.9,
+     "fat": 9.5
+    },
+    {
+     "food": "Palta",
+     "g": 160,
+     "kcal": 256,
+     "prot": 3.2,
+     "carb": 13.6,
+     "fat": 23.5
+    },
+    {
+     "food": "Mayonesa (1 cucharadita)",
+     "g": 5,
+     "kcal": 35,
+     "prot": 0.1,
+     "carb": 0.1,
+     "fat": 3.8
+    }
+   ],
+   "kcal": 761,
+   "prot": 38.4,
+   "carb": 54.2,
+   "fat": 46.7,
+   "notes": "plateada 211 g pesados, con valores de la etiqueta (108 kcal, 16,1 g prot, 4,7 g grasa por 100 g); 160 g interpretados como la palta; maduro frito sin peso, supuesto 3 tajadas ~105 g"
+  },
+  {
+   "id": "2026-10-31-cena",
+   "date": "2026-10-31",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Plateada Dark Kitchen (200 g, según etiqueta)",
+     "g": 200,
+     "kcal": 216,
+     "prot": 32.2,
+     "carb": 0.6,
+     "fat": 9.4
+    },
+    {
+     "food": "Pan de molde Líder bajo en grasa y azúcar (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Manjar (1 cucharada)",
+     "g": 20,
+     "kcal": 64,
+     "prot": 1.2,
+     "carb": 11.0,
+     "fat": 1.4
+    },
+    {
+     "food": "Vino blanco (430 ml)",
+     "g": 430,
+     "kcal": 353,
+     "prot": 0.4,
+     "carb": 11.0,
+     "fat": 0
+    }
+   ],
+   "kcal": 770,
+   "prot": 40.8,
+   "carb": 48.6,
+   "fat": 11.4,
+   "notes": "vino blanco seco ~82 kcal/100 ml (~41 g de alcohol, cerca de 285 kcal vienen del alcohol); manjar ~20 g; pan el mismo bajo en grasa y azúcar"
+  },
+  {
+   "id": "2026-11-01-desayuno",
+   "date": "2026-11-01",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 250,
+     "kcal": 162,
+     "prot": 22.0,
+     "carb": 14.8,
+     "fat": 1.8
+    },
+    {
+     "food": "Huevo entero frito sin aceite (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Queso fresco sin lactosa",
+     "g": 65,
+     "kcal": 156,
+     "prot": 11.1,
+     "carb": 1.9,
+     "fat": 11.7
+    }
+   ],
+   "kcal": 461,
+   "prot": 45.7,
+   "carb": 17.4,
+   "fat": 23.0,
+   "notes": "queso fresco supuesto ~240 kcal/100 g (17 g prot, 18 g grasa); huevos fritos sin aceite"
+  },
+  {
+   "id": "2026-11-01-almuerzo",
+   "date": "2026-11-01",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Ceviche de reineta: pescado (~200 g)",
+     "g": 200,
+     "kcal": 220,
+     "prot": 40.0,
+     "carb": 0,
+     "fat": 6.0
+    },
+    {
+     "food": "Ceviche: cebolla, pimiento, cilantro y limón (~150 g)",
+     "g": 150,
+     "kcal": 45,
+     "prot": 1.5,
+     "carb": 10.0,
+     "fat": 0.3
+    },
+    {
+     "food": "Plátano tostado frito (6 rodajas, ~90 g)",
+     "g": 90,
+     "kcal": 225,
+     "prot": 1.2,
+     "carb": 36.0,
+     "fat": 9.0
+    },
+    {
+     "food": "Sushi Chicken Rolls apanado (10 cortes de ~28 g): pollo, queso crema, palta, salsa agridulce, sésamo",
+     "g": 280,
+     "kcal": 672,
+     "prot": 25.2,
+     "carb": 78.4,
+     "fat": 29.4
+    }
+   ],
+   "kcal": 1162,
+   "prot": 67.9,
+   "carb": 124.4,
+   "fat": 44.7,
+   "notes": "ceviche 350 g supuesto ~200 g de pescado y el resto verduras y jugo de limón, sin aceite; plátano tostado tipo tostón frito ~15 g c/u; sushi apanado (frito) estimado ~240 kcal/100 g"
+  },
+  {
+   "id": "2026-11-01-cena",
+   "date": "2026-11-01",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    },
+    {
+     "food": "Plátano",
+     "g": 160,
+     "kcal": 142,
+     "prot": 1.8,
+     "carb": 36.5,
+     "fat": 0.5
+    },
+    {
+     "food": "Pan de molde (2 rebanadas)",
+     "g": 64,
+     "kcal": 137,
+     "prot": 7.0,
+     "carb": 26.0,
+     "fat": 0.6
+    },
+    {
+     "food": "Queso (1 lámina)",
+     "g": 25,
+     "kcal": 88,
+     "prot": 6.3,
+     "carb": 0.5,
+     "fat": 7.0
+    },
+    {
+     "food": "Kéfir",
+     "g": 250,
+     "kcal": 150,
+     "prot": 8.3,
+     "carb": 10.5,
+     "fat": 7.8
+    }
+   ],
+   "kcal": 636,
+   "prot": 47.4,
+   "carb": 76.1,
+   "fat": 17.3,
+   "notes": "plátano 160 g supuesto sin cáscara; queso tipo gouda/mantecoso; kéfir de leche entera"
+  },
+  {
+   "id": "2026-11-02-desayuno",
+   "date": "2026-11-02",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 200,
+     "kcal": 130,
+     "prot": 17.6,
+     "carb": 11.8,
+     "fat": 1.4
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 249,
+   "prot": 41.6,
+   "carb": 14.4,
+   "fat": 2.8,
+   "notes": "valores de etiqueta"
+  },
+  {
+   "id": "2026-11-02-almuerzo",
+   "date": "2026-11-02",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Chapsui: carne de vacuno salteada",
+     "g": 150,
+     "kcal": 300,
+     "prot": 39.0,
+     "carb": 0,
+     "fat": 15.0
+    },
+    {
+     "food": "Chapsui: verduras salteadas",
+     "g": 200,
+     "kcal": 70,
+     "prot": 3.0,
+     "carb": 12.0,
+     "fat": 1.0
+    },
+    {
+     "food": "Chapsui: salsa (soya, maicena) y aceite",
+     "g": 50,
+     "kcal": 160,
+     "prot": 1.0,
+     "carb": 8.0,
+     "fat": 14.0
+    },
+    {
+     "food": "Plátano",
+     "g": 170,
+     "kcal": 151,
+     "prot": 1.9,
+     "carb": 38.8,
+     "fat": 0.5
+    }
+   ],
+   "kcal": 681,
+   "prot": 44.9,
+   "carb": 58.8,
+   "fat": 30.5,
+   "notes": "chapsui supuesto de ~400 g en total (carne ~150 g, verduras y salsa), sin arroz; si fueron 400 g solo de carne suma ~500 kcal y ~65 g de proteína; plátano sin cáscara"
+  },
+  {
+   "id": "2026-11-02-colacion",
+   "date": "2026-11-02",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Kéfir",
+     "g": 215,
+     "kcal": 129,
+     "prot": 7.1,
+     "carb": 9.0,
+     "fat": 6.7
+    },
+    {
+     "food": "Proteína vegana Revitta (3/4 de medida)",
+     "g": 25,
+     "kcal": 89,
+     "prot": 18.0,
+     "carb": 2.0,
+     "fat": 1.1
+    },
+    {
+     "food": "Plátano (banano)",
+     "g": 140,
+     "kcal": 125,
+     "prot": 1.5,
+     "carb": 32.0,
+     "fat": 0.4
+    }
+   ],
+   "kcal": 343,
+   "prot": 26.6,
+   "carb": 43.0,
+   "fat": 8.2,
+   "notes": "kéfir de leche entera supuesto; plátano sin cáscara"
+  },
+  {
+   "id": "2026-11-02-cena",
+   "date": "2026-11-02",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Chapsui: carne de vacuno salteada",
+     "g": 90,
+     "kcal": 180,
+     "prot": 23.4,
+     "carb": 0,
+     "fat": 9.0
+    },
+    {
+     "food": "Chapsui: verduras salteadas",
+     "g": 200,
+     "kcal": 70,
+     "prot": 3.0,
+     "carb": 12.0,
+     "fat": 1.0
+    },
+    {
+     "food": "Chapsui: salsa (soya, maicena) y aceite",
+     "g": 50,
+     "kcal": 160,
+     "prot": 1.0,
+     "carb": 8.0,
+     "fat": 14.0
+    }
+   ],
+   "kcal": 410,
+   "prot": 27.4,
+   "carb": 20.0,
+   "fat": 24.0,
+   "notes": "carne 90 g cocida; verduras ~200 g y salsa con aceite como el almuerzo; sin arroz"
+  },
+  {
+   "id": "2026-11-03-desayuno",
+   "date": "2026-11-03",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 210,
+     "kcal": 136.5,
+     "prot": 18.5,
+     "carb": 12.4,
+     "fat": 1.5
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 255.5,
+   "prot": 42.5,
+   "carb": 15.0,
+   "fat": 2.9,
+   "notes": "valores de etiqueta; scoop = 1 medida (33 g), supuesto mezclada con agua"
+  },
+  {
+   "id": "2026-11-03-almuerzo",
+   "date": "2026-11-03",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Palta",
+     "g": 140,
+     "kcal": 224,
+     "prot": 2.8,
+     "carb": 11.9,
+     "fat": 20.6
+    },
+    {
+     "food": "Tomate",
+     "g": 30,
+     "kcal": 5.4,
+     "prot": 0.3,
+     "carb": 1.2,
+     "fat": 0.1
+    },
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 120,
+     "kcal": 198,
+     "prot": 37.2,
+     "carb": 0,
+     "fat": 4.3
+    },
+    {
+     "food": "Chunchules cocidos en freidora de aire (estimado)",
+     "g": 180,
+     "kcal": 405,
+     "prot": 32.4,
+     "carb": 0,
+     "fat": 30.6
+    },
+    {
+     "food": "Choclo cocido (granos)",
+     "g": 80,
+     "kcal": 76.8,
+     "prot": 2.7,
+     "carb": 16.8,
+     "fat": 1.2
+    },
+    {
+     "food": "Papa cocida",
+     "g": 200,
+     "kcal": 174,
+     "prot": 3.8,
+     "carb": 40.2,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 1083.2,
+   "prot": 79.2,
+   "carb": 70.1,
+   "fat": 57.0,
+   "notes": "palta ~140 g, tomate ~30 g y papa cocida ~200 g; pollo ~120 g cocido y chunchules ~180 g cocidos, aparte; chunchules en freidora de aire, sin aceite añadido (estimados a ~225 kcal/100 g: varían mucho según la grasa del corte)"
+  },
+  {
+   "id": "2026-11-03-colacion-gym",
+   "date": "2026-11-03",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Powerade sin azúcar (en el gym)",
+     "g": 500,
+     "kcal": 0,
+     "prot": 0,
+     "carb": 0,
+     "fat": 0
+    }
+   ],
+   "kcal": 0,
+   "prot": 0,
+   "carb": 0,
+   "fat": 0,
+   "notes": "supuesto: botella de 500 ml, versión sin azúcar (~0 kcal, solo electrolitos); no cambia los totales del día"
+  },
+  {
+   "id": "2026-11-03-cena",
+   "date": "2026-11-03",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Pizza (3 porciones, ~110 g c/u)",
+     "g": 330,
+     "kcal": 810,
+     "prot": 34.5,
+     "carb": 96.0,
+     "fat": 31.5
+    },
+    {
+     "food": "Alitas de pollo (3 pequeñas, parte comestible con piel)",
+     "g": 100,
+     "kcal": 250,
+     "prot": 24.0,
+     "carb": 0,
+     "fat": 16.5
+    },
+    {
+     "food": "Salsa barbacoa de las alitas",
+     "g": 30,
+     "kcal": 40,
+     "prot": 0.3,
+     "carb": 9.5,
+     "fat": 0.1
+    }
+   ],
+   "kcal": 1100,
+   "prot": 58.8,
+   "carb": 105.5,
+   "fat": 48.1,
+   "notes": "supuestos (estimados, sin etiqueta): porción de pizza de ~270 kcal (tipo y relleno no indicados; varía de 220 a 330 kcal); alita pequeña ~33 g comestibles; salsa barbacoa ~10 g por alita"
+  },
+  {
+   "id": "2026-11-04-desayuno",
+   "date": "2026-11-04",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 150,
+     "kcal": 98,
+     "prot": 13.2,
+     "carb": 8.9,
+     "fat": 1.1
+    }
+   ],
+   "kcal": 98,
+   "prot": 13.2,
+   "carb": 8.9,
+   "fat": 1.1,
+   "notes": "valores de etiqueta"
+  },
+  {
+   "id": "2026-11-04-almuerzo",
+   "date": "2026-11-04",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Burrata",
+     "g": 135,
+     "kcal": 365,
+     "prot": 20.3,
+     "carb": 2.7,
+     "fat": 31.1
+    },
+    {
+     "food": "Raviolis de carne cocidos (sin salsa)",
+     "g": 350,
+     "kcal": 665,
+     "prot": 31.5,
+     "carb": 87.5,
+     "fat": 21.0
+    },
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 200,
+     "kcal": 330,
+     "prot": 62.0,
+     "carb": 0,
+     "fat": 7.2
+    }
+   ],
+   "kcal": 1360,
+   "prot": 113.8,
+   "carb": 90.2,
+   "fat": 59.3,
+   "notes": "burrata ~270 kcal/100 g; raviolis rellenos de carne ~190 kcal/100 g, sin salsa (con salsa suma ~100-250 kcal); pollo supuesto sin piel"
+  },
+  {
+   "id": "2026-11-05-desayuno",
+   "date": "2026-11-05",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Huevo entero frito sin aceite (2)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    },
+    {
+     "food": "Arepa de maíz con queso",
+     "g": 150,
+     "kcal": 390,
+     "prot": 10.5,
+     "carb": 54.0,
+     "fat": 15.0
+    },
+    {
+     "food": "Yogurt griego",
+     "g": 170,
+     "kcal": 111,
+     "prot": 15.0,
+     "carb": 10.0,
+     "fat": 1.2
+    }
+   ],
+   "kcal": 644,
+   "prot": 38.1,
+   "carb": 64.7,
+   "fat": 25.7,
+   "notes": "arepa de maíz rellena o mezclada con queso, ~260 kcal/100 g, sin mantequilla; huevos sin aceite"
+  },
+  {
+   "id": "2026-11-05-almuerzo",
+   "date": "2026-11-05",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pollo cocido (pechuga sin piel)",
+     "g": 110,
+     "kcal": 182,
+     "prot": 34.1,
+     "carb": 0,
+     "fat": 4.0
+    },
+    {
+     "food": "Papa cocida",
+     "g": 180,
+     "kcal": 156,
+     "prot": 3.4,
+     "carb": 36.2,
+     "fat": 0.2
+    },
+    {
+     "food": "Queso crema",
+     "g": 30,
+     "kcal": 102,
+     "prot": 1.8,
+     "carb": 1.2,
+     "fat": 10.2
+    },
+    {
+     "food": "Sopa Mixta Martini (3 porciones de 45 g en seco, según etiqueta)",
+     "g": 135,
+     "kcal": 462,
+     "prot": 23.1,
+     "carb": 84.6,
+     "fat": 2.4
+    }
+   ],
+   "kcal": 902,
+   "prot": 62.4,
+   "carb": 122.0,
+   "fat": 16.8,
+   "notes": "pollo supuesto sin piel; papa cocida sin aceite; sopa mixta (arvejas, cebada, lentejas, fideos, chuchoca) 3 porciones según etiqueta, supuesta sin mantequilla (con 1 cucharada suma ~100 kcal)"
+  },
+  {
+   "id": "2026-11-20-desayuno",
+   "date": "2026-11-20",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Pan amasado aliñado con queso (tipo colombiano)",
+     "g": 180,
+     "kcal": 585,
+     "prot": 17,
+     "carb": 88,
+     "fat": 18
+    }
+   ],
+   "kcal": 585,
+   "prot": 17,
+   "carb": 88,
+   "fat": 18,
+   "notes": "supuestos: pan de trigo con mantequilla/manteca y algo de queso (~325 kcal/100 g)"
+  }
+ ]
+}
