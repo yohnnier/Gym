@@ -4207,13 +4207,6 @@
     "rpe": 10
    },
    {
-    "exerciseId": "remo-lineal",
-    "set": 3,
-    "weight": 20,
-    "reps": 15,
-    "rpe": 10
-   },
-   {
     "exerciseId": "curl-polea",
     "set": 1,
     "weight": 110,
@@ -4226,8 +4219,15 @@
     "weight": 110,
     "reps": 15,
     "rpe": 10
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 3,
+    "weight": 20,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1795207644952
+  "updatedAt": 1795207940605
  }
 ]
