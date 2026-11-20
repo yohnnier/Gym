@@ -4121,5 +4121,36 @@
    }
   ],
   "updatedAt": 1794760462105
+ },
+ {
+  "id": "mwpe73g3msywm",
+  "date": "2026-11-20",
+  "createdAt": 1795204144947,
+  "routineId": "dia-torso-a",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 1,
+    "weight": 40,
+    "reps": 8,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 2,
+    "weight": 40,
+    "reps": 8,
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 3,
+    "weight": 40,
+    "reps": 8,
+    "rpe": 10
+   }
+  ],
+  "updatedAt": 1795204154022
  }
 ]
