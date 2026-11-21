@@ -2703,6 +2703,34 @@
    "carb": 56.9,
    "fat": 45.8,
    "notes": "supuestos: pernil mediano ~200 g con hueso = ~140 g comestible, con piel; guiso con algo de aceite"
+  },
+  {
+   "id": "2026-11-21-colacion-2",
+   "date": "2026-11-21",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Jalea (gelatina con azúcar, 1 porción)",
+     "g": 150,
+     "kcal": 95,
+     "prot": 2,
+     "carb": 22,
+     "fat": 0
+    },
+    {
+     "food": "Pan (1 rebanada)",
+     "g": 32,
+     "kcal": 68.5,
+     "prot": 3.5,
+     "carb": 13,
+     "fat": 0.3
+    }
+   ],
+   "kcal": 163.5,
+   "prot": 5.5,
+   "carb": 35,
+   "fat": 0.3,
+   "notes": "supuestos: jalea normal (no light)"
   }
  ]
 }
