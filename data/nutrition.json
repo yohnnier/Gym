@@ -2543,6 +2543,50 @@
    "carb": 71.8,
    "fat": 90.3,
    "notes": "supuestos: chunchules de vacuno asados ~300 kcal/100 g (18 g prot, 25 g grasa); chimichurri ~1,5 cda con aceite; cuchuflí relleno de manjar ~10 g c/u"
+  },
+  {
+   "id": "2026-11-20-cena",
+   "date": "2026-11-20",
+   "meal": "cena",
+   "items": [
+    {
+     "food": "Jalea (gelatina con azúcar, 1 porción)",
+     "g": 150,
+     "kcal": 95,
+     "prot": 2,
+     "carb": 22,
+     "fat": 0
+    },
+    {
+     "food": "Huevo frito sin aceite (2 claras + 3 yemas)",
+     "g": 117,
+     "kcal": 200,
+     "prot": 15.3,
+     "carb": 1.9,
+     "fat": 13.6
+    },
+    {
+     "food": "Arroz blanco cocido (frío)",
+     "g": 80,
+     "kcal": 104,
+     "prot": 2.2,
+     "carb": 22.6,
+     "fat": 0.2
+    },
+    {
+     "food": "Pan",
+     "g": 25,
+     "kcal": 53.5,
+     "prot": 2.7,
+     "carb": 10.2,
+     "fat": 0.2
+    }
+   ],
+   "kcal": 452.5,
+   "prot": 22.2,
+   "carb": 56.7,
+   "fat": 14.0,
+   "notes": "supuestos: jalea normal (no light); huevo doble = 3 yemas; arroz frío cuenta igual en kcal (algo más de almidón resistente)"
   }
  ]
 }
