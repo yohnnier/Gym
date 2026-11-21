@@ -2587,6 +2587,42 @@
    "carb": 56.7,
    "fat": 14.0,
    "notes": "supuestos: jalea normal (no light); huevo doble = 3 yemas; arroz frío cuenta igual en kcal (algo más de almidón resistente)"
+  },
+  {
+   "id": "2026-11-21-desayuno",
+   "date": "2026-11-21",
+   "meal": "desayuno",
+   "items": [
+    {
+     "food": "Yogurt griego",
+     "g": 120,
+     "kcal": 78,
+     "prot": 10.6,
+     "carb": 7.1,
+     "fat": 0.8
+    },
+    {
+     "food": "Plátano (banano)",
+     "g": 150,
+     "kcal": 134,
+     "prot": 1.6,
+     "carb": 34.3,
+     "fat": 0.5
+    },
+    {
+     "food": "Huevo cocido (2 unidades)",
+     "g": 100,
+     "kcal": 143,
+     "prot": 12.6,
+     "carb": 0.7,
+     "fat": 9.5
+    }
+   ],
+   "kcal": 355,
+   "prot": 24.8,
+   "carb": 42.1,
+   "fat": 10.8,
+   "notes": "supuestos: 'babso' = banano de 150 g con cáscara retirada"
   }
  ]
 }
