@@ -4313,8 +4313,15 @@
     "weight": 75,
     "reps": 12,
     "rpe": 9
+   },
+   {
+    "exerciseId": "prensa",
+    "set": 2,
+    "weight": 75,
+    "reps": 15,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1795263756796
+  "updatedAt": 1795264161233
  }
 ]
