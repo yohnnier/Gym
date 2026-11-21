@@ -2644,12 +2644,20 @@
      "prot": 24.0,
      "carb": 2.6,
      "fat": 1.4
+    },
+    {
+     "food": "Plátano (banano)",
+     "g": 160,
+     "kcal": 142.4,
+     "prot": 1.7,
+     "carb": 36.5,
+     "fat": 0.5
     }
    ],
-   "kcal": 269,
-   "prot": 32.3,
-   "carb": 13.1,
-   "fat": 9.2,
+   "kcal": 411.4,
+   "prot": 34.0,
+   "carb": 49.6,
+   "fat": 9.7,
    "notes": "kéfir entero (mismos valores que registros anteriores)"
   }
  ]
