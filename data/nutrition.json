@@ -2623,6 +2623,34 @@
    "carb": 42.1,
    "fat": 10.8,
    "notes": "supuestos: 'babso' = banano de 150 g con cáscara retirada"
+  },
+  {
+   "id": "2026-11-21-colacion-1",
+   "date": "2026-11-21",
+   "meal": "colación",
+   "items": [
+    {
+     "food": "Kéfir",
+     "g": 250,
+     "kcal": 150,
+     "prot": 8.3,
+     "carb": 10.5,
+     "fat": 7.8
+    },
+    {
+     "food": "Proteína vegana Revitta (1 medida)",
+     "g": 33,
+     "kcal": 119,
+     "prot": 24.0,
+     "carb": 2.6,
+     "fat": 1.4
+    }
+   ],
+   "kcal": 269,
+   "prot": 32.3,
+   "carb": 13.1,
+   "fat": 9.2,
+   "notes": "kéfir entero (mismos valores que registros anteriores)"
   }
  ]
 }
