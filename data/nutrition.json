@@ -2659,6 +2659,50 @@
    "carb": 49.6,
    "fat": 9.7,
    "notes": "kéfir entero (mismos valores que registros anteriores)"
+  },
+  {
+   "id": "2026-11-21-almuerzo",
+   "date": "2026-11-21",
+   "meal": "almuerzo",
+   "items": [
+    {
+     "food": "Pernil de pollo asado con piel (2 medianos, parte comestible)",
+     "g": 280,
+     "kcal": 645,
+     "prot": 67,
+     "carb": 0,
+     "fat": 42
+    },
+    {
+     "food": "Arvejas con papa (guiso)",
+     "g": 100,
+     "kcal": 90,
+     "prot": 3.5,
+     "carb": 13,
+     "fat": 2.5
+    },
+    {
+     "food": "Arroz blanco cocido",
+     "g": 100,
+     "kcal": 130,
+     "prot": 2.7,
+     "carb": 28.2,
+     "fat": 0.3
+    },
+    {
+     "food": "Choclo (1 de ~10 cm, granos)",
+     "g": 75,
+     "kcal": 72,
+     "prot": 2.5,
+     "carb": 15.7,
+     "fat": 1
+    }
+   ],
+   "kcal": 937,
+   "prot": 75.7,
+   "carb": 56.9,
+   "fat": 45.8,
+   "notes": "supuestos: pernil mediano ~200 g con hueso = ~140 g comestible, con piel; guiso con algo de aceite"
   }
  ]
 }
