@@ -4491,8 +4491,15 @@
     "weight": 40,
     "reps": 17,
     "rpe": 10
+   },
+   {
+    "exerciseId": "curl-martillo-polea",
+    "set": 1,
+    "weight": 85,
+    "reps": 10,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1795360304955
+  "updatedAt": 1795360373351
  }
 ]
