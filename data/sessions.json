@@ -4536,5 +4536,29 @@
    }
   ],
   "updatedAt": 1795361052099
+ },
+ {
+  "id": "mwtcldu5pex7a",
+  "date": "2026-11-23",
+  "createdAt": 1795443317069,
+  "routineId": "dia-pierna-b",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "hip-thrust",
+    "set": 1,
+    "weight": 37.5,
+    "reps": 13,
+    "rpe": 9
+   },
+   {
+    "exerciseId": "hip-thrust",
+    "set": 2,
+    "weight": 40,
+    "reps": 12,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1795443493568
  }
 ]
