@@ -4592,8 +4592,15 @@
     "weight": 40,
     "reps": 15,
     "rpe": 10
+   },
+   {
+    "exerciseId": "extension-cuadriceps",
+    "set": 2,
+    "weight": 47.5,
+    "reps": 16,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1795444393362
+  "updatedAt": 1795444647928
  }
 ]
