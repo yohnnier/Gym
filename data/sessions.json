@@ -4732,21 +4732,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 10,
+    "weight": 20,
     "reps": 20,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 15,
+    "weight": 30,
     "reps": 12,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 15,
+    "weight": 30,
     "reps": 11,
     "rpe": 10
    },
@@ -4756,8 +4756,15 @@
     "weight": 25,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 2,
+    "weight": 25,
+    "reps": 14,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1795531144186
+  "updatedAt": 1795531604274
  }
 ]
