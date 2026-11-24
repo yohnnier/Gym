@@ -4711,11 +4711,18 @@
    {
     "exerciseId": "press-pecho-maquina",
     "set": 1,
-    "weight": 45,
+    "weight": 40,
     "reps": 10,
-    "rpe": 9
+    "rpe": 10
+   },
+   {
+    "exerciseId": "press-pecho-maquina",
+    "set": 2,
+    "weight": 40,
+    "reps": 10,
+    "rpe": null
    }
   ],
-  "updatedAt": 1795528975701
+  "updatedAt": 1795530298541
  }
 ]
