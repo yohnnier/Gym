@@ -56,7 +56,7 @@ python3 -m http.server 8000
    ```
 
 3. En el repositorio, ve a **Settings → Pages** y en **Source** elige **GitHub Actions**.
-4. El workflow `.github/workflows/pages.yml` publica la app en cada push a `main`. La URL será `https://TU_USUARIO.github.io/rutinas/`.
+4. GitHub Pages (Settings → Pages → Deploy from a branch → `main` / raíz) publica la app en cada push a `main`. La URL será `https://TU_USUARIO.github.io/rutinas/`.
 5. Ábrela en el celular y usa **Agregar a pantalla de inicio** para instalarla.
 
 ## Personalizar la rutina

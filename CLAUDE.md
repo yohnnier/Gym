@@ -1,6 +1,6 @@
 # Rutinas — guía para quien continúe el proyecto
 
-PWA en JavaScript puro (sin dependencias ni compilación) para registrar rutinas de gimnasio y cardio. El dueño la usa en el celular, en el gimnasio. Se publica en GitHub Pages con el workflow `.github/workflows/pages.yml` en **cada push a `main`**.
+PWA en JavaScript puro (sin dependencias ni compilación) para registrar rutinas de gimnasio y cardio. El dueño la usa en el celular, en el gimnasio. Se publica en GitHub Pages desde la rama `main` (Pages "Deploy from a branch", con `.nojekyll`) en **cada push a `main`**. No agregues un workflow de despliegue: competía con el de GitHub y mandaba correos de fallo al usuario.
 
 ## Cómo trabajar con el usuario
 - Habla **español**, claro y corto. Escribe rápido y con errores de tipeo: interpreta la intención. Valora que le expliques el "porqué" en palabras simples.
