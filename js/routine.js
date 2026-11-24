@@ -186,7 +186,7 @@ const HOMBROS = {
     {
       id: 'press-hombro-maquina', name: 'Press de hombros en máquina', muscle: 'hombros', secondary: ['triceps'],
       sets: 3, repMin: 8, repMax: 12, rest: 120, restText: '2 min',
-      unit: 'kg', step: 5, provisional: true,
+      unit: 'kg/lado', step: 2.5, provisional: true,
       notes: 'Rango y descanso sugeridos: ajústalos a tu rutina. Sin arquear la zona lumbar.'
     },
     {

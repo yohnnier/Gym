@@ -324,21 +324,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 12,
     "rpe": 8.5
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 9,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 6,
     "rpe": 10
    },
@@ -378,7 +378,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1793541828782
+  "updatedAt": 1795531144186
  },
  {
   "id": "chat-2026-10-07-dia-tiron",
@@ -983,21 +983,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 13,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 12,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 8,
     "rpe": 10
    },
@@ -1107,7 +1107,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1793541711675
+  "updatedAt": 1795531144186
  },
  {
   "id": "mv5fbsbklfr3x",
@@ -1691,21 +1691,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 14,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 13,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 11,
     "rpe": 10
    },
@@ -1838,7 +1838,7 @@
     "rpe": 9
    }
   ],
-  "updatedAt": 1792251218570
+  "updatedAt": 1795531144186
  },
  {
   "id": "mvdzqqeg4wx5a",
@@ -2408,7 +2408,7 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 11,
     "rpe": 10,
     "altOrder": true
@@ -2416,7 +2416,7 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 10,
     "rpe": 10,
     "altOrder": true
@@ -2424,7 +2424,7 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 7,
     "rpe": 10,
     "altOrder": true
@@ -2521,7 +2521,7 @@
     "rpe": 9
    }
   ],
-  "updatedAt": 1792857252315
+  "updatedAt": 1795531144186
  },
  {
   "id": "mvnyi55p24nyb",
@@ -3035,21 +3035,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 12,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 9,
     "rpe": 8
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 8,
     "rpe": 10
    },
@@ -3124,7 +3124,7 @@
     "rpe": 9
    }
   ],
-  "updatedAt": 1793371521630
+  "updatedAt": 1795531144186
  },
  {
   "id": "mvxzdm356jv4f",
@@ -3653,21 +3653,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 13,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 20,
+    "weight": 10,
     "reps": 13,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 20,
+    "weight": 10,
     "reps": 13,
     "rpe": 10
    },
@@ -3717,7 +3717,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1794409651063
+  "updatedAt": 1795531144186
  },
  {
   "id": "mwdznp8t8nil8",
@@ -4174,21 +4174,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 20,
     "rpe": 8
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 30,
+    "weight": 15,
     "reps": 15,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 30,
+    "weight": 15,
     "reps": 15,
     "rpe": 10
    },
@@ -4277,7 +4277,7 @@
     "rpe": 10
    }
   ],
-  "updatedAt": 1795209395963
+  "updatedAt": 1795531144186
  },
  {
   "id": "mwqdapjz89ghv",
@@ -4732,21 +4732,21 @@
    {
     "exerciseId": "press-hombro-maquina",
     "set": 1,
-    "weight": 20,
+    "weight": 10,
     "reps": 20,
     "rpe": 9
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 2,
-    "weight": 30,
+    "weight": 15,
     "reps": 12,
     "rpe": 10
    },
    {
     "exerciseId": "press-hombro-maquina",
     "set": 3,
-    "weight": 30,
+    "weight": 15,
     "reps": 11,
     "rpe": 10
    },
@@ -4758,6 +4758,6 @@
     "rpe": 9
    }
   ],
-  "updatedAt": 1795531067786
+  "updatedAt": 1795531144186
  }
 ]
