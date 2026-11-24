@@ -4679,5 +4679,22 @@
    }
   ],
   "updatedAt": 1795448264791
+ },
+ {
+  "id": "mwuqpu7irzojd",
+  "date": "2026-11-24",
+  "createdAt": 1795527505710,
+  "routineId": "dia-torso-a",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "jalon-pecho",
+    "set": 1,
+    "weight": 45,
+    "reps": 10,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1795527505711
  }
 ]
