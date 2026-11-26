@@ -806,17 +806,22 @@ function doseCard() {
       'Próxima: ' + longDay(dose.proxima) + ' (' + fmtDate(dose.proxima) + ')' + (dose.ultima ? ' · última: ' + fmtDate(dose.ultima) : '') + ' · cada ' + dose.intervalo + ' días.' +
       (d === 0 ? ' Hoy te toca: confírmala cuando te la pongas.' : d < 0 ? ' Se pasó la fecha: si ya te la pusiste, márcala; si se corrió, cambia la fecha.' : '')));
   const panel = h('div', { style: 'margin-top:10px' });
-  const dateIn = h('input', { type: 'date', value: todayISO(), max: todayISO(), 'aria-label': 'Fecha de aplicación' });
+  // Si la dosis estaba para un dia ya pasado, se propone ese dia (lo normal es marcarla tarde, no ponerla tarde)
+  const dateIn = h('input', { type: 'date', value: dose.proxima < todayISO() ? dose.proxima : todayISO(), max: todayISO(), 'aria-label': 'Fecha de aplicación' });
   const moveIn = h('input', { type: 'date', value: dose.proxima, min: todayISO(), 'aria-label': 'Nueva fecha' });
   const open = (kind) => {
     panel.replaceChildren();
     if (kind === 'done') {
-      panel.append(h('label', { class: 'small muted' }, '¿Qué día te la pusiste?'), dateIn,
+      const when = h('p', { class: 'small', style: 'margin:6px 0 0' });
+      const showWhen = () => { when.textContent = isoOk(dateIn.value) ? 'Se anotará el ' + longDay(dateIn.value) + ' y la próxima quedará el ' + longDay(isoAdd(dateIn.value, dose.intervalo)) + '.' : ''; };
+      dateIn.addEventListener('input', showWhen); dateIn.addEventListener('change', showWhen); showWhen();
+      panel.append(h('label', { class: 'small muted' }, '¿Qué día te la pusiste? Cámbiala si no fue hoy.'), dateIn, when,
         h('button', { class: 'btn primary', type: 'button', style: 'margin-top:8px', onclick: () => {
           if (!isoOk(dateIn.value)) { toast('Elige la fecha.'); return; }
-          dose.ultima = dateIn.value; dose.aplicadas = (dose.aplicadas || []).filter((x) => x !== dateIn.value).concat(dateIn.value).sort();
-          dose.proxima = isoAdd(dateIn.value, dose.intervalo); saveDose();
-          toast('Anotada. Próxima: ' + fmtDate(dose.proxima) + '.'); render();
+          dose.aplicadas = (dose.aplicadas || []).filter((x) => x !== dateIn.value).concat(dateIn.value).sort();
+          dose.ultima = dose.aplicadas[dose.aplicadas.length - 1];
+          dose.proxima = isoAdd(dose.ultima, dose.intervalo); saveDose();
+          toast('Anotada el ' + longDay(dateIn.value) + '. Próxima: ' + longDay(dose.proxima) + '.'); render();
         } }, 'Guardar y calcular la próxima'));
     } else if (kind === 'move') {
       panel.append(h('label', { class: 'small muted' }, 'Nueva fecha de la próxima aplicación'), moveIn,
@@ -827,6 +832,17 @@ function doseCard() {
     } else if (kind === 'cfg') {
       const nom = h('input', { type: 'text', value: dose.nombre || '', 'aria-label': 'Nombre' });
       const inter = h('input', { type: 'number', inputmode: 'numeric', min: '1', max: '90', value: String(dose.intervalo), 'aria-label': 'Cada cuántos días' });
+      // Ultimas aplicaciones: se puede quitar una anotada por error (la proxima se recalcula con la anterior)
+      const apl = (dose.aplicadas || []).slice(-6).reverse();
+      const list = h('div', { style: 'margin-top:10px' }, h('label', { class: 'small muted' }, 'Últimas aplicaciones (quita la que esté mal)'),
+        ...apl.map((iso) => h('div', { class: 'row', style: 'justify-content:space-between;align-items:center;margin-top:4px' },
+          h('span', { class: 'small' }, longDay(iso)),
+          h('button', { class: 'btn small', type: 'button', 'aria-label': 'Quitar ' + iso, onclick: () => {
+            if (!confirm('¿Quitar la aplicación del ' + longDay(iso) + '?')) return;
+            dose.aplicadas = dose.aplicadas.filter((x) => x !== iso);
+            if (dose.aplicadas.length) { dose.ultima = dose.aplicadas[dose.aplicadas.length - 1]; dose.proxima = isoAdd(dose.ultima, dose.intervalo); }
+            saveDose(); toast('Quitada. Próxima: ' + longDay(dose.proxima) + '.'); render();
+          } }, '✕'))));
       panel.append(h('label', { class: 'small muted' }, 'Nombre'), nom, h('label', { class: 'small muted' }, 'Cada cuántos días'), inter,
         h('div', { class: 'row wrap', style: 'margin-top:8px' },
           h('button', { class: 'btn primary', type: 'button', onclick: () => {
@@ -836,7 +852,7 @@ function doseCard() {
             if (n !== dose.intervalo && dose.ultima) dose.proxima = isoAdd(dose.ultima, n);
             dose.intervalo = n; saveDose(); toast('Guardado.'); render();
           } }, 'Guardar'),
-          h('button', { class: 'btn', type: 'button', onclick: () => { if (confirm('¿Borrar el recordatorio de este dispositivo?')) { dose = null; try { localStorage.removeItem(DOSE_KEY); } catch (e) { /* sin almacenamiento */ } render(); } } }, 'Borrar recordatorio')));
+          h('button', { class: 'btn', type: 'button', onclick: () => { if (confirm('¿Borrar el recordatorio de este dispositivo?')) { dose = null; try { localStorage.removeItem(DOSE_KEY); } catch (e) { /* sin almacenamiento */ } render(); } } }, 'Borrar recordatorio')), apl.length ? list : '');
     }
   };
   card.append(h('div', { class: 'row wrap' },

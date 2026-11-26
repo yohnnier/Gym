@@ -201,6 +201,29 @@ function sess(id, date, routineId, exId, weight, reps) {
     await c.close();
   }
 
+  console.log('Dosis');
+  {
+    // Ficticio: tocaba el 24-nov y se marca el 26 -> propone el 24; la proxima sale de la fecha elegida
+    const D = { nombre: 'Prueba', intervalo: 5, proxima: '2026-11-24', ultima: '2026-11-19', aplicadas: ['2026-11-14', '2026-11-19'] };
+    const a = await open({ 'rutinas.dose.v1': D }, '#/salud', '2026-11-26T19:00:00-03:00');
+    await a.page.getByRole('button', { name: '✅ Ya me la puse' }).click();
+    const v = await a.page.inputValue('input[aria-label="Fecha de aplicación"]');
+    check('atrasada: propone el día que tocaba', v === '2026-11-24', v);
+    await a.page.fill('input[aria-label="Fecha de aplicación"]', '2026-11-25');
+    await a.page.getByRole('button', { name: 'Guardar y calcular la próxima' }).click();
+    await a.page.waitForTimeout(200);
+    let d = await a.page.evaluate(() => JSON.parse(localStorage.getItem('rutinas.dose.v1')));
+    check('guarda la fecha elegida y calcula la próxima', d.ultima === '2026-11-25' && d.proxima === '2026-11-30', d);
+    await a.page.locator('section.dose button[aria-label="Ajustes"]').click();
+    a.page.once('dialog', (dl) => dl.accept());
+    await a.page.getByRole('button', { name: 'Quitar 2026-11-25' }).click();
+    await a.page.waitForTimeout(200);
+    d = await a.page.evaluate(() => JSON.parse(localStorage.getItem('rutinas.dose.v1')));
+    check('quitar una aplicación vuelve a la anterior', d.ultima === '2026-11-19' && d.proxima === '2026-11-24' && d.aplicadas.indexOf('2026-11-25') === -1, d);
+    check('sin errores en la dosis', a.errors.length === 0, a.errors);
+    await a.close();
+  }
+
   console.log('Copia de seguridad');
   {
     const a = await open({ 'rutinas.weight.v1': WEIGHTS, 'rutinas.waist.v1': { entries: [{ date: '2026-10-30', cm: 90, hip: 98 }] } });
