@@ -4822,5 +4822,22 @@
    }
   ],
   "updatedAt": 1795532607953
+ },
+ {
+  "id": "mwxzh0aal0s29",
+  "date": "2026-11-26",
+  "createdAt": 1795723608754,
+  "routineId": "dia-pierna-a",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "sentadilla-pendular",
+    "set": 1,
+    "weight": 20,
+    "reps": 12,
+    "rpe": null
+   }
+  ],
+  "updatedAt": 1795723608755
  }
 ]
