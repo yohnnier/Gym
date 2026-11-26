@@ -4871,8 +4871,15 @@
     "weight": 35,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "pantorrillas-prensa",
+    "set": 2,
+    "weight": 35,
+    "reps": 25,
+    "rpe": 9
    }
   ],
-  "updatedAt": 1795726244647
+  "updatedAt": 1795726330565
  }
 ]
