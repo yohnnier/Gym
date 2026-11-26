@@ -4855,10 +4855,10 @@
     "exerciseId": "prensa",
     "set": 2,
     "weight": 85,
-    "reps": 10,
-    "rpe": 9
+    "reps": 12,
+    "rpe": null
    }
   ],
-  "updatedAt": 1795725253734
+  "updatedAt": 1795725509630
  }
 ]
