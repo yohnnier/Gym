@@ -5000,8 +5000,15 @@
     "weight": 140,
     "reps": 20,
     "rpe": 9
+   },
+   {
+    "exerciseId": "pullover-polea",
+    "set": 3,
+    "weight": 150,
+    "reps": 20,
+    "rpe": null
    }
   ],
-  "updatedAt": 1795879063733
+  "updatedAt": 1795879081217
  }
 ]
