@@ -388,14 +388,17 @@ function renderHome(root) {
   const wl = waistSorted(), wlast = wl[wl.length - 1];
   if (!wlast || daysSince(wlast.date) >= WAIST_DAYS) notes.push(h('button', { class: 'card body-link warm', type: 'button', onclick: () => go('#/salud') },
     h('div', {}, h('strong', {}, '📏 Toca medir el abdomen'), h('div', { class: 'muted small' }, wlast ? 'Última: ' + fmt(wlast.cm) + ' cm · ' + agoText(wlast.date) : 'Aún sin medidas')), h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
+  const bd = bodyNextDays();
+  if (bd !== null && bd >= 1 && bd <= 2) notes.push(h('button', { class: 'card body-link warm', type: 'button', onclick: () => go('#/salud') },
+    h('div', {}, h('strong', {}, '📊 Control de bioimpedancia · ' + bodyNextText(bd)), h('div', { class: 'muted small' }, longDay(bodyNextDate()) + ': llega en ayunas y sin entrenar antes')), h('span', { class: 'day-go', 'aria-hidden': 'true' }, '›')));
   notes.forEach((n) => root.append(n));
   // Aviso de control corporal: pasan 5 semanas desde el ultimo
   const lbody = lastBody();
   let snoozed = 0;
   try { snoozed = +localStorage.getItem(SNOOZE_KEY) || 0; } catch (e) { /* sin almacenamiento */ }
-  if (lbody && daysSince(lbody.date) >= BODY_REMIND_DAYS && Date.now() > snoozed) {
+  if (lbody && bd !== null && bd <= 0 && Date.now() > snoozed) {
     root.append(h('section', { class: 'card warm remind' },
-      h('strong', {}, '📏 Toca un nuevo control corporal'),
+      h('strong', {}, '📊 Toca el control de bioimpedancia'),
       h('p', { class: 'small', style: 'margin:4px 0 10px' }, 'Tu último control fue el ' + fmtDate(lbody.date) + ' (hace ' + daysSince(lbody.date) + ' días). Hazlo en las mismas condiciones: en ayunas o a la misma hora, sin entrenar antes, para poder comparar.'),
       h('div', { class: 'row wrap' },
         h('button', { class: 'btn primary small', type: 'button', onclick: () => go('#/cuerpo') }, 'Registrar control'),
@@ -463,7 +466,7 @@ function linkCard(title, sub, hash) {
 // ---------- Salud: peso, abdomen, dosis, cuerpo y examenes ----------
 function renderSalud(root) {
   root.append(h('section', { class: 'hero' }, h('h2', {}, 'Salud'), h('p', {}, '🔒 Datos privados: se guardan en tu celular y en tu repositorio privado, nunca en el público.')));
-  root.append(weightCard(), waistCard(), doseCard());
+  root.append(weightCard(), waistCard(), doseCard(), bodyNextCard());
   const lb = lastBody();
   root.append(linkCard('🧍 Mi cuerpo', lb
     ? 'Último control ' + fmtDate(lb.date) + (lb.peso ? ' · ' + fmt(lb.peso) + ' kg' : '') + (lb.grasa ? ' · ' + fmt(lb.grasa) + ' % grasa' : '') + ' · calorías basales'

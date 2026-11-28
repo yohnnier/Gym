@@ -224,6 +224,27 @@ function sess(id, date, routineId, exId, weight, reps) {
     await a.close();
   }
 
+  console.log('Próximo control de bioimpedancia');
+  {
+    const B = { profile: {}, controls: [{ id: 'c1', date: '2026-11-15', peso: 80, grasa: 20, tmb: 1700 }] };
+    const a = await open({ 'rutinas.body.v1': B }, '#/', '2026-12-13T09:00:00-03:00');
+    const r = await a.page.evaluate(() => ({ next: bodyNextDate(), d: bodyNextDays() }));
+    check('sin fecha elegida: último control + 30 días', r.next === '2026-12-15' && r.d === 2, r);
+    check('en Hoy avisa 2 días antes', /Control de bioimpedancia · en 2 días/.test(await a.page.locator('#app').innerText()));
+    await a.page.evaluate(() => go('#/salud'));
+    await a.page.waitForTimeout(200);
+    await a.page.getByRole('button', { name: '📆 Cambiar fecha' }).last().click();
+    await a.page.fill('input[aria-label="Fecha del próximo control"]', '2026-12-20');
+    await a.page.getByRole('button', { name: 'Guardar fecha' }).click();
+    await a.page.waitForTimeout(200);
+    const r2 = await a.page.evaluate(() => ({ next: bodyNextDate(), saved: JSON.parse(localStorage.getItem('rutinas.body.v1')).nextControl, ics: /DTSTART:20261220T080000/.test(bodyIcs()) }));
+    check('guarda la fecha elegida (se sincroniza con el cuerpo) y el calendario la usa', r2.next === '2026-12-20' && r2.saved === '2026-12-20' && r2.ics, r2);
+    const r3 = await a.page.evaluate(() => { body.controls.push({ id: 'c2', date: '2026-12-21', peso: 79 }); return bodyNextDate(); });
+    check('con un control nuevo vuelve a contar 30 días desde él', r3 === '2027-01-20', r3);
+    check('sin errores en el próximo control', a.errors.length === 0, a.errors);
+    await a.close();
+  }
+
   console.log('Copia de seguridad');
   {
     const a = await open({ 'rutinas.weight.v1': WEIGHTS, 'rutinas.waist.v1': { entries: [{ date: '2026-10-30', cm: 90, hip: 98 }] } });

@@ -764,6 +764,55 @@ function waistCard() {
   return card;
 }
 
+// ---------- proximo control de bioimpedancia (Fitdays) ----------
+// Fecha: la que elija el usuario (body.nextControl, se sincroniza con el cuerpo) o el ultimo control + BODY_REMIND_DAYS.
+// Una fecha elegida que ya quedo antes del ultimo control no cuenta (se registro un control nuevo).
+function bodyNextDate() {
+  const lb = lastBody();
+  if (body.nextControl && isoOk(body.nextControl) && (!lb || body.nextControl > lb.date)) return body.nextControl;
+  return lb ? isoAdd(lb.date, BODY_REMIND_DAYS) : null;
+}
+function bodyNextDays() { const n = bodyNextDate(); return n ? Math.round((isoToDate(n) - isoToDate(todayISO())) / DAY) : null; }
+function bodyNextText(d) { return d > 1 ? 'en ' + d + ' días' : d === 1 ? 'mañana' : d === 0 ? 'HOY' : 'atrasado ' + (-d) + (d === -1 ? ' día' : ' días'); }
+function bodyIcs() {
+  const d = bodyNextDate().replace(/-/g, '');
+  const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const alarm = (trig, txt) => ['BEGIN:VALARM', 'TRIGGER:' + trig, 'ACTION:DISPLAY', 'DESCRIPTION:' + txt, 'END:VALARM'];
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Rutinas//ES', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+    'UID:control-' + d + '@rutinas', 'DTSTAMP:' + now, 'DTSTART:' + d + 'T080000', 'DTEND:' + d + 'T081500',
+    'SUMMARY:📊 Control de bioimpedancia (Fitdays)',
+    'DESCRIPTION:En ayunas\\, sin entrenar antes y con estatura 172 cm. Regístralo en la app Rutinas (Salud › Mi cuerpo).']
+    .concat(alarm('-P2D', 'En 2 días toca el control de bioimpedancia'), alarm('-PT12H', 'Mañana toca el control: llega en ayunas'), ['END:VEVENT', 'END:VCALENDAR']).join('\r\n');
+}
+function bodyNextCard() {
+  const next = bodyNextDate();
+  if (!next) return linkCard('📊 Control de bioimpedancia', 'Registra tu primer control en Mi cuerpo y la app te avisará cuándo toca el siguiente', '#/cuerpo');
+  const lb = lastBody(), d = bodyNextDays();
+  const card = h('section', { class: 'card dose' + (d <= 2 ? ' warm' : '') });
+  card.append(h('strong', {}, '📊 Control de bioimpedancia · ' + (d === 0 ? 'toca HOY' : d < 0 ? bodyNextText(d) : 'próximo ' + bodyNextText(d))),
+    h('p', { class: 'small', style: 'margin:4px 0 10px' },
+      'Próximo: ' + longDay(next) + ' (' + fmtDate(next) + ')' + (lb ? ' · último: ' + fmtDate(lb.date) : '') + (body.nextControl === next ? ' · fecha elegida por ti.' : ' · cada ' + BODY_REMIND_DAYS + ' días.') +
+      ' Hazlo en ayunas, sin entrenar antes y con estatura 172 cm.'));
+  const panel = h('div', { style: 'margin-top:10px' });
+  const moveIn = h('input', { type: 'date', value: next, min: todayISO(), 'aria-label': 'Fecha del próximo control' });
+  card.append(h('div', { class: 'row wrap' },
+    h('button', { class: 'btn primary small', type: 'button', onclick: () => go('#/cuerpo') }, '➕ Registrar control'),
+    h('button', { class: 'btn small', type: 'button', onclick: () => {
+      panel.replaceChildren(h('label', { class: 'small muted' }, 'Fecha del próximo control'), moveIn,
+        h('div', { class: 'row wrap', style: 'margin-top:8px' },
+          h('button', { class: 'btn primary', type: 'button', onclick: () => {
+            if (!isoOk(moveIn.value)) { toast('Elige la fecha.'); return; }
+            body.nextControl = moveIn.value; saveBody(); toast('Próximo control: ' + longDay(moveIn.value) + '.'); render();
+          } }, 'Guardar fecha'),
+          body.nextControl ? h('button', { class: 'btn', type: 'button', onclick: () => {
+            delete body.nextControl; saveBody(); toast('Vuelve a cada ' + BODY_REMIND_DAYS + ' días.'); render();
+          } }, 'Usar cada ' + BODY_REMIND_DAYS + ' días') : ''));
+    } }, '📆 Cambiar fecha'),
+    h('button', { class: 'btn small', type: 'button', onclick: () => download('control-bioimpedancia.ics', bodyIcs(), 'text/calendar') }, '📅 Al calendario')),
+    panel);
+  return card;
+}
+
 // ---------- recordatorio de aplicacion ----------
 const isoOk = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
 function doseDays() { return Math.round((isoToDate(dose.proxima) - isoToDate(todayISO())) / DAY); }
