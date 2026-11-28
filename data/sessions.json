@@ -5021,8 +5021,15 @@
     "weight": 25,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "remo-lineal",
+    "set": 3,
+    "weight": 25,
+    "reps": 15,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1795879966755
+  "updatedAt": 1795880641980
  }
 ]
