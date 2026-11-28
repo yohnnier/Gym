@@ -4958,5 +4958,22 @@
    }
   ],
   "updatedAt": 1795729585143
+ },
+ {
+  "id": "mx0jac7r3j9eu",
+  "date": "2026-11-28",
+  "createdAt": 1795877822295,
+  "routineId": "dia-torso-b",
+  "source": "app",
+  "entries": [
+   {
+    "exerciseId": "press-inclinado",
+    "set": 1,
+    "weight": 15,
+    "reps": 15,
+    "rpe": 9
+   }
+  ],
+  "updatedAt": 1795877826160
  }
 ]
