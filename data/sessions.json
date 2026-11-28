@@ -4972,8 +4972,15 @@
     "weight": 15,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "press-inclinado",
+    "set": 2,
+    "weight": 25,
+    "reps": 7,
+    "rpe": null
    }
   ],
-  "updatedAt": 1795877826160
+  "updatedAt": 1795877839672
  }
 ]
