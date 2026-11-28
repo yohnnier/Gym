@@ -5119,8 +5119,15 @@
     "weight": 70,
     "reps": 15,
     "rpe": 9
+   },
+   {
+    "exerciseId": "extension-polea-sobre-cabeza",
+    "set": 3,
+    "weight": 70,
+    "reps": 13,
+    "rpe": 10
    }
   ],
-  "updatedAt": 1795884309088
+  "updatedAt": 1795884660016
  }
 ]
